@@ -53,6 +53,9 @@ sigma_n <- sigma_c
 # Number of observations
 n <- ceiling(params$n)
 
+# Random seed
+set.seed(1007)
+
 # Collect the sample with n observations
 data <- data_generation(n = n)
 

@@ -1,0 +1,210 @@
+---
+title: |
+    | Planejamento e Análise de Experimentos (EEE933)
+    | Estudo de Caso 1
+#title: Planejamento e Análise de Experimentos (EEE933) Estudo de Caso 1
+author: Pedro Vinícius, Samara Silva e Savio Vieira
+date: 10 de Agosto de 2020
+output:
+  html_document:
+    df_print: paged
+  pdf_document:
+    fig_caption: yes
+doi: https://github.com/pedbrgs/Design-and-Analysis-of-Experiments
+pagetitle: Estudo de Caso 1
+---
+
+```{r setup,results='hide',warning=FALSE,echo=FALSE}
+# A few initial definitions just to make sure all required packages are installed. Change as needed.
+# NOTE: It may echo some weird messages to the PDF on the first compile (package installation messages). Run twice and the problem will (hopefully) go away. 
+if (!require(ggplot2, quietly = TRUE)){
+      install.packages("ggplot2")
+      }
+if (!require(devtools, quietly = TRUE)){
+      install.packages("devtools")
+      }
+ if (!require(broom, quietly = TRUE)){
+       devtools::install_github("dgrtwo/broom")
+      }
+if (!require(GGally, quietly = TRUE)){
+      install.packages("GGally")
+      }
+if (!require(ExpDE, quietly = TRUE)){
+      install.packages("ExpDE")
+      }
+```
+
+
+```{r, message = FALSE, warning = FALSE, results = 'hide', echo = FALSE}
+# ExpDE package (it was built under R version 3.6.1)
+library(ExpDE)
+# Statistical package
+library(stats)
+# Ggplot2 package
+library(ggplot2)
+# Plotly package
+library(plotly)
+```
+
+# Descrição do Problema
+
+```{r, results = 'hide', echo = FALSE}
+# ------------ Current version parameters (populational) ------------ #
+# Mean
+mu_c <- 50
+# Standard deviation
+sigma_c <- sqrt(100)
+# Variance
+sigma2_c <- sigma_c^2
+```
+
+```{r, results = 'hide', echo = FALSE}
+# Desired significance level (Type I error probability)
+alpha <- 0.01
+# Confidence level
+conf_level <- 1 - alpha
+# Minimally relevant effect size
+delta_star <- 4
+# Desired power (statistical power)
+pi <- 0.8
+# Type II error probability
+beta <- 1 - pi
+
+# Assuming equivalence of variances (initial estimate of the variance)
+sigma_n <- sigma_c
+```
+
+## Parte 1: Teste Sobre o Custo Médio
+
+### Planejamento dos Experimentos
+
+$$\begin{cases} H_0: \mu = 50&\\H_1: \mu<50\end{cases}$$
+
+```{r}
+# Define the sample size to be used in this experiment
+(params <- power.t.test(delta = delta_star,
+             sd = sigma_n,
+             sig.level = alpha, 
+             power = pi,
+             type = "one.sample",
+             alternative = "one.sided"))
+
+# Number of observations
+n <- ceiling(params$n)
+```
+
+### Coleta dos Dados
+
+```{r}
+data_generation <- function(n){
+  
+  mre <- list(name = "recombination_bin", cr = 0.9)
+  mmu <- list(name = "mutation_rand", f = 2)
+  mpo <- 100
+  mse <- list(name = "selection_standard")
+  mst <- list(names = "stop_maxeval", maxevals = 10000)
+  mpr <- list(name = "sphere", xmin = -seq(1, 20), xmax = 20 + 5 * seq(5, 24))
+  
+  sample <- c()
+  # Generate n observations
+  for (i in 1:n){
+    observation <- ExpDE(mpo, mmu, mre, mse, mst, mpr, 
+                    showpars = list(show.iters = "none"))$Fbest
+    sample <- c(sample, observation)
+  }
+  
+  return(sample)
+  
+}
+```
+
+```{r}
+# Random seed
+set.seed(1007)
+
+# Collect the sample with n observations
+sample <- data_generation(n = n)
+
+# Saves data to the csv file
+write.table(sample, file = 'sample.csv', row.names = FALSE, col.names = FALSE)
+```
+
+### Análise Exploratória de Dados
+
+```{r, echo = FALSE, results = 'hide'}
+# ------------ New version parameters (sample) ------------ #
+# Mean
+mu_n <- mean(sample)
+# Standard deviation
+sigma_n <- sd(sample)
+# Variance
+sigma2_n <- var(sample)
+```
+
+```{r, fig.height = 3, fig.width = 3, fig.align = 'center'}
+# Histogram
+histogram <- ggplot(data = as.data.frame(sample), mapping = aes(x = sample))
+histogram + geom_histogram(lwd = 0.3, bins = 20, color = 'black', fill = 'gray') +
+            scale_x_continuous(name = 'Amostra') + 
+            scale_y_continuous(name = 'Frequência')
+```
+
+```{r, fig.height = 3, fig.width = 3, fig.align = 'center'}
+# Boxplot
+boxplot <- ggplot(data = as.data.frame(sample), mapping = aes(y = sample))
+boxplot + geom_boxplot(lwd = 0.3) + 
+          scale_x_continuous(name = 'Amostra') + 
+          scale_y_continuous(name = '') + 
+          theme(axis.text.x = element_blank())
+```
+
+```{r, fig.height = 3, fig.width = 3, fig.align = 'center'}
+# QQ-Plot
+qqplot <- ggplot(data = as.data.frame(sample), mapping = aes(sample = sample))
+qqplot + geom_qq_line() + 
+         geom_qq() + 
+         scale_y_continuous(name = 'Amostra') + 
+         scale_x_continuous(name = 'Quantil')
+```
+
+### Análise Estatística
+
+```{r}
+# ------------ Hypothesis Testing ------------ #    
+(t_test <- t.test(x = sample, 
+                mu = mu_c, 
+                alternative = "less",
+                conf.level = conf_level))
+
+# Confidence Interval
+CI <- t_test$conf.int[1:2]
+```
+
+### Validação de Premissas
+
+```{r}
+# Wilcoxon Signed-Ranks Test, because it does not assume normality
+(wilcoxon_test <- wilcox.test(x = sample,
+                alternative = "less",
+                mu = mu_c, 
+                paired = FALSE, 
+                exact = NULL, 
+                correct = TRUE,
+                conf.int = FALSE, 
+                conf.level = conf_level))
+```
+
+## Parte 2: Teste Sobre a Variância do Custo
+
+## Planejamento dos Experimentos 
+
+$$\begin{cases} H_0: \sigma^2 = 100&\\H_1: \sigma^2<100\end{cases}$$
+
+```{r, results = 'hide', echo = FALSE}
+# Desired significance level (Type I error probability)
+alpha <- 0.05
+# Confidence level
+conf_level <- 1 - alpha
+```
+
+### Conclusões
