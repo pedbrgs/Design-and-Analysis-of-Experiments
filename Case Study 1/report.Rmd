@@ -46,6 +46,14 @@ library(ggplot2)
 library(plotly)
 ```
 
+# Introdução
+
+Lindsey (1996) define inferência estatística como o campo que se preocupa com o processo probabilístico relacionado a eventos já ocorridos e às ilações sobre a população que pode-se chegar com base nesse conhecimento, ou seja, extrair conclusões a partir de observações empíricas ou processos estocásticos.
+Neste trabalho, esse conceito será utilizado mediante a geração de dados experimentais da nova versão de um determinado software, seguida da análise comparativa quanto a variante já conhecida.
+
+Nessa perspectiva, é investigado se houve redução do custo médio de execução e/ou da variância conhecida. Para isso, em ambos os casos as hipóteses nulas foram definidas de maneira conservadora, partindo-se do pressuposto de que os parâmetros populacionais conhecidos foram mantidos na nova versão. 
+
+
 # Descrição do Problema
 
 ```{r, results = 'hide', echo = FALSE}
@@ -208,3 +216,6 @@ conf_level <- 1 - alpha
 ```
 
 ### Conclusões
+
+# Referências
+LINDSEY, James K. Parametric statistical inference. Oxford University Press, 1996.
