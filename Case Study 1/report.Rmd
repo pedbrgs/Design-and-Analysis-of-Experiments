@@ -90,7 +90,7 @@ sigma_n <- sigma_c
 
 A primeira fase desse experimento consiste em gerar uma amostra representativa do desempenho do novo software. Para isso, é necessário especificar o tamanho dessa amostra, considerando os critérios de análise pré-estabelecidos. A saber, nível de significância \(\alpha = 0.01\), efeito relevante de \(\delta^* = 4\), e poder de \(\pi = 1 - \beta = 0.8\).
 
-A esse respeito, o Poder do Teste assume especial relevância, pois é possível estimar o número de observações necessários com base nos critérios estatísticos pré-estabelecidos. DEFINIR PODER DO TESTE.
+Neste âmbito, o Poder do Teste pode ser considerado. Esse teste é originalmente usado para avaliar a hipótese nula, e rejeitá-la quando for falsa (...), porém também pode ser utilizado para estimar outros parâmetros amostrais, como efeito relevante, significância, poder e tamanho da amostra. Este último, é tido como critério de fundamental importância no planejamento da pesquisa, para reduzir o custo operacional, que é aproximadamente linear (KOCHER, JAFFE, JUN,1999).
 
 Todavia, para executar esse teste é necessário fornecer um dado inicial para variância, que ainda não é conhecida. A bibliografia sugere três maneiras de fazê-lo, ...
 
@@ -229,4 +229,7 @@ conf_level <- 1 - alpha
 ### Conclusões
 
 # Referências
+
+KOCHER, Paul; JAFFE, Joshua; JUN, Benjamin. Differential power analysis. In: Annual international cryptology conference. Springer, Berlin, Heidelberg, 1999. p. 388-397.
+
 LINDSEY, James K. Parametric statistical inference. Oxford University Press, 1996.
