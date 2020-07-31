@@ -10,6 +10,10 @@ output:
     fig_caption: yes
   html_document:
     df_print: paged
+indent: true
+header-includes: 
+    - \usepackage{indentfirst}
+bibliography: ref.bib
 doi: https://github.com/pedbrgs/Design-and-Analysis-of-Experiments
 pagetitle: Estudo de Caso 1
 ---
@@ -48,15 +52,13 @@ library(plotly)
 
 # Introdução
 
+<!--
 Lindsey (1996) define inferência estatística como o campo que se preocupa com o processo probabilístico relacionado a eventos já ocorridos e às ilações sobre a população que pode-se chegar com base nesse conhecimento, ou seja, trata-se de extrair conclusões para o universo de estudo a partir de observações empíricas ou processos estocásticos.
+-->
 
-Neste trabalho, esse conceito será utilizado mediante a geração de dados experimentais da nova versão de um determinado software, seguida da análise comparativa quanto a variante já conhecida. Nessa perspectiva, é investigado se houve redução do custo médio de execução e/ou da variância fornecida. Para isso, em ambos os casos as hipóteses nulas foram definidas de maneira conservadora, partindo-se do pressuposto de que os parâmetros populacionais conhecidos foram mantidos na nova versão. Posteriormente foram estabelecidas condições iniciais quanto à quantidade de observações, junto à coleta de dados, análise da distribuição amostral e aplicação dos testes.
+Uma versão atual de um software conhecido apresenta uma distribuição dos custos de execução com média populacional $\mu_c = 50$ e variância populacional $\sigma^2_c = 100$. Posteriormente, uma nova versão do software é desenvolvida, no qual deseja-se investigar prováveis melhorias de desempenho. Com esse intuito, duas análises estatísticas são propostas: (i) uma sobre o custo médio e (ii) uma sobre a variância do custo.
 
-Nas próximas seções é feito o detalhamento de cada uma dessas etapas.
-
-
-
-# Descrição do Problema
+Para ambos os casos, as hipóteses nulas foram definidas de maneira conservadora, partindo-se do pressuposto de que os parâmetros populacionais conhecidos foram mantidos na nova versão. A partir disso, diversas etapas foram conduzidas até a conclusão dos experimentos, entre elas a coleta de dados da distribuição dos custos do software novo, a análise exploratória dessa amostra, a inferência por meio dos testes estatísticos, a validação das premissas consideradas e as conclusões. As próximas seções contém o detalhamento técnico de cada uma dessas etapas.
 
 ```{r, results = 'hide', echo = FALSE}
 # ------------ Current version parameters (populational) ------------ #
@@ -88,16 +90,28 @@ sigma_n <- sigma_c
 
 ### Planejamento dos Experimentos
 
-A primeira fase desse experimento consiste em gerar uma amostra representativa do desempenho da nova versão do software. Para isso, é necessário especificar o tamanho dessa amostra, considerando os critérios de análise pré-estabelecidos. A saber, nível de significância \(\alpha = 0.01\), efeito relevante de \(\delta^* = 4\), e poder de \(\pi = 1 - \beta = 0.8\).
+No que se refere a primeira parte do estudo de caso, o teste terá que dispor de um nível de significância $\alpha = 0.01$, um tamanho de efeito de mínima relevância $\delta^* = 4$ e uma potência desejada $\pi = 1 - \beta = 0.8$. As hipóteses estatísticas foram definidas com o intuito de responder às questões propostas abaixo:
 
-Neste âmbito, o Poder do Teste pode ser considerado. Esse teste é originalmente usado para avaliar a hipótese nula, e rejeitá-la quando for falsa (...), porém também pode ser utilizado para estimar outros parâmetros amostrais, como efeito relevante, significância, poder e tamanho da amostra. Este último, é tido como critério de fundamental importância no planejamento da pesquisa, para reduzir o custo operacional, que é aproximadamente linear (KOCHER, JAFFE, JUN,1999).
+* Há alguma diferença entre o custo médio da versão nova do software e o custo médio da versão corrente?
+* Caso haja, qual a melhor versão em termos de custo médio?
 
-Contudo, para executar esse teste é necessário fornecer um valor inicial para variância, que ainda não é conhecida. A bibliografia sugere três maneiras de fazê-lo, ...
+Em concordância com a proposta de comparação de custo médio entre as versões, as hipóteses de teste podem ser formuladas sobre o parâmetro média:
+$$\begin{cases} H_0: \mu_n = 50&\\H_1: \mu_n<50\end{cases}$$
+onde a hipótese nula implica na igualdade entre os custos médios das versões e a hipótese alternativa unilateral na superioridade da nova versão em média.
 
-Considerando as vantagens e desvantagens de cada uma, optou-se por utilizar...
+  A fase subsequente desse experimento consiste em gerar uma amostra representativa do desempenho da nova versão do software. Para tal fim, é necessário especificar o tamanho dessa amostra, considerando as propriedades preestabelecidas do teste. A priori, o Poder do Teste é bastante conveniente, porém implica em um grande dilema. O cálculo do tamanho amostral requer uma estimativa da variância, que só é obtida através das observações contidas na amostra. As possibilidades mais práticas de se conduzir o experimento nesse caso são\cite{Campelo2018-LNDoE}:
 
+1. Utilização de conhecimento do problema para se obter uma estimativa (inicial) da variância;
+2. Condução do estudo com um tamanho amostral predefinido, como $N = 30$, o que poderia violar a potência desejada;
+3. Realização de um estudo piloto para estimar a variância dos dados a partir do tamanho de efeito de mínima relevância $\delta^*$.
 
-$$\begin{cases} H_0: \mu = 50&\\H_1: \mu<50\end{cases}$$
+Considerando as vantagens e desvantagens de cada uma, optou-se por utilizar a primeira abordagem. Por mais que essa estimativa seja sobre-estimada e os prováveis ganhos não sejam observados ao término do estudo, uma vez que se espera ganhos de variância da nova versão do software em relação à versão atual, pode-se considerar igualdade de variâncias como uma estimativa inicial, ou seja, $\sigma^2_n \approx \sigma^2_c = 100$. Entretanto, essa premissa será avaliada posteriormente na análise exploratória dos dados.
+
+Diante da estimativa inicial da variância amostral, o Poder do Teste pode ser finalmente realizado. Esse teste é originalmente usado para mensurar o controle do teste de hipóteses sobre o erro do tipo II ($\beta$), isto é, $P(\mbox{rejeitar}\ H_0|H_0 \ \mbox{é falso})$. No entanto, tal teste também pode ser utilizado para estimar outros parâmetros amostrais, como tamanho de efeito $\delta^*$, nível de significância $\alpha$, tamanho da amostra $N$, potência $\pi$ e desvio padrão amostral $\sigma_n$ \cite{PowerTest}. 
+
+<!--
+Este último, é tido como critério de fundamental importância no planejamento da pesquisa, para reduzir o custo operacional, que é aproximadamente linear (KOCHER, JAFFE, JUN, 1999).
+-->
 
 ```{r}
 # Define the sample size to be used in this experiment
@@ -111,6 +125,8 @@ $$\begin{cases} H_0: \mu = 50&\\H_1: \mu<50\end{cases}$$
 # Number of observations
 n <- ceiling(params$n)
 ```
+Assim, tem-se uma estimativa de $N = 66$ observações.
+
 
 ### Coleta dos Dados
 
@@ -137,15 +153,18 @@ data_generation <- function(n){
 }
 ```
 
-```{r}
+```{r, results = 'hide', echo = FALSE}
 # Random seed
-set.seed(1007)
+# set.seed(1007)
 
 # Collect the sample with n observations
-sample <- data_generation(n = n)
+# sample <- data_generation(n = n)
 
 # Saves data to the csv file
-write.table(sample, file = 'sample.csv', row.names = FALSE, col.names = FALSE)
+# write.table(sample, file = 'sample.csv', row.names = FALSE, col.names = FALSE)
+
+# Loads data from csv file
+sample <- read.csv('sample.csv', header = FALSE)$V1
 ```
 
 ### Análise Exploratória de Dados
@@ -217,7 +236,7 @@ CI <- t_test$conf.int[1:2]
 
 ## Planejamento dos Experimentos 
 
-$$\begin{cases} H_0: \sigma^2 = 100&\\H_1: \sigma^2<100\end{cases}$$
+$$\begin{cases} H_0: \sigma^2_n = 100&\\H_1: \sigma^2_n<100\end{cases}$$
 
 ```{r, results = 'hide', echo = FALSE}
 # Desired significance level (Type I error probability)
@@ -228,8 +247,12 @@ conf_level <- 1 - alpha
 
 ### Conclusões
 
-# Referências
+\renewcommand\refname{Referências}
+\bibliographystyle{plain}
+\bibliography{ref}
 
-KOCHER, Paul; JAFFE, Joshua; JUN, Benjamin. Differential power analysis. In: Annual international cryptology conference. Springer, Berlin, Heidelberg, 1999. p. 388-397.
+<!--
+KOCHER, Paul; JAFFE, Joshua; JUN, Benjamin. Differential Power Analysis. In: Annual international cryptology conference. Springer, Berlin, Heidelberg, 1999. p. 388-397.
 
-LINDSEY, James K. Parametric statistical inference. Oxford University Press, 1996.
+LINDSEY, James K. Parametric Statistical Inference. Oxford University Press, 1996.
+-->
