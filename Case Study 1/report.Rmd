@@ -88,11 +88,11 @@ sigma_n <- sigma_c
 
 ### Planejamento dos Experimentos
 
-A primeira fase desse experimento consiste em gerar uma amostra representativa do desempenho do novo software. Para isso, é necessário especificar o tamanho dessa amostra, considerando os critérios de análise pré-estabelecidos. A saber, nível de significância \(\alpha = 0.01\), efeito relevante de \(\delta^* = 4\), e poder de \(\pi = 1 - \beta = 0.8\).
+A primeira fase desse experimento consiste em gerar uma amostra representativa do desempenho da nova versão do software. Para isso, é necessário especificar o tamanho dessa amostra, considerando os critérios de análise pré-estabelecidos. A saber, nível de significância \(\alpha = 0.01\), efeito relevante de \(\delta^* = 4\), e poder de \(\pi = 1 - \beta = 0.8\).
 
 Neste âmbito, o Poder do Teste pode ser considerado. Esse teste é originalmente usado para avaliar a hipótese nula, e rejeitá-la quando for falsa (...), porém também pode ser utilizado para estimar outros parâmetros amostrais, como efeito relevante, significância, poder e tamanho da amostra. Este último, é tido como critério de fundamental importância no planejamento da pesquisa, para reduzir o custo operacional, que é aproximadamente linear (KOCHER, JAFFE, JUN,1999).
 
-Todavia, para executar esse teste é necessário fornecer um dado inicial para variância, que ainda não é conhecida. A bibliografia sugere três maneiras de fazê-lo, ...
+Contudo, para executar esse teste é necessário fornecer um valor inicial para variância, que ainda não é conhecida. A bibliografia sugere três maneiras de fazê-lo, ...
 
 Considerando as vantagens e desvantagens de cada uma, optou-se por utilizar...
 
