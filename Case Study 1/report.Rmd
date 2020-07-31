@@ -6,10 +6,10 @@ title: |
 author: Pedro Vinícius, Samara Silva e Savio Vieira
 date: 10 de Agosto de 2020
 output:
-  html_document:
-    df_print: paged
   pdf_document:
     fig_caption: yes
+  html_document:
+    df_print: paged
 doi: https://github.com/pedbrgs/Design-and-Analysis-of-Experiments
 pagetitle: Estudo de Caso 1
 ---
