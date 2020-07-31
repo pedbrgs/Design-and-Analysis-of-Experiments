@@ -1644,12 +1644,22 @@ Estudo de Caso 1</div></h1>
 <pre><code>## Registered S3 method overwritten by &#39;GGally&#39;:
 ##   method from   
 ##   +.gg   ggplot2</code></pre>
+<div id="introdução" class="section level1">
+<h1>Introdução</h1>
+<p>Lindsey (1996) define inferência estatística como o campo que se preocupa com o processo probabilístico relacionado a eventos já ocorridos e às ilações sobre a população que pode-se chegar com base nesse conhecimento, ou seja, trata-se de extrair conclusões para o universo de estudo a partir de observações empíricas ou processos estocásticos.</p>
+<p>Neste trabalho, esse conceito será utilizado mediante a geração de dados experimentais da nova versão de um determinado software, seguida da análise comparativa quanto a variante já conhecida. Nessa perspectiva, é investigado se houve redução do custo médio de execução e/ou da variância fornecida. Para isso, em ambos os casos as hipóteses nulas foram definidas de maneira conservadora, partindo-se do pressuposto de que os parâmetros populacionais conhecidos foram mantidos na nova versão. Posteriormente foram estabelecidas condições iniciais quanto à quantidade de observações, junto à coleta de dados, análise da distribuição amostral e aplicação dos testes.</p>
+<p>Nas próximas seções é feito o detalhamento de cada uma dessas etapas.</p>
+</div>
 <div id="descrição-do-problema" class="section level1">
 <h1>Descrição do Problema</h1>
 <div id="parte-1-teste-sobre-o-custo-médio" class="section level2">
 <h2>Parte 1: Teste Sobre o Custo Médio</h2>
 <div id="planejamento-dos-experimentos" class="section level3">
 <h3>Planejamento dos Experimentos</h3>
+<p>A primeira fase desse experimento consiste em gerar uma amostra representativa do desempenho do novo software. Para isso, é necessário especificar o tamanho dessa amostra, considerando os critérios de análise pré-estabelecidos. A saber, nível de significância <span class="math inline">\(\alpha = 0.01\)</span>, efeito relevante de <span class="math inline">\(\delta^* = 4\)</span>, e poder de <span class="math inline">\(\pi = 1 - \beta = 0.8\)</span>.</p>
+<p>A esse respeito, o Poder do Teste assume especial relevância, pois com ele é possível estimar o número de observações necessários com base nos critérios estatísticos pré-estabelecidos. DEFINIR PODER DO TESTE.</p>
+<p>Todavia, para executar esse teste é necessário fornecer um dado inicial para variância, que ainda não é conhecida. A bibliografia sugere três maneiras de fazê-lo, …</p>
+<p>Considerando as vantagens e desvantagens de cada uma, optou-se por utilizar…</p>
 <p><span class="math display">\[\begin{cases} H_0: \mu = 50&amp;\\H_1: \mu&lt;50\end{cases}\]</span></p>
 <pre class="r"><code># Define the sample size to be used in this experiment
 (params &lt;- power.t.test(delta = delta_star,
@@ -1774,6 +1784,10 @@ CI &lt;- t_test$conf.int[1:2]</code></pre>
 <h3>Conclusões</h3>
 </div>
 </div>
+</div>
+<div id="referências" class="section level1">
+<h1>Referências</h1>
+<p>LINDSEY, James K. Parametric statistical inference. Oxford University Press, 1996.</p>
 </div>
 
 
