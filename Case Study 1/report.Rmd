@@ -48,10 +48,12 @@ library(plotly)
 
 # Introdução
 
-Lindsey (1996) define inferência estatística como o campo que se preocupa com o processo probabilístico relacionado a eventos já ocorridos e às ilações sobre a população que pode-se chegar com base nesse conhecimento, ou seja, extrair conclusões a partir de observações empíricas ou processos estocásticos.
-Neste trabalho, esse conceito será utilizado mediante a geração de dados experimentais da nova versão de um determinado software, seguida da análise comparativa quanto a variante já conhecida.
+Lindsey (1996) define inferência estatística como o campo que se preocupa com o processo probabilístico relacionado a eventos já ocorridos e às ilações sobre a população que pode-se chegar com base nesse conhecimento, ou seja, extrair conclusões para o universo de estudo a partir de observações empíricas ou processos estocásticos.
 
-Nessa perspectiva, é investigado se houve redução do custo médio de execução e/ou da variância conhecida. Para isso, em ambos os casos as hipóteses nulas foram definidas de maneira conservadora, partindo-se do pressuposto de que os parâmetros populacionais conhecidos foram mantidos na nova versão. 
+Neste trabalho, esse conceito será utilizado mediante a geração de dados experimentais da nova versão de um determinado software, seguida da análise comparativa quanto a variante já conhecida. Nessa perspectiva, é investigado se houve redução do custo médio de execução e/ou da variância fornecida. Para isso, em ambos os casos as hipóteses nulas foram definidas de maneira conservadora, partindo-se do pressuposto de que os parâmetros populacionais conhecidos foram mantidos na nova versão. Posteriormente foram estabelecidas condições iniciais quanto à quantidade de observações, junto à coleta de dados, análise da distribuição amostral e aplicação dos testes.
+
+Nas próximas seções é feito o detalhamento de cada uma dessas etapas.
+
 
 
 # Descrição do Problema
