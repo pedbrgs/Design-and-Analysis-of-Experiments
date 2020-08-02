@@ -6,10 +6,10 @@ title: |
 author: Pedro Vinícius, Samara Silva e Savio Vieira
 date: 10 de Agosto de 2020
 output:
-  pdf_document:
-    fig_caption: yes
   html_document:
     df_print: paged
+  pdf_document:
+    fig_caption: yes
 indent: true
 header-includes: 
     - \usepackage{indentfirst}
@@ -130,9 +130,9 @@ Assim, tem-se uma estimativa de $N = 66$ observações.
 
 ### Coleta dos Dados
 
-Para configurar o procedimento de coleta de dados usamos a funcação R: ExpDE, essa rotina é usada para iniciar um algoritmo de evolução diferencial para a minimização de uma determinada instância de problema usando diferentes variantes dos operadores de recombinação, mutação e seleção. 
-Dessa forma, rodamos n (numeros de observações da amostra) vezes a função a fim de construir nossa amostra.
-A amostra gerada foi salva em um arquivo .csv, que permanecerá sem alterações. Uma vez fixo nossa amostra, permitirá um estudo constante toda vez que compilarmos o codigo estatistico, pois durante a execução do codigo, carregaremos o .csv da amostra.
+Para configurar o procedimento de coleta de dados usamos a função R: ExpDE, essa rotina é usada para iniciar um algoritmo de evolução diferencial para a minimização de uma determinada instância de problema usando diferentes variantes dos operadores de recombinação, mutação e seleção. 
+Dessa forma, rodamos n (números de observações da amostra) vezes a função a fim de construir nossa amostra.
+A amostra gerada foi salva em um arquivo .csv, que permanecerá sem alterações. Uma vez fixo nossa amostra, permitirá um estudo constante toda vez que compilarmos o codigo estatistico, pois durante a execução do código, carregaremos o .csv da amostra.
 
 ```{r}
 data_generation <- function(n){
@@ -173,6 +173,10 @@ sample <- read.csv('sample.csv', header = FALSE)$V1
 
 ### Análise Exploratória de Dados
 
+A fim de melhor entender nosso cenário de estudo apresentaremos a seguir representações gráficas da nossa amostra.
+Primeiro, o histograma, que representa a distribuição da frequência de nossas observações, a partir dos dados quantitativos da nossa amostra, uma aproximação a uma função de densidade probabilística. O histograma é uma boa ferramenta de analise visual do comportamento de amostras em geral, neste caso auxiliando no processo de visualização de características como a media da amostra e variação da distribuição em torno da mesma.  
+
+
 ```{r, echo = FALSE, results = 'hide'}
 # ------------ New version parameters (sample) ------------ #
 # Mean
@@ -190,6 +194,7 @@ histogram + geom_histogram(lwd = 0.3, bins = 20, color = 'black', fill = 'gray')
             scale_x_continuous(name = 'Amostra') + 
             scale_y_continuous(name = 'Frequência')
 ```
+Segundo, o boxplot, uma exibição gráfica que descreve simultaneamente vários recursos importantes de um conjunto de dados, como centro, dispersão, desvio da simetria e identificação de observações de valores incomuns ou outliers. [1] Os boxplots são muito úteis em comparações gráficas entre conjuntos de dados, porque têm alto impacto visual e são fáceis de entender.
 
 ```{r, fig.height = 3, fig.width = 3, fig.align = 'center'}
 # Boxplot
@@ -199,7 +204,7 @@ boxplot + geom_boxplot(lwd = 0.3) +
           scale_y_continuous(name = '') + 
           theme(axis.text.x = element_blank())
 ```
-
+Terceiro, o QQ-plot, usado para comparar duas distribuições de probabilidade. Caso os dados tenham distribuições idênticas, uma linha reta com inclinação um é traçada, e os quantis ao redor da mesma. A densidade com que os pontos são representados indicam a frequência de ocorrência dos mesmos. Para o caso em que as variáveis têm caudas longas, o gráfico Q-Q tende a enfatizar a estrutura comparativa nas caudas e a embaçar as distinções no "meio", onde as densidades são altas. A razão para isso é que o quantil é uma mudança rápida função de p quando a densidade é escassa (nas caudas) e uma função de mudança lenta de p, onde a densidade é alta (no meio). [2]
 ```{r, fig.height = 3, fig.width = 3, fig.align = 'center'}
 # QQ-Plot
 qqplot <- ggplot(data = as.data.frame(sample), mapping = aes(sample = sample))
@@ -256,6 +261,10 @@ conf_level <- 1 - alpha
 \bibliography{ref}
 
 <!--
+1 - D.C. Montgomery and G.C. Runger, Applied Statistics and Probability for Engineers, Chapter 7. 3rd Ed., Wiley 2005.
+
+2 - Wilk, M.B.; Gnanadesikan, R. (1968). Probability plotting methods for the analysis of data. Biometrika Trust. 55 (1): 1–17.
+
 KOCHER, Paul; JAFFE, Joshua; JUN, Benjamin. Differential Power Analysis. In: Annual international cryptology conference. Springer, Berlin, Heidelberg, 1999. p. 388-397.
 
 LINDSEY, James K. Parametric Statistical Inference. Oxford University Press, 1996.
