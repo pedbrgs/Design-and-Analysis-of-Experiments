@@ -130,6 +130,10 @@ Assim, tem-se uma estimativa de $N = 66$ observações.
 
 ### Coleta dos Dados
 
+Para configurar o procedimento de coleta de dados usamos a funcação R: ExpDE, essa rotina é usada para iniciar um algoritmo de evolução diferencial para a minimização de uma determinada instância de problema usando diferentes variantes dos operadores de recombinação, mutação e seleção. 
+Dessa forma, rodamos n (numeros de observações da amostra) vezes a função a fim de construir nossa amostra.
+A amostra gerada foi salva em um arquivo .csv, que permanecerá sem alterações. Uma vez fixo nossa amostra, permitirá um estudo constante toda vez que compilarmos o codigo estatistico, pois durante a execução do codigo, carregaremos o .csv da amostra.
+
 ```{r}
 data_generation <- function(n){
   
@@ -255,4 +259,6 @@ conf_level <- 1 - alpha
 KOCHER, Paul; JAFFE, Joshua; JUN, Benjamin. Differential Power Analysis. In: Annual international cryptology conference. Springer, Berlin, Heidelberg, 1999. p. 388-397.
 
 LINDSEY, James K. Parametric Statistical Inference. Oxford University Press, 1996.
+
+ExpDE v0.1.4. by Felipe Campelo. CRAN package description, 2018-01-10 10:45:05 UTC. Disponível em: <https://www.rdocumentation.org/packages/ExpDE/versions/0.1.4>. Acesso em: 02 de ago. de 2020.
 -->
