@@ -6,10 +6,10 @@ title: |
 author: Pedro Vinícius, Samara Silva e Savio Vieira
 date: 10 de Agosto de 2020
 output:
-  html_document:
-    df_print: paged
   pdf_document:
     fig_caption: yes
+  html_document:
+    df_print: paged
 indent: true
 header-includes: 
     - \usepackage{indentfirst}
@@ -299,6 +299,11 @@ cat('Tamanho amostral:', ceiling(params$n))
 ## Parte 2: Teste Sobre a Variância do Custo
 
 ## Planejamento dos Experimentos 
+Em relação à segunda parte deste experimento, quanto a avaliação da melhora da variância, foi considerado como hipótese nula $H_0$ a asserção de que o valor de variância conhecido foi mantido e como hipótese alternativa a que este valor foi reduzido.
+
+Existem vários testes estatísticos para comparação de variância, como o teste F, o teste de Bonett, o teste Chi-quadrado, o teste de Levene, dentre outros. Contudo, além das particularidades de cada um deles, os três primeiros são indicados para amostras normais. Tendo em vista que o TLC não é aplicável para o cálculo da variância, a opção recomendada é o uso de um teste não-paramétrico, como o teste de Levene, já que os dados não pertencem a uma distribuição normal.
+
+O Teste de Levene tem como hipótese nula a proposição de que os grupos que estão sendo comparados têm variâncias iguais, enquanto que a hipótese alternativa é que pelo menos um par desses grupos não possui igualdade de variância. Entretanto, essa categorização que não comporta a situação em questão, visto que o intuito é a comparação da amostra da versão atual com o valor de referência da versão nova. Nesse âmbito, adequa-se o teste não-paramétrico que receba somente uma amostra e a compare em com variância populacional dada. Sendo assim, mesmo sendo indicado para dados não paramétricos, o teste de Levene não é apropriado para o problema em questão.
 
 $$\begin{cases} H_0: \sigma^2_n = 100&\\H_1: \sigma^2_n<100\end{cases}$$
 
