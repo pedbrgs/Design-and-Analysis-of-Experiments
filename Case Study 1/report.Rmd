@@ -13,6 +13,7 @@ output:
 indent: true
 header-includes: 
     - \usepackage{indentfirst}
+    - \usepackage{float}
 bibliography: ref.bib
 doi: https://github.com/pedbrgs/Design-and-Analysis-of-Experiments
 pagetitle: Estudo de Caso 1
@@ -30,11 +31,8 @@ if (!require(devtools, quietly = TRUE)){
  if (!require(broom, quietly = TRUE)){
        devtools::install_github("dgrtwo/broom")
       }
-if (!require(GGally, quietly = TRUE)){
-      install.packages("GGally")
-      }
 if (!require(ExpDE, quietly = TRUE)){
-      install.packages("ExpDE")
+      suppressMessages(install.packages("ExpDE"))
       }
 ```
 
@@ -42,12 +40,14 @@ if (!require(ExpDE, quietly = TRUE)){
 ```{r, message = FALSE, warning = FALSE, results = 'hide', echo = FALSE}
 # ExpDE package (it was built under R version 3.6.1)
 library(ExpDE)
-# Statistical package
+# Statistical package 
 library(stats)
 # Ggplot2 package
 library(ggplot2)
 # Plotly package
 library(plotly)
+# Car package
+library(car)
 ```
 
 # Introdução
@@ -99,7 +99,7 @@ Em concordância com a proposta de comparação de custo médio entre as versõe
 $$\begin{cases} H_0: \mu_n = 50&\\H_1: \mu_n<50\end{cases}$$
 onde a hipótese nula implica na igualdade entre os custos médios das versões e a hipótese alternativa unilateral na superioridade da nova versão em média.
 
-  A fase subsequente desse experimento consiste em gerar uma amostra representativa do desempenho da nova versão do software. Para tal fim, é necessário especificar o tamanho dessa amostra, considerando as propriedades preestabelecidas do teste. A priori, o Poder do Teste é bastante conveniente, porém implica em um grande dilema. O cálculo do tamanho amostral requer uma estimativa da variância, que só é obtida através das observações contidas na amostra. As possibilidades mais práticas de se conduzir o experimento nesse caso são\cite{Campelo2018-LNDoE}:
+  A fase subsequente desse experimento consiste em gerar uma amostra representativa do desempenho da nova versão do software. Para tal fim, é necessário especificar o tamanho dessa amostra, considerando as propriedades preestabelecidas do teste. A priori, o Poder do Teste é bastante conveniente, porém implica em um grande dilema. O cálculo do tamanho amostral requer uma estimativa da variância, que só é obtida através das observações contidas na amostra. As possibilidades mais práticas de se conduzir o experimento nesse caso são \cite{Campelo2018-LNDoE}:
 
 1. Utilização de conhecimento do problema para se obter uma estimativa (inicial) da variância;
 2. Condução do estudo com um tamanho amostral predefinido, como $N = 30$, o que poderia violar a potência desejada;
@@ -107,7 +107,7 @@ onde a hipótese nula implica na igualdade entre os custos médios das versões 
 
 Considerando as vantagens e desvantagens de cada uma, optou-se por utilizar a primeira abordagem. Por mais que essa estimativa seja sobre-estimada e os prováveis ganhos não sejam observados ao término do estudo, uma vez que se espera ganhos de variância da nova versão do software em relação à versão atual, pode-se considerar igualdade de variâncias como uma estimativa inicial, ou seja, $\sigma^2_n \approx \sigma^2_c = 100$. Entretanto, essa premissa será avaliada posteriormente na análise exploratória dos dados.
 
-Diante da estimativa inicial da variância amostral, o Poder do Teste pode ser finalmente realizado. Esse teste é originalmente usado para mensurar o controle do teste de hipóteses sobre o erro do tipo II ($\beta$), isto é, $P(\mbox{rejeitar}\ H_0|H_0 \ \mbox{é falso})$. No entanto, tal teste também pode ser utilizado para estimar outros parâmetros amostrais, como tamanho de efeito $\delta^*$, nível de significância $\alpha$, tamanho da amostra $N$, potência $\pi$ e desvio padrão amostral $\sigma_n$ \cite{PowerTest}. 
+Diante da estimativa inicial da variância amostral, o Poder do Teste pode ser finalmente realizado. Esse teste é originalmente usado para mensurar o controle do teste de hipóteses sobre o erro do tipo II ($\beta$), isto é, $P(\mbox{rejeitar}\ H_0|H_0 \ \mbox{é falso})$. No entanto, tal teste também pode ser utilizado para estimar outros parâmetros amostrais, como tamanho de efeito $\delta^*$, nível de significância $\alpha$, tamanho da amostra $N$, potência $\pi$ e desvio padrão amostral $\sigma_n$ \cite{PowerTest}. No presente estudo, ele é utilizado para estimar o tamanho amostral $N$.
 
 <!--
 Este último, é tido como critério de fundamental importância no planejamento da pesquisa, para reduzir o custo operacional, que é aproximadamente linear (KOCHER, JAFFE, JUN, 1999).
@@ -115,23 +115,20 @@ Este último, é tido como critério de fundamental importância no planejamento
 
 ```{r}
 # Poder do Teste para estimar o tamanho amostral
-(params <- power.t.test(delta = delta_star,
-             sd = sigma_n,
-             sig.level = alpha, 
-             power = pi,
+(params <- power.t.test(delta = 4,
+             sd = 10,
+             sig.level = 0.01, 
+             power = 0.8,
              type = "one.sample",
              alternative = "one.sided"))
 
 N <- ceiling(params$n)
 ```
-Assim, tem-se uma estimativa de $N = 66$ observações com o arredondamento superior.
-
+\noindent Assim, tem-se uma estimativa de $N = 66$ observações com o arredondamento superior.
 
 ### Coleta dos Dados
 
-Para configurar o procedimento de coleta de dados usamos a função R: ExpDE, essa rotina é usada para iniciar um algoritmo de evolução diferencial para a minimização de uma determinada instância de problema usando diferentes variantes dos operadores de recombinação, mutação e seleção. 
-Dessa forma, rodamos n (números de observações da amostra) vezes a função a fim de construir nossa amostra.
-A amostra gerada foi salva em um arquivo .csv, que permanecerá sem alterações. Uma vez fixo nossa amostra, permitirá um estudo constante toda vez que compilarmos o codigo estatistico, pois durante a execução do código, carregaremos o .csv da amostra.
+O custo de execução do software novo é modelado por um algoritmo de Evolução Diferencial que faz uso de recombinação binomial, mutação aleatória e seleção elitista padrão para a minimização do *Shifted Sphere Problem*. Dessa forma, como cada observação é obtida por meio do módulo ExpDE \cite{Campelo2016-ExpDE}, foram necessárias $N$ execuções para construção da amostra. Os dados coletados foram salvos em um arquivo `.csv` com uma semente definida empiricamente `seed = 1007`. Uma vez que a amostra está fixa, as análises estatísticas da média e da variância poderão ser efetuadas sobre os mesmos dados.
 
 ```{r}
 data_generation <- function(n){
@@ -144,7 +141,7 @@ data_generation <- function(n){
   mpr <- list(name = "sphere", xmin = -seq(1, 20), xmax = 20 + 5 * seq(5, 24))
   
   sample <- c()
-  # Generate n observations
+  # Geração de N observações
   for (i in 1:n){
     observation <- ExpDE(mpo, mmu, mre, mse, mst, mpr, 
                     showpars = list(show.iters = "none"))$Fbest
@@ -172,10 +169,19 @@ sample <- read.csv('sample.csv', header = FALSE)$V1
 
 ### Análise Exploratória de Dados
 
-A fim de melhor entender nosso cenário de estudo apresentaremos a seguir representações gráficas da nossa amostra.
+Algumas primeiras propriedades da amostra, como média, mediana, valores extremos e variância, podem ser obtidas de imediato. 
 
-Primeiro, o histograma, que representa a distribuição da frequência de nossas observações, a partir dos dados quantitativos da nossa amostra, uma aproximação a uma função de densidade probabilística. O histograma é uma boa ferramenta de analise visual do comportamento de amostras em geral, neste caso auxiliando no processo de visualização de características como a media da amostra e variação da distribuição em torno da mesma.  
+```{r}
+sample_statistics <- data.frame('Variância' = var(sample), 'Média' = mean(sample), 
+                                'Mediana' = median(sample), 'Mínimo' = min(sample), 
+                                'Máximo' = max(sample), 'Desvio' = sd(sample))
+print(sample_statistics)
+```
+\noindent É importante ressaltar que a variância é significativamente menor que a considerada no cálculo do tamanho amostral $N$, assim, caso as premissas consideradas sejam válidas, a potência do teste será superior a desejada ($\pi > 0.8$).
 
+Entretanto, a fim de compreender melhor os dados em estudo, algumas representações gráficas da amostra coletada serão investigadas. Inicialmente, faz-se o uso do histograma, que representa a distribuição de frequências das observações. O histograma é uma boa ferramenta de análise visual do comportamento de variáveis contínuas em geral, auxiliando no processo de visualização de características, como a média da amostra e a variação da distribuição em torno da mesma. Para a amostra em questão, o histograma mostra uma distribuição levemente inclinada à direita, que corrobora que a média é maior do que a moda, bem como sugere a presença de outliers com custos maiores que 60 (Figura \ref{fig:histograma}).
+
+\renewcommand{\figurename}{Figura}
 
 ```{r, echo = FALSE, results = 'hide'}
 # ------------ New version parameters (sample) ------------ #
@@ -190,55 +196,55 @@ sigma2_n <- var(sample)
 # cat('Variância amostral: ', sigma2_n)
 ```
 
-```{r, fig.height = 3, fig.width = 3, fig.align = 'center'}
-# Histogram
+```{r histograma, fig.height = 2, fig.width = 2, fig.align = 'center', fig.cap = 'Histograma.', fig.pos = 'H'}
 histogram <- ggplot(data = as.data.frame(sample), mapping = aes(x = sample))
 histogram + geom_histogram(lwd = 0.3, bins = 20, color = 'black', fill = 'gray') +
-            scale_x_continuous(name = 'Amostra') + 
-            scale_y_continuous(name = 'Frequência')
+            scale_x_continuous(name = 'Custo de Execução') + 
+            scale_y_continuous(name = 'Frequência') + 
+            theme(axis.title = element_text(size = 8), 
+                axis.text = element_text(size = 8))
 ```
-Segundo, o boxplot ou gráfico de caixa, uma exibição gráfica que descreve simultaneamente vários recursos importantes de um conjunto de dados, como centro, dispersão, desvio da simetria e identificação de observações de valores incomuns ou outliers \cite{Montgomery2010}. Os boxplots são muito úteis em comparações gráficas entre conjuntos de dados, porque têm alto impacto visual e são fáceis de entender.
+Posteriormente, o boxplot, também conhecido como gráfico de caixa, é considerado. Além de descrever simultaneamente várias propriedades importantes de um conjunto de dados, como centro, dispersão e desvio de simetria, ele também possiblita a identificação de valores atípicos \cite{Montgomery2010}. Para a amostra em questão, foi possível reforçar a presença das observações em torno da mediana levemente inferior a 50 (segundo quartil). Outro aspecto importante é a presença de uma assimetria positiva na distribuição, uma vez que a mediana está mais próxima do primeiro do que do terceiro quartil. A diferença nos comprimentos das linhas que saem da caixa pressupõe novamente a cauda acentuada à direita (Figura \ref{fig:boxplot}).
 
-```{r, fig.height = 3, fig.width = 3, fig.align = 'center'}
-# Boxplot
+```{r boxplot, fig.height = 2, fig.width = 2, fig.align = 'center', fig.cap = 'Boxplot.', fig.pos = 'H'}
 boxplot <- ggplot(data = as.data.frame(sample), mapping = aes(y = sample))
 boxplot + geom_boxplot(lwd = 0.3) + 
-          scale_x_continuous(name = 'Amostra') + 
-          scale_y_continuous(name = '') + 
-          theme(axis.text.x = element_blank())
+          scale_x_continuous(name = '') + 
+          scale_y_continuous(name = 'Custo de Execução') + 
+          theme(axis.text.x = element_blank(), axis.title = element_text(size = 8), 
+                axis.text = element_text(size = 8))
 ```
-Terceiro, o QQ-plot, usado para comparar duas distribuições de probabilidade. Caso os dados tenham distribuições idênticas, uma linha reta com inclinação um é traçada, e os quantis ao redor da mesma. A densidade com que os pontos são representados indicam a frequência de ocorrência dos mesmos. Para o caso em que as variáveis têm caudas longas, o gráfico Q-Q tende a enfatizar a estrutura comparativa nas caudas e a embaçar as distinções no "meio", onde as densidades são altas. A razão para isso é que o quantil é uma mudança rápida função de p quando a densidade é escassa (nas caudas) e uma função de mudança lenta de p, onde a densidade é alta (no meio) \cite{Gnanadesikan1968}.
-```{r, fig.height = 3, fig.width = 3, fig.align = 'center'}
-# QQ-Plot
+Por fim, um gráfico bastante utilizado em estatística é o quantil-quantil (*QQ-Plot*), cujo objetivo é verificar a adequação da distribuição de frequência dos dados à uma distribuição de probabilidades de interesse. Caso os dados tenham distribuições idênticas, uma linha reta com inclinação unitária é traçada. A densidade com que os pontos são representados indicam a frequência de ocorrência dos mesmos \cite{Gnanadesikan1968}. No presente trabalho, o gráfico Q-Q foi utilizado para comparar a distribuição dos custos de execução da nova versão do software com uma distribuição normal. Ao gerá-lo, é evidente que os dados não seguem um padrão linear e, portanto, não provém de uma distribuição normal (Figura \ref{fig:qqplot}).
+
+<!--Para o caso em que as variáveis têm caudas longas, o gráfico Q-Q tende a enfatizar a estrutura comparativa nas caudas e a embaçar as distinções no "meio", onde as densidades são altas. A razão para isso é que o quantil é uma mudança rápida função de p quando a densidade é escassa (nas caudas) e uma função de mudança lenta de p, onde a densidade é alta (no meio)-->
+
+```{r qqplot, fig.height = 2, fig.width = 2, fig.align = 'center', fig.cap = 'QQ-Plot.', fig.pos = 'H'}
 qqplot <- ggplot(data = as.data.frame(sample), mapping = aes(sample = sample))
 qqplot + geom_qq_line() + 
          geom_qq() + 
-         scale_y_continuous(name = 'Amostra') + 
-         scale_x_continuous(name = 'Quantil')
-```
-
-O histograma mostra uma distribuição inclinada à direita, que indica que a média é maior do que a moda e sugere a presença de outliers. Em relação ao Q-Q, percebe-se que os dados não seguem um padrão linear, que denota que a amostra  não provém de distribuição padrão normal. Finalmente, o gráfico de caixa reforça a presença dos dados em torno da média levemente inferior a 50.
-
-Devido à presumível falta de normalidade dos dados foi feito o teste de Shapiro-Wilk para confirmação. A Hipótese Nula desse teste assume que amostra veio de uma população com distribuição normal e para isso o parâmetro  W é calculado  e comparado com um valor de referência. Caso a resultante de W seja inferior ao tabelado, rejeita-se a hipótese de normalidade, considerando o nível $\alpha$ de significância.  A aplicação do teste gerou como resultado $W = 0.94772$ e o valor de $p = 0.00755$, que confirmam a premissa de não normalidade dos dados.
-
-Apesar disso, como o número de observações é suficientemente grande, o Teorema do Limite Central pôde ser evocado para estimação da média.
-
-### Análise Estatística
-
-```{r}
-# ------------ Hypothesis Testing ------------ #    
-(t_test <- t.test(x = sample, 
-                mu = mu_c, 
-                alternative = "less",
-                conf.level = conf_level))
-
-# Confidence Interval
-CI <- t_test$conf.int[1:2]
+         scale_y_continuous(name = 'Quantis da Amostra') + 
+         scale_x_continuous(name = 'Quantis Teóricos Normais') +
+         theme(axis.title = element_text(size = 8), 
+               axis.text = element_text(size = 8))
 ```
 
 ### Validação de Premissas
 
+Devido à presumível falta de normalidade dos dados, o teste de Shapiro-Wilk foi feito para confirmação. A hipótese nula $H_0$ desse teste assume que a amostra veio de uma população com distribuição normal e para isso o parâmetro $W$ é calculado e comparado com um valor de referência. Caso a resultante de $W$ seja inferior ao valor tabelado, rejeita-se a hipótese de normalidade a um nível de significância $\alpha$. A aplicação do teste gerou como resultado $W = 0.94772$ e o valor de $p = 0.00755$, que confirmam a não normalidade dos dados ($p < 0.05$).
+
 ```{r}
+(shapiro_test <- shapiro.test(x = sort(sample)))
+```
+
+Apesar disso, como o número de observações é suficientemente grande ($N=66 >> 30$), o Teorema do Limite Central pôde ser evocado para estimação da distribuição amostral das médias. Já a premissa de independência foi assumida no processo de coleta dos dados. No entanto, o teste de Durbin-Watson também caberia para avaliar uma possível autocorrelação nos resíduos. 
+
+```{r}
+
+```
+
+<!--Quanto a premissa de independência dos dados, mesmo que elas tenham sido assumidas no processo de coleta dos dados, o teste de Durbin-Watson permite avaliar se há autocorrelação serial nos resíduos. -->
+
+```{r, results = 'hide', echo = FALSE}
 # Wilcoxon Signed-Ranks Test, because it does not assume normality
 (wilcoxon_test <- wilcox.test(x = sample,
                 alternative = "less",
@@ -249,6 +255,46 @@ CI <- t_test$conf.int[1:2]
                 conf.int = FALSE, 
                 conf.level = conf_level))
 ```
+
+
+### Análise Estatística
+
+A partir disso, pode-se realizar o Teste t de Student sem que suas premissas sejam violadas.
+
+```{r}
+(t_test <- t.test(x = sample, 
+                mu = 50, 
+                alternative = "less",
+                conf.level = 0.99))
+cat('Intervalo de confiança:', t_test$conf.int[1:2])
+```
+Como o valor $p$ encontrado é maior que o nível de significância estabelecido ($0.3145 > 0.05$), conclui-se que a hipótese nula $H_0$ não pode ser rejeitada a um nível de confiança de $95\%$. No contexto do problema estudado e para as configurações de teste definidas, uma falha ao rejeitar a hipótese nula significa que não há evidências de que os desempenhos médios das duas versões do software sejam distintos e, portanto, trata-se de uma conclusão fraca. Além disso, dado que a hipótese alternativa $H_1$ é unilateral, tem-se um intervalo de confiança aberto à esquerda $[-\infty, \ 51.42]$.
+
+### Potência do Teste
+
+Conforme relatado anteriormente, como a estimativa da variância amostral foi substancialmente superior à variância calculada sobre os dados, é bem provável que a potência do teste seja superior aos $80\%$ utilizados para o cálculo do tamanho amostral $N$. Dessa forma, uma estimativa da potência para detecção de diferenças maiores ou iguais ao tamanho de efeito $\delta^*$ pode ser obtida pelo Poder do Teste, utilizando o desvio padrão amostral $\sigma = 6.05$, o tamanho amostral $N=66$ e conservando as demais propriedades.
+```{r}
+(params <- power.t.test(delta = 4,
+             sd = sqrt(var(sample)),
+             sig.level = 0.01,
+             n = 66,
+             type = "one.sample",
+             alternative = "one.sided"))
+cat('Potência obtida:', params$power)
+```
+\noindent Em concordância com o que se esperava, a potência obtida $\pi = 0.9982$ é superior à desejada. 
+
+Outra perspectiva para esse caso é que, consequentemente, o número de observações na amostra foi sobre-estimado. Assim, uma estimativa para $N$ capaz de garantir exatamente a potência desejada $\pi = 0.8$ pode ser obtida pelo Poder de Teste ao utilizar o desvio padrão amostral em conjunto com os demais parâmetros.
+```{r}
+(params <- power.t.test(delta = 4,
+             sd = sqrt(var(sample)),
+             sig.level = 0.01,
+             power = 0.8,
+             type = "one.sample",
+             alternative = "one.sided"))
+cat('Tamanho amostral:', ceiling(params$n))
+```
+\noindent Ou seja, o tamanho amostral necessário para o experimento é de apenas 26 observações, 40 observações a menos do que foi utilizado na estimativa inicial.
 
 ## Parte 2: Teste Sobre a Variância do Custo
 
