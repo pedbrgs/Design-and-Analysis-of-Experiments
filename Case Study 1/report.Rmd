@@ -46,8 +46,8 @@ library(stats)
 library(ggplot2)
 # Plotly package
 library(plotly)
-# Car package
-library(car)
+# Boot package
+library(boot)
 ```
 
 # Introdução
@@ -100,7 +100,7 @@ $$\begin{cases} H_0: \mu_n = 50&\\H_1: \mu_n<50\end{cases}$$
 onde a hipótese nula implica na igualdade entre os custos médios das versões e a hipótese alternativa unilateral na superioridade da nova versão em média.
 
   A fase subsequente desse experimento consiste em gerar uma amostra representativa do desempenho da nova versão do software. Para tal fim, é necessário especificar o tamanho dessa amostra, considerando as propriedades preestabelecidas do teste. A priori, o Poder do Teste é bastante conveniente, porém implica em um grande dilema. O cálculo do tamanho amostral requer uma estimativa da variância, que só é obtida através das observações contidas na amostra. As possibilidades mais práticas de se conduzir o experimento nesse caso são \cite{Campelo2018-LNDoE}:
-
+  
 1. Utilização de conhecimento do problema para se obter uma estimativa (inicial) da variância;
 2. Condução do estudo com um tamanho amostral predefinido, como $N = 30$, o que poderia violar a potência desejada;
 3. Realização de um estudo piloto para estimar a variância dos dados a partir do tamanho de efeito de mínima relevância $\delta^*$.
@@ -236,7 +236,7 @@ Devido à presumível falta de normalidade dos dados, o teste de Shapiro-Wilk fo
 (shapiro_test <- shapiro.test(x = sort(sample)))
 ```
 
-Apesar disso, como o número de observações é suficientemente grande ($N=66 >> 30$), o Teorema do Limite Central pôde ser evocado para estimação da distribuição amostral das médias. Já a premissa de independência foi assumida no processo de coleta dos dados. No entanto, o teste de Durbin-Watson também caberia para avaliar uma possível autocorrelação nos resíduos. 
+Apesar disso, como o número de observações é suficientemente grande ($N=66 >> 30$), o Teorema do Limite Central pôde ser evocado para estimação da distribuição amostral das médias. Já a premissa de independência foi assumida no processo de coleta dos dados. Caso uma amostra do software atual estivesse disponível, o teste de Durbin-Watson também caberia para avaliar uma possível autocorrelação nos resíduos. 
 
 ```{r}
 
@@ -268,11 +268,11 @@ A partir disso, pode-se realizar o Teste t de Student sem que suas premissas sej
                 conf.level = 0.99))
 cat('Intervalo de confiança:', t_test$conf.int[1:2])
 ```
-Como o valor $p$ encontrado é maior que o nível de significância estabelecido ($0.3145 > 0.05$), conclui-se que a hipótese nula $H_0$ não pode ser rejeitada a um nível de confiança de $95\%$. No contexto do problema estudado e para as configurações de teste definidas, uma falha ao rejeitar a hipótese nula significa que não há evidências de que os desempenhos médios das duas versões do software sejam distintos e, portanto, trata-se de uma conclusão fraca. Além disso, dado que a hipótese alternativa $H_1$ é unilateral, tem-se um intervalo de confiança aberto à esquerda $[-\infty, \ 51.42]$.
+Como o valor $p$ encontrado é maior que o nível de significância estabelecido ($0.3145 > 0.05$), conclui-se que a hipótese nula $H_0$ não pode ser rejeitada a um nível de confiança de $95\%$. No contexto do problema estudado e para as configurações de teste definidas, uma falha ao rejeitar a hipótese nula significa que não há evidências de que os desempenhos médios das duas versões do software sejam distintos e, portanto, trata-se de uma conclusão fraca. Além disso, dado que a hipótese alternativa $H_1$ é unilateral, tem-se um intervalo de confiança aberto à esquerda $[-\infty, \ 51.4154]$.
 
 ### Potência do Teste
 
-Conforme relatado anteriormente, como a estimativa da variância amostral foi substancialmente superior à variância calculada sobre os dados, é bem provável que a potência do teste seja superior aos $80\%$ utilizados para o cálculo do tamanho amostral $N$. Dessa forma, uma estimativa da potência para detecção de diferenças maiores ou iguais ao tamanho de efeito $\delta^*$ pode ser obtida pelo Poder do Teste, utilizando o desvio padrão amostral $\sigma = 6.05$, o tamanho amostral $N=66$ e conservando as demais propriedades.
+Conforme relatado anteriormente, como a estimativa da variância amostral foi substancialmente superior à variância calculada sobre os dados, é bem provável que a potência do teste seja superior aos $80\%$ utilizados para o cálculo do tamanho amostral $N$. Dessa forma, uma estimativa da potência para detecção de diferenças maiores ou iguais ao tamanho de efeito $\delta^*$ pode ser obtida pelo Poder do Teste, utilizando o desvio padrão amostral $\sigma = 6.0526$, o tamanho amostral $N=66$ e conservando as demais propriedades.
 ```{r}
 (params <- power.t.test(delta = 4,
              sd = sqrt(var(sample)),
@@ -301,17 +301,32 @@ cat('Tamanho amostral:', ceiling(params$n))
 ## Planejamento dos Experimentos 
 Em relação à segunda parte deste experimento, quanto a avaliação da melhora da variância, foi considerado como hipótese nula $H_0$ a asserção de que o valor de variância conhecido foi mantido e como hipótese alternativa a que este valor foi reduzido.
 
+$$\begin{cases} H_0: \sigma^2_n = 100&\\H_1: \sigma^2_n<100\end{cases}$$
+
 Existem vários testes estatísticos para comparação de variância, como o teste F, o teste de Bonett, o teste Chi-quadrado, o teste de Levene, dentre outros. Contudo, além das particularidades de cada um deles, os três primeiros são indicados para amostras normais. Tendo em vista que o TLC não é aplicável para o cálculo da variância, a opção recomendada é o uso de um teste não-paramétrico, como o teste de Levene, já que os dados não pertencem a uma distribuição normal.
 
 O Teste de Levene tem como hipótese nula a proposição de que os grupos que estão sendo comparados têm variâncias iguais, enquanto que a hipótese alternativa é que pelo menos um par desses grupos não possui igualdade de variância. Entretanto, essa categorização que não comporta a situação em questão, visto que o intuito é a comparação da amostra da versão atual com o valor de referência da versão nova. Nesse âmbito, adequa-se o teste não-paramétrico que receba somente uma amostra e a compare em com variância populacional dada. Sendo assim, mesmo sendo indicado para dados não paramétricos, o teste de Levene não é apropriado para o problema em questão.
-
-$$\begin{cases} H_0: \sigma^2_n = 100&\\H_1: \sigma^2_n<100\end{cases}$$
 
 ```{r, results = 'hide', echo = FALSE}
 # Desired significance level (Type I error probability)
 alpha <- 0.05
 # Confidence level
 conf_level <- 1 - alpha
+```
+
+```{r}
+# Função estatística
+statistic_function <- function(x, i){
+  variance <- var(x[i])
+  return(variance)
+}
+
+# Bootstrap com 10000 replicações
+resampling <- boot(data = sample, statistic = statistic_function, R = 10000)
+
+# Intervalo de confiança não-paramétrico
+boot.ci(boot.out = resampling, conf = 0.95, type = 'basic')
+
 ```
 
 ### Conclusões
