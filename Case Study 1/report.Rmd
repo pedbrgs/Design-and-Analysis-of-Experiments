@@ -297,6 +297,10 @@ Existem vários testes estatísticos para comparação de variância, como o tes
 
 O Teste de Levene tem como hipótese nula a proposição de que os grupos que estão sendo comparados têm variâncias iguais, enquanto que a hipótese alternativa é que pelo menos um par desses grupos não possui igualdade de variância. Entretanto, essa categorização que não comporta a situação em questão, visto que o intuito é a comparação da amostra da versão atual com o valor de referência da versão nova. Nesse âmbito, adequa-se o teste não-paramétrico que receba somente uma amostra e a compare em com variância populacional dada. Sendo assim, mesmo sendo indicado para dados não paramétricos, o teste de Levene não é apropriado para o problema em questão.
 
+Em virtude disso, e diante da escassez de métodos não-paramétricos compatível aos dados obtidos, a equipe decidiu testar outras abordagens, como a transformação de dados logarítmica e quadrática. As transformações monotônicas não lineares log 10 e raiz quadrada a mudam a distância entre os valores na distribuição e, portanto, a forma da distribuição \cite{weinberg2008statistics}. A primeira calcula o logaritmo de um grupo de números contidos na calda à direita da distribuição, com intuito de reduzir a inclinação positiva, enquanto a segunda toma a raiz quadrada de grandes valores, levando os valores altos para mais próximo do centro. Contudo, esses dois tipos de transformação são convenientes quando os dados possuem variâncias distintas e inclinação à direita, contudo, o histograma mostra que a inclinação dos dados é à esquerda \cite{field2009discovering}. As tentativas de uso desses métodos mostraram que o comportamento dos dados não correspondia ao esperado .
+
+Por esse motivo, o grupo prosseguiu para outra metodologia: a de reamostragem dos dados. Essa técnica consiste em realizar estimativas por meio de repetidas amostragens dentro de uma mesma amostra.
+
 ```{r, results = 'hide', echo = FALSE}
 # Desired significance level (Type I error probability)
 alpha <- 0.05
