@@ -48,6 +48,8 @@ library(ggplot2)
 library(plotly)
 # Boot package
 library(boot)
+# UFT-8 Encoding
+options(Encoding="UTF-8")
 ```
 
 ```{r, message = FALSE, warning = FALSE, results = 'hide', echo = FALSE}
@@ -90,7 +92,7 @@ sigma_n <- sigma_c
 
 ### Planejamento dos Experimentos
 
-No que se refere a primeira parte do estudo de caso, o teste terá que dispor de um nível de significância $\alpha = 0.01$, um tamanho de efeito de mínima relevância $\delta^* = 4$ e uma potência desejada $\pi = 1 - \beta = 0.8$. As hipóteses estatísticas foram definidas com o intuito de responder às questões propostas abaixo:
+No que se refere a primeira parte do estudo de caso, o teste terá que dispor de um nível de significância $\alpha = 0,01$, um tamanho de efeito de mínima relevância $\delta^* = 4$ e uma potência desejada $\pi = 1 - \beta = 0,8$. As hipóteses estatísticas foram definidas com o intuito de responder às questões propostas abaixo:
 
 * Há alguma diferença entre o custo médio da versão nova do software e o custo médio da versão corrente?
 * Caso haja, qual a melhor versão em termos de custo médio?
@@ -109,10 +111,6 @@ Considerando as vantagens e desvantagens de cada uma, optou-se por utilizar a pr
 
 Diante da estimativa inicial da variância amostral, o Poder do Teste pode ser finalmente realizado. Esse teste é originalmente usado para mensurar o controle do teste de hipóteses sobre o erro do tipo II ($\beta$), isto é, $P(\mbox{rejeitar}\ H_0|H_0 \ \mbox{é falso})$. No entanto, tal teste também pode ser utilizado para estimar outros parâmetros amostrais, como tamanho de efeito $\delta^*$, nível de significância $\alpha$, tamanho da amostra $N$, potência $\pi$ e desvio padrão amostral $\sigma_n$ \cite{PowerTest}. No presente estudo, ele é utilizado para estimar o tamanho amostral $N$.
 
-<!--
-Este último, é tido como critério de fundamental importância no planejamento da pesquisa, para reduzir o custo operacional, que é aproximadamente linear (KOCHER, JAFFE, JUN, 1999).
--->
-
 ```{r}
 # Poder do Teste para estimar o tamanho amostral
 (params <- power.t.test(delta = 4,
@@ -128,7 +126,7 @@ N <- ceiling(params$n)
 
 ### Coleta dos Dados
 
-O custo de execução do software novo é modelado por um algoritmo de Evolução Diferencial que faz uso de recombinação binomial, mutação aleatória e seleção elitista padrão para a minimização do *Shifted Sphere Problem*. Dessa forma, como cada observação é obtida por meio do módulo ExpDE \cite{Campelo2016-ExpDE}, foram necessárias $N$ execuções para construção da amostra. Os dados coletados foram salvos em um arquivo `.csv` com uma semente definida empiricamente `seed = 1007`. Uma vez que a amostra está fixa, as análises estatísticas da média e da variância poderão ser efetuadas sobre os mesmos dados.
+O custo de execução do software novo é modelado por um algoritmo de Evolução Diferencial que faz uso de recombinação binomial, mutação aleatória e seleção elitista padrão para a minimização do *Shifted Sphere Problem*. Dessa forma, como cada observação é obtida por meio do módulo `ExpDE` em linguagem R \cite{Campelo2016-ExpDE}, foram necessárias $N$ execuções para construção da amostra. Os dados coletados foram salvos em um arquivo `.csv` com uma semente definida empiricamente `seed = 1007`. Uma vez que a amostra está fixa, as análises estatísticas da média e da variância poderão ser efetuadas sobre os mesmos dados.
 
 ```{r}
 data_generation <- function(n){
@@ -174,7 +172,7 @@ data.frame('Variância' = var(sample), 'Média' = mean(sample),
                                 'Mediana' = median(sample), 'Mínimo' = min(sample), 
                                 'Máximo' = max(sample), 'Desvio' = sd(sample))
 ```
-\noindent É importante ressaltar que a variância é significativamente menor que a considerada no cálculo do tamanho amostral $N$, assim, caso as premissas consideradas sejam válidas, a potência do teste será superior a desejada ($\pi > 0.8$).
+\noindent É importante ressaltar que a variância é significativamente menor que a considerada no cálculo do tamanho amostral $N$, assim, caso as premissas consideradas sejam válidas, a potência do teste será superior a desejada ($\pi > 0,8$).
 
 Entretanto, a fim de compreender melhor os dados em estudo, algumas representações gráficas da amostra coletada serão investigadas. Inicialmente, faz-se o uso do histograma, que representa a distribuição de frequências das observações. O histograma é uma boa ferramenta de análise visual do comportamento de variáveis contínuas em geral, auxiliando no processo de visualização de características, como a média da amostra e a variação da distribuição em torno da mesma. Para a amostra em questão, o histograma mostra uma distribuição levemente inclinada à direita, que corrobora que a média é maior do que a moda, bem como sugere a presença de outliers com custos maiores que 60 (Figura \ref{fig:histograma}).
 
@@ -206,8 +204,6 @@ boxplot + geom_boxplot(lwd = 0.3) + scale_x_continuous(name = '') +
 ```
 Por fim, um gráfico bastante utilizado em estatística é o quantil-quantil (*QQ-Plot*), cujo objetivo é verificar a adequação da distribuição de frequência dos dados à uma distribuição de probabilidades de interesse. Caso os dados tenham distribuições idênticas, uma linha reta com inclinação unitária é traçada. A densidade com que os pontos são representados indicam a frequência de ocorrência dos mesmos \cite{Gnanadesikan1968}. No presente trabalho, o gráfico Q-Q foi utilizado para comparar a distribuição dos custos de execução da nova versão do software com uma distribuição normal. Ao gerá-lo, é evidente que os dados não seguem um padrão linear e, portanto, não provém de uma distribuição normal (Figura \ref{fig:qqplot}).
 
-<!--Para o caso em que as variáveis têm caudas longas, o gráfico Q-Q tende a enfatizar a estrutura comparativa nas caudas e a embaçar as distinções no "meio", onde as densidades são altas. A razão para isso é que o quantil é uma mudança rápida função de p quando a densidade é escassa (nas caudas) e uma função de mudança lenta de p, onde a densidade é alta (no meio)-->
-
 ```{r qqplot, fig.height = 1.9, fig.width = 1.9, fig.align = 'center', fig.cap = 'QQ-Plot.', fig.pos = 'H'}
 qqplot <- ggplot(data = as.data.frame(sample), mapping = aes(sample = sample))
 qqplot + geom_qq_line() + geom_qq() + scale_y_continuous(name = 'Quantis da Amostra') + 
@@ -216,19 +212,13 @@ qqplot + geom_qq_line() + geom_qq() + scale_y_continuous(name = 'Quantis da Amos
 
 ### Validação de Premissas
 
-Devido à presumível falta de normalidade dos dados, o teste de Shapiro-Wilk foi feito para confirmação. A hipótese nula $H_0$ desse teste assume que a amostra veio de uma população com distribuição normal e para isso o parâmetro $W$ é calculado e comparado com um valor de referência. Caso a resultante de $W$ seja inferior ao valor tabelado, rejeita-se a hipótese de normalidade a um nível de significância $\alpha$. A aplicação do teste gerou como resultado $W = 0.94772$ e o valor de $p = 0.00755$, que confirmam a não normalidade dos dados ($p < 0.05$).
+Devido à presumível falta de normalidade dos dados, o teste de Shapiro-Wilk foi feito para confirmação. A hipótese nula $H_0$ desse teste assume que a amostra veio de uma população com distribuição normal e para isso o parâmetro $W$ é calculado e comparado com um valor de referência. Caso a resultante de $W$ seja inferior ao valor tabelado, rejeita-se a hipótese de normalidade a um nível de significância $\alpha$. A aplicação do teste gerou como resultado $W = 0,94772$ e o valor de $p = 0,00755$, que confirmam a não normalidade dos dados ($p < 0,05$).
 
 ```{r}
 (shapiro_test <- shapiro.test(x = sort(sample)))
 ```
 
-Apesar disso, como o número de observações é suficientemente grande ($N=66 >> 30$), o Teorema do Limite Central pôde ser evocado para estimação da distribuição amostral das médias. Já a premissa de independência foi assumida no processo de coleta dos dados. Caso uma amostra do software atual estivesse disponível, o teste de Durbin-Watson também caberia para avaliar uma possível autocorrelação nos resíduos. 
-
-```{r}
-
-```
-
-<!--Quanto a premissa de independência dos dados, mesmo que elas tenham sido assumidas no processo de coleta dos dados, o teste de Durbin-Watson permite avaliar se há autocorrelação serial nos resíduos. -->
+Apesar disso, como o número de observações é suficientemente grande ($N=66 >\!\!> 30$), o Teorema do Limite Central (TLC) pôde ser evocado para estimação da distribuição amostral das médias. Já a premissa de independência foi assumida no processo de coleta dos dados. Caso uma amostra do software atual estivesse disponível, o teste de Durbin-Watson também caberia para avaliar uma possível autocorrelação nos resíduos. 
 
 ```{r, results = 'hide', echo = FALSE}
 # Wilcoxon Signed-Ranks Test, because it does not assume normality
@@ -254,11 +244,11 @@ A partir disso, pode-se realizar o Teste t de Student sem que suas premissas sej
                 conf.level = 0.99))
 cat('Intervalo de confiança:', t_test$conf.int[1:2])
 ```
-Como o valor $p$ encontrado é maior que o nível de significância estabelecido ($0.3145 > 0.05$), conclui-se que a hipótese nula $H_0$ não pode ser rejeitada a um nível de confiança de $95\%$. No contexto do problema estudado e para as configurações de teste definidas, uma falha ao rejeitar a hipótese nula significa que não há evidências de que os desempenhos médios das duas versões do software sejam distintos e, portanto, trata-se de uma conclusão fraca. Além disso, dado que a hipótese alternativa $H_1$ é unilateral, tem-se um intervalo de confiança aberto à esquerda $[-\infty, \ 51.4154]$.
+Como o valor $p$ encontrado é maior que o nível de significância estabelecido ($0,3145 > 0,05$), conclui-se que a hipótese nula $H_0$ não pode ser rejeitada a um nível de confiança de $95\%$. No contexto do problema estudado e para as configurações de teste definidas, uma falha ao rejeitar a hipótese nula significa que não há evidências de que os desempenhos médios das duas versões do software sejam distintos e, portanto, trata-se de uma conclusão fraca. Além disso, dado que a hipótese alternativa $H_1$ é unilateral, tem-se um intervalo de confiança aberto à esquerda $[-\infty, \ 51,4154]$.
 
 ### Potência do Teste
 
-Conforme relatado anteriormente, como a estimativa da variância amostral foi substancialmente superior à variância calculada sobre os dados, é bem provável que a potência do teste seja superior aos $80\%$ utilizados para o cálculo do tamanho amostral $N$. Dessa forma, uma estimativa da potência para detecção de diferenças maiores ou iguais ao tamanho de efeito $\delta^*$ pode ser obtida pelo Poder do Teste, utilizando o desvio padrão amostral $\sigma = 6.0526$, o tamanho amostral $N=66$ e conservando as demais propriedades.
+Conforme relatado anteriormente, como a estimativa da variância amostral foi substancialmente superior à variância calculada sobre os dados, é bem provável que a potência do teste seja superior aos $80\%$ utilizados para o cálculo do tamanho amostral $N$. Dessa forma, uma estimativa da potência para detecção de diferenças maiores ou iguais ao tamanho de efeito $\delta^*$ pode ser obtida pelo Poder do Teste, utilizando o desvio padrão amostral $\sigma = 6,0526$, o tamanho amostral $N=66$ e conservando as demais propriedades.
 ```{r}
 (params <- power.t.test(delta = 4,
              sd = sqrt(var(sample)),
@@ -268,9 +258,9 @@ Conforme relatado anteriormente, como a estimativa da variância amostral foi su
              alternative = "one.sided"))
 cat('Potência obtida:', params$power)
 ```
-\noindent Em concordância com o que se esperava, a potência obtida $\pi = 0.9982$ é superior à desejada. 
+\noindent Em concordância com o que se esperava, a potência obtida $\pi = 0,9982$ é superior à desejada. 
 
-Outra perspectiva para esse caso é que, consequentemente, o número de observações na amostra foi sobre-estimado. Assim, uma estimativa para $N$ capaz de garantir exatamente a potência desejada $\pi = 0.8$ pode ser obtida pelo Poder de Teste ao utilizar o desvio padrão amostral em conjunto com os demais parâmetros.
+Outra perspectiva para esse caso é que, consequentemente, o número de observações na amostra foi sobre-estimado. Assim, uma estimativa para $N$ capaz de garantir exatamente a potência desejada $\pi = 0,8$ pode ser obtida pelo Poder de Teste ao utilizar o desvio padrão amostral em conjunto com os demais parâmetros.
 ```{r}
 (params <- power.t.test(delta = 4,
              sd = sqrt(var(sample)),
@@ -285,23 +275,31 @@ cat('Tamanho amostral:', ceiling(params$n))
 ## Parte 2: Teste Sobre a Variância do Custo
 
 ## Planejamento dos Experimentos 
-Em relação à segunda parte deste experimento, quanto a avaliação da melhora da variância, foi considerado como hipótese nula $H_0$ a asserção de que o valor de variância conhecido foi mantido e como hipótese alternativa a que este valor foi reduzido.
+Em relação à segunda parte deste experimento, isto é, quanto a avaliação de uma potencial melhoria na variância do custo de execução, foi considerado como hipótese nula $H_0$ a equivalência das variâncias entre as duas versões e como hipótese alternativa $H_1$ a redução da variância do custo do software nessa nova versão em análise.
 
 $$\begin{cases} H_0: \sigma^2_n = 100&\\H_1: \sigma^2_n<100\end{cases}$$
 
-Existem vários testes estatísticos para comparação de variância, como o teste F, o teste de Bonett, o teste Chi-quadrado, o teste de Levene, dentre outros. Contudo, além das particularidades de cada um deles, os três primeiros são indicados para amostras normais. Tendo em vista que o TLC não é aplicável para o cálculo da variância, a opção recomendada é o uso de um teste não-paramétrico, como o teste de Levene, já que os dados não pertencem a uma distribuição normal.
+### Tentativas Iniciais
 
-O Teste de Levene tem como hipótese nula a proposição de que os grupos que estão sendo comparados têm variâncias iguais, enquanto que a hipótese alternativa é que pelo menos um par desses grupos não possui igualdade de variância. Entretanto, essa categorização que não comporta a situação em questão, visto que o intuito é a comparação da amostra da versão atual com o valor de referência da versão nova. Nesse âmbito, adequa-se o teste não-paramétrico que receba somente uma amostra e a compare em com variância populacional dada. Sendo assim, mesmo sendo indicado para dados não paramétricos, o teste de Levene não é apropriado para o problema em questão.
+Existem vários testes estatísticos para comparação de variância, como o teste F, o teste de Bonett, o teste Chi-quadrado, o teste de Levene, dentre outros. Todavia, além das particularidades de cada um deles, os três primeiros são indicados para distribuições normais. Além disso, tendo em vista que o TLC não é aplicável para o estimador amostral da variância, uma das opções recomendadas é o uso de um teste não-paramétrico, como o teste de Levene.
 
-Em virtude disso, e diante da escassez de métodos não-paramétricos compatível aos dados obtidos, a equipe decidiu testar outras abordagens, como a transformação de dados logarítmica e quadrática. As transformações monotônicas não lineares log 10 e raiz quadrada a mudam a distância entre os valores na distribuição e, portanto, a forma da distribuição \cite{weinberg2008statistics}. A primeira calcula o logaritmo de um grupo de números contidos na calda à direita da distribuição, com intuito de reduzir a inclinação positiva, enquanto a segunda toma a raiz quadrada de grandes valores, levando os valores altos para mais próximo do centro. Contudo, esses dois tipos de transformação são convenientes quando os dados possuem variâncias distintas e inclinação à direita, contudo, o histograma mostra que a inclinação dos dados é à esquerda \cite{field2009discovering}. As tentativas de uso desses métodos mostraram que o comportamento dos dados não correspondia ao esperado .
+O Teste de Levene tem como hipótese nula a proposição de que os grupos que estão sendo comparados têm variâncias iguais, enquanto que a hipótese alternativa é que pelo menos um par desses grupos não possui igualdade de variância. Entretanto, essa categorização não comporta a situação em questão, visto que o intuito é a comparação da amostra da versão nova com o valor de referência da versão atual. Nesse âmbito, um teste não-paramétrico apropriado deve receber somente uma amostra para compará-la com uma variância populacional conhecida, o que, portanto, descarta o teste de Levene para o problema em questão.
 
-Por esse motivo, o grupo prosseguiu para outra metodologia: a de reamostragem dos dados. Essa técnica consiste em realizar estimativas por meio de repetidas amostragens dentro de uma mesma amostra. A literatura apresenta alguns tipos, a saber: Teste de Aletorização, Validação Cruzada, Jackknife e Bootstrap.
+Em virtude disso, bem como da escassez de métodos não-paramétricos compatíveis aos dados, outras abordagens foram investigadas. A primeira delas trata-se de uma transformação nos dados com o intuito de torná-los normais. As transformações monotônicas não-lineares $\log_{10}$ e quadrática mudam a distância entre os valores na distribuição e, portanto, a forma da distribuição \cite{Weinberg2008}. A primeira calcula o logaritmo na base 10 de um grupo de números contidos na calda à direita da distribuição para reduzir a inclinação positiva, enquanto a segunda toma a raiz quadrada de grandes valores, levando os valores altos para mais próximo do centro. Contudo, as tentativas de transformações não asseguraram normalidade aos dados.
 
-Os testes de aleatorização são testes de significância nos quais são calculados os possíveis resultados estatísticos permutando os valores amostrais, tendo como princípio a hipótese nula como verdadeira. Já na validação cruzada, divide-se a amostra entre um grupo de treinamento e outro de teste, como por exemplo no estudo de regressão, onde o primeiro é usado para cálculo dos coeficientes da equação. O Jackkine, por sua vez, é usado na estimação da variância e a tendência de algum estimador. E, finalmente, o bootstrap também é usado para os mesmos propósitos do Jackknife, porém é considerado mais abrangente, pois permite mais replicações \cite{Reamostragem}. Em vista disso, optou-se pelo uso da técnica de bootstrap.
+### Solução Proposta
 
-A ideia básica do bootstrap é que a inferência sobre uma população a partir de uma amostra possa ser modelada através de nova amostragem dos dados da amostra e realizando inferência sobre uma amostra a partir de dados novamente amostrados. O bootstrap funciona tratando a inferência da verdadeira distribuição de probabilidade X sobre os dados originais, como sendo análoga à inferência da distribuição empírica de X^ sobre os dados reamostrados. A precisão das inferências sobre X^ usando os dados reamostrados pode ser estimada. Se X^ é uma aproximação razoável de X, então a qualidade da inferência em X pode, por sua vez, ser inferida \cite{efron1992bootstrap}.
+Por fim, a possibilidade encontrada para testar as hipóteses de teste foi a reamostragem dos dados. Essa técnica consiste em descartar a distribuição amostral assumida de uma estatística e calcular uma distribuição empírica à sua real distribuição. Assim, uma vez que essa distribuição é estimada, testes estatísticos podem ser realizados, intervalos de confiança podem ser construídos e hipóteses podem ser testadas sem que seja necessário validar premissas inerentes à distribuição \cite{Renno2011}. 
 
-Em nossa analise, o método de bootstrap foi concebido a partir de nossa amostra única,  como função estatística de interesse a variância e o número de replicações de 10000. Uma estimativa ideal da amostra usando bootstrap leva o número de replicações ao infinito \cite{efron1994introduction}, em regras gerais, usa-se um número relativamente grande, limitado ao poder de processamento do computador que irá executar o cálculo. Por fim, devemos encontrar o intervalo de confiança correspondente a reamostragem bootstrap, para tal utilizamos a função boot.ci, que retornará o intervalo de confiança da variância, visto que é a função estatística de interesse na reamostragem.
+Dentre os métodos da literatura mais comuns estão *Jackknife* e *Bootstrap* \cite{Efron1992}. Ambas as técnicas são bastante utilizadas para avaliar a variância de um estimador a partir da sua distribuição empírica. No entanto, o *Jackknife* é mais conservador e, consequentemente, produz erros padrões maiores \cite{Efron1982}. Em vista disso, optou-se pelo uso da técnica de *Bootstrap* do tipo não-paramétrico para estimar a distribuição da variância amostral do software novo, cuja região coberta pelo intervalo de confiança permitirá testar a hipótese de interesse ao nível de significância previamente definido em $\alpha=0,05$.
+
+A partir do módulo `boot` em linguagem R \cite{Angelo2020}, que contempla funções e conjuntos de dados para reamostragem do livro *Bootstrap Methods and Their Application* \cite{Davison1997}, foi possível realizar o experimento proposto. Uma estimativa ideal da distribuição empírica por reamostragem *Bootstrap* leva o número de replicações ao infinito e, em regras gerais, utiliza-se um número relativamente grande ($R > 1.000$) \cite{Efron1994}. Como o processo do presente estudo não demanda muito esforço computacional, o número de replicações para estimar a distribuição amostral da função estatística variância foi definido em $R=10.000$, de forma a minimizar o erro de amortecimento intrínseco ao *Bootstrap* devido à reamostragem finita. Por fim, é possível encontrar o intervalo de confiança correspondente à distribuição estimada. A função `boot.ci` permite gerar cinco tipos diferentes de intervalo de confiança não-paramétricos e bilaterais: (i) *basic*, (ii) *studentized*, (iii) *percentile*, (iv) *adjusted percentile* (BCa) e (v) *first order normal approximation* \cite{Angelo2020}. 
+
+A priori, o tipo de intervalo definido foi o BCa, uma vez que ele é um intervalo mais preciso (segunda ordem) e permite ajustar distorções na distribuição, como viés e assimetria. Se a distribuição empírica foi distorcida positivamente, o intervalo de confiança é ajustado para a direita. Caso a distribuição seja distorcida negativamente, o intervalo é ajustado para a esquerda \cite{Davison1997}.
+
+Conforme especificado anteriormente, deseja-se ainda um nível de confiança de $95\%$, entretanto, a estimativa do intervalo de confiança obtida pelo `boot.ci` é bilateral. Uma potencial alternativa para esse caso é ajustar o nível de confiança para $90\%$, de tal forma que cada lado do intervalo tenha a probabilidade de erro do tipo I desejada $\alpha=0,05$ \cite{Montgomery2010}. 
+
+Supondo novamente que os dados são independentes e identicamente distribuídos em razão do seu processo de coleta e que a reamostragem já foi calculada com $R$ suficientemente grande, é possível estimar o intervalo de confiança para o estimador variância amostral. A reprodutibilidade do experimento é possível a partir da semente aleatória fixa em `seed = 1007`.
 
 ```{r, results = 'hide', echo = FALSE}
 # Desired significance level (Type I error probability)
@@ -317,19 +315,20 @@ statistic_function <- function(x, i){
   return(variance)
 }
 
+# Semente aleatória
+set.seed(1007)
+
 # Bootstrap com 10000 replicações
 resampling <- boot(data = sample, statistic = statistic_function, R = 10000)
 
 # Intervalo de confiança não-paramétrico
-boot.ci(boot.out = resampling, conf = 0.95, type = 'basic')
+boot.ci(boot.out = resampling, conf = 0.90, type = 'bca')
 
 ```
-Considerando um nível de confiança de 95%, obtemos um intervalo de confiança para variância de 21.49 a 50.97, o intervalo foi calculado usando o método *basic bootstrap*. Baseado nestes resultados rejeitamos a hipótese nula, de que a variância é igual a 100.
 
+É possível afirmar, ao nível de confiança de $95\%$, que a variância da nova versão do software é substancialmente inferior à variância da versão atual ($53,07 <\!\!< 100)$. Com o intuito de corroborar a ausência de influência do tipo de intervalo de confiança definido previamente no resultado, o teste foi feito para os demais tipos e pode-se concluir que em todos os casos há evidências estatísticas de que a versão nova é superior à versão atual em termos da variância do custo de execução.
 
 ### Conclusões
-<!--Lindsey (1996) \cite{ lindsey1996parametric} define inferência estatística como o campo que se preocupa com o processo probabilístico relacionado a eventos já ocorridos e às ilações sobre a população que pode-se chegar com base nesse conhecimento, ou seja, trata-se de extrair conclusões para o universo de estudo a partir de observações empíricas ou processos estocásticos.
--->
 
 Com o objetivo de inferir sobre a melhora de desempenho da nova versão de um software em comparação com a versão atual, utilizamos de conceitos e ferramentas estatísticas para investigar e concluir sobre esta comparação.
 
@@ -340,15 +339,3 @@ Ficamos a cargo de investigar sobre dois pontos principais, custo médio de exec
 \renewcommand\refname{Referências}
 \bibliographystyle{plain}
 \bibliography{ref}
-
-<!--
-1 - D.C. Montgomery and G.C. Runger, Applied Statistics and Probability for Engineers, Chapter 7. 3rd Ed., Wiley 2005.
-
-2 - Wilk, M.B.; Gnanadesikan, R. (1968). Probability plotting methods for the analysis of data. Biometrika Trust. 55 (1): 1–17.
-
-KOCHER, Paul; JAFFE, Joshua; JUN, Benjamin. Differential Power Analysis. In: Annual international cryptology conference. Springer, Berlin, Heidelberg, 1999. p. 388-397.
-
-LINDSEY, James K. Parametric Statistical Inference. Oxford University Press, 1996.
-
-ExpDE v0.1.4. by Felipe Campelo. CRAN package description, 2018-01-10 10:45:05 UTC. Disponível em: <https://www.rdocumentation.org/packages/ExpDE/versions/0.1.4>. Acesso em: 02 de ago. de 2020.
--->
