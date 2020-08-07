@@ -56,10 +56,6 @@ theme_update(axis.title = element_text(size = 8), axis.text = element_text(size 
 
 # Introdução
 
-<!--
-Lindsey (1996) define inferência estatística como o campo que se preocupa com o processo probabilístico relacionado a eventos já ocorridos e às ilações sobre a população que pode-se chegar com base nesse conhecimento, ou seja, trata-se de extrair conclusões para o universo de estudo a partir de observações empíricas ou processos estocásticos.
--->
-
 Uma versão atual de um software conhecido apresenta uma distribuição dos custos de execução com média populacional $\mu_c = 50$ e variância populacional $\sigma^2_c = 100$. Posteriormente, uma nova versão do software é desenvolvida, no qual deseja-se investigar prováveis melhorias de desempenho. Com esse intuito, duas análises estatísticas são propostas: (i) uma sobre o custo médio e (ii) uma sobre a variância do custo.
 
 Para ambos os casos, as hipóteses nulas foram definidas de maneira conservadora, partindo-se do pressuposto de que os parâmetros populacionais conhecidos foram mantidos na nova versão. A partir disso, diversas etapas foram conduzidas até a conclusão dos experimentos, entre elas a coleta de dados da distribuição dos custos do software novo, a análise exploratória dessa amostra, a inferência por meio dos testes estatísticos, a validação das premissas consideradas e as conclusões. As próximas seções contém o detalhamento técnico de cada uma dessas etapas.
@@ -299,7 +295,13 @@ O Teste de Levene tem como hipótese nula a proposição de que os grupos que es
 
 Em virtude disso, e diante da escassez de métodos não-paramétricos compatível aos dados obtidos, a equipe decidiu testar outras abordagens, como a transformação de dados logarítmica e quadrática. As transformações monotônicas não lineares log 10 e raiz quadrada a mudam a distância entre os valores na distribuição e, portanto, a forma da distribuição \cite{weinberg2008statistics}. A primeira calcula o logaritmo de um grupo de números contidos na calda à direita da distribuição, com intuito de reduzir a inclinação positiva, enquanto a segunda toma a raiz quadrada de grandes valores, levando os valores altos para mais próximo do centro. Contudo, esses dois tipos de transformação são convenientes quando os dados possuem variâncias distintas e inclinação à direita, contudo, o histograma mostra que a inclinação dos dados é à esquerda \cite{field2009discovering}. As tentativas de uso desses métodos mostraram que o comportamento dos dados não correspondia ao esperado .
 
-Por esse motivo, o grupo prosseguiu para outra metodologia: a de reamostragem dos dados. Essa técnica consiste em realizar estimativas por meio de repetidas amostragens dentro de uma mesma amostra.
+Por esse motivo, o grupo prosseguiu para outra metodologia: a de reamostragem dos dados. Essa técnica consiste em realizar estimativas por meio de repetidas amostragens dentro de uma mesma amostra. A literatura apresenta alguns tipos, a saber: Teste de Aletorização, Validação Cruzada, Jackknife e Bootstrap.
+
+Os testes de aleatorização são testes de significância nos quais são calculados os possíveis resultados estatísticos permutando os valores amostrais, tendo como princípio a hipótese nula como verdadeira. Já na validação cruzada, divide-se a amostra entre um grupo de treinamento e outro de teste, como por exemplo no estudo de regressão, onde o primeiro é usado para cálculo dos coeficientes da equação. O Jackkine, por sua vez, é usado na estimação da variância e a tendência de algum estimador. E, finalmente, o bootstrap também é usado para os mesmos propósitos do Jackknife, porém é considerado mais abrangente, pois permite mais replicações \cite{Reamostragem}. Em vista disso, optou-se pelo uso da técnica de bootstrap.
+
+A ideia básica do bootstrap é que a inferência sobre uma população a partir de uma amostra possa ser modelada através de nova amostragem dos dados da amostra e realizando inferência sobre uma amostra a partir de dados novamente amostrados. O bootstrap funciona tratando a inferência da verdadeira distribuição de probabilidade X sobre os dados originais, como sendo análoga à inferência da distribuição empírica de X^ sobre os dados reamostrados. A precisão das inferências sobre X^ usando os dados reamostrados pode ser estimada. Se X^ é uma aproximação razoável de X, então a qualidade da inferência em X pode, por sua vez, ser inferida \cite{efron1992bootstrap}.
+
+Em nossa analise, o método de bootstrap foi concebido a partir de nossa amostra única,  como função estatística de interesse a variância e o número de replicações de 10000. Uma estimativa ideal da amostra usando bootstrap leva o número de replicações ao infinito \cite{efron1994introduction}, em regras gerais, usa-se um número relativamente grande, limitado ao poder de processamento do computador que irá executar o cálculo. Por fim, devemos encontrar o intervalo de confiança correspondente a reamostragem bootstrap, para tal utilizamos a função boot.ci, que retornará o intervalo de confiança da variância, visto que é a função estatística de interesse na reamostragem.
 
 ```{r, results = 'hide', echo = FALSE}
 # Desired significance level (Type I error probability)
@@ -322,8 +324,18 @@ resampling <- boot(data = sample, statistic = statistic_function, R = 10000)
 boot.ci(boot.out = resampling, conf = 0.95, type = 'basic')
 
 ```
-  
+Considerando um nível de confiança de 95%, obtemos um intervalo de confiança para variância de 21.49 a 50.97, o intervalo foi calculado usando o método *basic bootstrap*. Baseado nestes resultados rejeitamos a hipótese nula, de que a variância é igual a 100.
+
+
 ### Conclusões
+<!--Lindsey (1996) \cite{ lindsey1996parametric} define inferência estatística como o campo que se preocupa com o processo probabilístico relacionado a eventos já ocorridos e às ilações sobre a população que pode-se chegar com base nesse conhecimento, ou seja, trata-se de extrair conclusões para o universo de estudo a partir de observações empíricas ou processos estocásticos.
+-->
+
+Com o objetivo de inferir sobre a melhora de desempenho da nova versão de um software em comparação com a versão atual, utilizamos de conceitos e ferramentas estatísticas para investigar e concluir sobre esta comparação.
+
+Ficamos a cargo de investigar sobre dois pontos principais, custo médio de execução e sobre a variância no custo de execução. Sobre o custo médio de execução, concluímos que por não rejeitarmos a hipótese nula de que o custo médio de execução é igual a 50, neste caso, não podemos inferir sobre a melhoria da nova versão sobre a versão atual. Vale lembrar que não rejeitar a hipótese nula não significa que ela é verdadeira, e sim que pelos testes que realizamos, com 95% de confiança, não conseguimos provar sua falsidade. Porem, sobre a variância do custo da execução, rejeitamos a hipótese nula, de que a variância é igual a 100, neste caso, com os testes realizados, com 95% de confiança, a hipótese alternativa foi aceita. Assim, a partir da nossa analise, concluímos que, por esse quesito, houve melhoria da nova versão do software com relação a versão atual.
+
+
 
 \renewcommand\refname{Referências}
 \bibliographystyle{plain}
