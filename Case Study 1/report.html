@@ -1715,6 +1715,12 @@ Estudo de Caso 1</div></h1>
 {"columns":[{"label":["Variância"],"name":[1],"type":["dbl"],"align":["right"]},{"label":["Média"],"name":[2],"type":["dbl"],"align":["right"]},{"label":["Mediana"],"name":[3],"type":["dbl"],"align":["right"]},{"label":["Mínimo"],"name":[4],"type":["dbl"],"align":["right"]},{"label":["Máximo"],"name":[5],"type":["dbl"],"align":["right"]},{"label":["Desvio"],"name":[6],"type":["dbl"],"align":["right"]}],"data":[{"1":"36.6344","2":"49.63844","3":"48.92703","4":"38.76112","5":"67.21031","6":"6.052636"}],"options":{"columns":{"min":{},"max":[10]},"rows":{"min":[10],"max":[10]},"pages":{}}}
   </script>
 </div>
+<pre class="r"><code>getmode &lt;- function(v) {
+   uniqv &lt;- unique(v)
+   uniqv[which.max(tabulate(match(v, uniqv)))]
+}
+
+result &lt;- getmode(sample)</code></pre>
 <p>É importante ressaltar que a variância é significativamente menor que a considerada no cálculo do tamanho amostral <span class="math inline">\(N\)</span>, assim, caso as premissas consideradas sejam válidas, a potência do teste será superior a desejada (<span class="math inline">\(\pi &gt; 0,8\)</span>).</p>
 <p>Entretanto, a fim de compreender melhor os dados em estudo, algumas representações gráficas da amostra coletada serão investigadas. Inicialmente, faz-se o uso do histograma, que representa a distribuição de frequências das observações. O histograma é uma boa ferramenta de análise visual do comportamento de variáveis contínuas em geral, auxiliando no processo de visualização de características, como a média da amostra e a variação da distribuição em torno da mesma. Para a amostra em questão, o histograma mostra uma distribuição levemente inclinada à direita, que corrobora que a média é maior do que a moda, bem como sugere a presença de outliers com custos maiores que 60 (Figura ).</p>
 
@@ -1752,7 +1758,7 @@ QQ-Plot.
 </div>
 <div id="validação-de-premissas" class="section level3">
 <h3>Validação de Premissas</h3>
-<p>Devido à presumível falta de normalidade dos dados, o teste de Shapiro-Wilk foi feito para confirmação. A hipótese nula <span class="math inline">\(H_0\)</span> desse teste assume que a amostra veio de uma população com distribuição normal e para isso o parâmetro <span class="math inline">\(W\)</span> é calculado e comparado com um valor de referência. Caso a resultante de <span class="math inline">\(W\)</span> seja inferior ao valor tabelado, rejeita-se a hipótese de normalidade a um nível de significância <span class="math inline">\(\alpha\)</span>. A aplicação do teste gerou como resultado <span class="math inline">\(W = 0,94772\)</span> e o valor de <span class="math inline">\(p = 0,00755\)</span>, que confirmam a não normalidade dos dados (<span class="math inline">\(p &lt; 0,05\)</span>).</p>
+<p>Devido à presumível falta de normalidade dos dados, o teste de Shapiro-Wilk foi feito para confirmação. A hipótese nula <span class="math inline">\(H_0\)</span> desse teste assume que a amostra veio de uma população com distribuição normal e para isso o parâmetro <span class="math inline">\(W\)</span> é calculado e comparado com um valor de referência. Caso a resultante de <span class="math inline">\(W\)</span> seja inferior ao valor tabelado, rejeita-se a hipótese de normalidade a um nível de significância <span class="math inline">\(\alpha\)</span> . A aplicação do teste gerou como resultado <span class="math inline">\(W = 0,94772\)</span> e o valor de <span class="math inline">\(p = 0,00755\)</span>, que confirmam a não normalidade dos dados (<span class="math inline">\(p &lt; 0,05\)</span>).</p>
 <pre class="r"><code>(shapiro_test &lt;- shapiro.test(x = sort(sample)))</code></pre>
 <pre><code>## 
 ##  Shapiro-Wilk normality test
@@ -1781,7 +1787,7 @@ QQ-Plot.
 ##  49.63844</code></pre>
 <pre class="r"><code>cat(&#39;Intervalo de confiança:&#39;, t_test$conf.int[1:2])</code></pre>
 <pre><code>## Intervalo de confiança: -Inf 51.4154</code></pre>
-<p>Como o valor <span class="math inline">\(p\)</span> encontrado é maior que o nível de significância estabelecido (<span class="math inline">\(0,3145 &gt; 0,05\)</span>), conclui-se que a hipótese nula <span class="math inline">\(H_0\)</span> não pode ser rejeitada a um nível de confiança de <span class="math inline">\(95\%\)</span>. No contexto do problema estudado e para as configurações de teste definidas, uma falha ao rejeitar a hipótese nula significa que não há evidências de que os desempenhos médios das duas versões do software sejam distintos e, portanto, trata-se de uma conclusão fraca. Além disso, dado que a hipótese alternativa <span class="math inline">\(H_1\)</span> é unilateral, tem-se um intervalo de confiança aberto à esquerda <span class="math inline">\([-\infty, \ 51,4154]\)</span>.</p>
+<p>Como o valor <span class="math inline">\(p\)</span> encontrado é maior que o nível de significância estabelecido (<span class="math inline">\(0,3145 &gt; 0,05\)</span>), conclui-se que a hipótese nula <span class="math inline">\(H_0\)</span> não pode ser rejeitada a um nível de confiança de <span class="math inline">\(99\%\)</span>. No contexto do problema estudado e para as configurações de teste definidas, uma falha ao rejeitar a hipótese nula significa que não há evidências de que os desempenhos médios das duas versões do software sejam distintos e, portanto, trata-se de uma conclusão fraca. Além disso, dado que a hipótese alternativa <span class="math inline">\(H_1\)</span> é unilateral, tem-se um intervalo de confiança aberto à esquerda <span class="math inline">\([-\infty, \ 51,4154]\)</span>.</p>
 </div>
 <div id="potência-do-teste" class="section level3">
 <h3>Potência do Teste</h3>
@@ -1874,8 +1880,8 @@ boot.ci(boot.out = resampling, conf = 0.90, type = &#39;bca&#39;)</code></pre>
 </div>
 <div id="conclusões" class="section level3">
 <h3>Conclusões</h3>
-<p>Com o objetivo de inferir sobre a melhora de desempenho da nova versão de um software em comparação com a versão atual, foi utilizado de conceitos e ferramentas estatísticas para investigar e concluir sobre esta comparação.</p>
-<p>Ficou a cargo de investigar sobre dois pontos principais, custo médio de execução e sobre a variância no custo de execução. Sobre o custo médio de execução, conclui-se que por não ter sido rejeitada a hipótese nula de que o custo médio de execução é igual a 50, neste caso, não pode-se inferir sobre a melhoria da nova versão sobre a versão atual. Vale lembrar que não rejeitar a hipótese nula não significa que ela é verdadeira, e sim que pelos testes realizados, com 95% de confiança, não conseguiu-se provar sua falsidade. Porém, sobre a variância do custo da execução, a hipótese nula de que a variância é igual a 100 foi rejeitada, neste caso, com os testes realizados, com 95% de confiança, a hipótese alternativa foi aceita. Assim, a partir da análise realizada, conclui-se que, por esse quesito, houve melhoria da nova versão do software com relação a versão atual.</p>
+<p>Com o objetivo de inferir sobre a possível melhora de desempenho da nova versão de um software, quando comparado a versão atual, foi utilizado de conceitos e ferramentas estatísticas para investigar e concluir sobre o custo médio de execução e sobre a variância no custo de execução.</p>
+<p>Sobre o custo médio de execução, conclui-se que por não ter sido rejeitada a hipótese nula de que o custo médio de execução é igual a 50, neste caso, não pode-se inferir sobre a melhoria da nova versão sobre a versão atual. Vale lembrar que não rejeitar a hipótese nula não significa que ela é verdadeira, e sim que pelos testes realizados, com <span class="math inline">\(99\%\)</span> de confiança, não conseguiu-se provar sua falsidade. Porém, sobre a variância do custo da execução, a hipótese nula de que a variância é igual a 100 foi rejeitada, neste caso, com os testes realizados, com <span class="math inline">\(95\%\)</span> de confiança, a hipótese alternativa foi aceita. Assim, a partir da análise realizada, conclui-se que, por esse quesito, houve melhoria da nova versão do software com relação a versão atual.</p>
 <p>Diante das inferências expostas, recomenda-se a utilização da nova versão do software em substituição da versão atual.</p>
 </div>
 <div id="aperfeiçoando-os-testes" class="section level3">
@@ -1884,7 +1890,7 @@ boot.ci(boot.out = resampling, conf = 0.90, type = &#39;bca&#39;)</code></pre>
 </div>
 <div id="questão-bônus" class="section level3">
 <h3>Questão Bônus</h3>
-<p>O objetivo é obter o intervalo de tolerância que contem <span class="math inline">\(90\%\)</span> dos custos de execução do software, com um nível de confiança de <span class="math inline">\(95\%\)</span>.Para tal, foi utilizado um método não paramétrico pois não foi possível assumir que a amostra é normalmente distribuída. O método utilizado requer apenas que os dados sejam contínuos.</p>
+<p>Os limites de tolerância fornecem os valores entre os quais uma específica proporção da populacional amostral pode ser encontrada dentro de um determinado nível de confiança . Diante disso, o objetivo deste experimento é obter o intervalo de tolerância que contenha <span class="math inline">\(90\%\)</span> dos custos de execução do software, com um nível de confiança de <span class="math inline">\(95\%\)</span>. Para tal, foi utilizado um método não paramétrico pois não foi possível assumir que a amostra é normalmente distribuída. O método utilizado assume como premissa que os dados são contínuos. Tendo isso em vista, foi usado a função npregtol.int no R , que calcula os limites de tolerância de regressão não paramétrica, onde foi utilizado o método de Wilks que gera o intervalo de tolerância simétrico ao centro dos dados, utilizando para isso uma distribuição beta .</p>
 <pre class="r"><code># Questão Bônus
 out &lt;- nptol.int(sort(sample), alpha = 0.05, P = 0.90, side = 2, method = &quot;WILKS&quot;, upper = NULL, lower = NULL)
 show(out)</code></pre>

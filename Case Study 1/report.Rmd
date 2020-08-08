@@ -256,7 +256,7 @@ A partir disso, pode-se realizar o Teste t de Student sem que suas premissas sej
                 conf.level = 0.99))
 cat('Intervalo de confiança:', t_test$conf.int[1:2])
 ```
-Como o valor $p$ encontrado é maior que o nível de significância estabelecido ($0,3145 > 0,05$), conclui-se que a hipótese nula $H_0$ não pode ser rejeitada a um nível de confiança de $95\%$. No contexto do problema estudado e para as configurações de teste definidas, uma falha ao rejeitar a hipótese nula significa que não há evidências de que os desempenhos médios das duas versões do software sejam distintos e, portanto, trata-se de uma conclusão fraca. Além disso, dado que a hipótese alternativa $H_1$ é unilateral, tem-se um intervalo de confiança aberto à esquerda $[-\infty, \ 51,4154]$.
+Como o valor $p$ encontrado é maior que o nível de significância estabelecido ($0,3145 > 0,05$), conclui-se que a hipótese nula $H_0$ não pode ser rejeitada a um nível de confiança de $99\%$. No contexto do problema estudado e para as configurações de teste definidas, uma falha ao rejeitar a hipótese nula significa que não há evidências de que os desempenhos médios das duas versões do software sejam distintos e, portanto, trata-se de uma conclusão fraca. Além disso, dado que a hipótese alternativa $H_1$ é unilateral, tem-se um intervalo de confiança aberto à esquerda $[-\infty, \ 51,4154]$.
 
 ### Potência do Teste
 
@@ -344,7 +344,7 @@ boot.ci(boot.out = resampling, conf = 0.90, type = 'bca')
 
 Com o objetivo de inferir sobre a possível melhora de desempenho da nova versão de um software, quando comparado a versão atual, foi utilizado de conceitos e ferramentas estatísticas para investigar e concluir sobre o custo médio de execução e sobre a variância no custo de execução.
 
-Sobre o custo médio de execução, conclui-se que por não ter sido rejeitada a hipótese nula de que o custo médio de execução é igual a 50, neste caso, não pode-se inferir sobre a melhoria da nova versão sobre a versão atual. Vale lembrar que não rejeitar a hipótese nula não significa que ela é verdadeira, e sim que pelos testes realizados, com 95% de confiança, não conseguiu-se provar sua falsidade. Porém, sobre a variância do custo da execução, a hipótese nula de que a variância é igual a 100 foi rejeitada, neste caso, com os testes realizados, com 95% de confiança, a hipótese alternativa foi aceita. Assim, a partir da análise realizada, conclui-se que, por esse quesito, houve melhoria da nova versão do software com relação a versão atual.
+Sobre o custo médio de execução, conclui-se que por não ter sido rejeitada a hipótese nula de que o custo médio de execução é igual a 50, neste caso, não pode-se inferir sobre a melhoria da nova versão sobre a versão atual. Vale lembrar que não rejeitar a hipótese nula não significa que ela é verdadeira, e sim que pelos testes realizados, com $99\%$ de confiança, não conseguiu-se provar sua falsidade. Porém, sobre a variância do custo da execução, a hipótese nula de que a variância é igual a 100 foi rejeitada, neste caso, com os testes realizados, com $95\%$ de confiança, a hipótese alternativa foi aceita. Assim, a partir da análise realizada, conclui-se que, por esse quesito, houve melhoria da nova versão do software com relação a versão atual.
 
 Diante das inferências expostas, recomenda-se a utilização da nova versão do software em substituição da versão atual.
 
