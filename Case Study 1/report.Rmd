@@ -48,6 +48,8 @@ library(ggplot2)
 library(plotly)
 # Boot package
 library(boot)
+# Tolerance package
+library(tolerance)
 # UFT-8 Encoding
 options(Encoding="UTF-8")
 ```
@@ -339,6 +341,27 @@ Diante das inferências expostas, recomenda-se a utilização da nova versão do
 ### Aperfeiçoando os testes
 
 Alguns testes não puderam ser feitos pois a amostra não tem uma representação normal associada. Já outros testes pelo fato de se ter somente uma amostra. Sugere-se possibilidade de extrair amostra da versão atual do software. De posse desta amostra seria possível utilizar de outros testes para calcular os estimadores de interesse, como por exemplo o teste de Levene, e na tentativa até de se evitar o uso da ferramenta de reamostragem, como foi usada no experimento acima.
+
+### Questão Bônus
+
+O objetivo é obter o intervalo de tolerância que contem $90\%$ dos custos de execução do software, com um nível de confiança de $95\%$.Para tal, foi utilizado um método não paramétrico pois não foi possível assumir que a amostra é normalmente distribuída. O método utilizado requer apenas que os dados sejam contínuos.
+```{r}
+# Questão Bônus
+out <- nptol.int(sort(sample), alpha = 0.05, P = 0.90, side = 2, method = "WILKS", upper = NULL, lower = NULL)
+show(out)
+
+```
+
+Sendo assim, pode-se afirmar com $95\%$ de confiança de que $90\%$ dos dados estão contidos entre 38,76112 e 67,21031.
+Abaixo representações gráficas para melhor visualizar o intervalo.
+  
+```{r plottol, fig.height = 4, fig.width = 12, fig.align = 'center', fig.cap = 'Intervalo de Tolerância', fig.pos = 'H'}
+
+plottol(out, sort(sample), plot.type = "both", side = "two", x.lab = "Custo de Execução")
+
+
+```
+
 
 
 
