@@ -173,6 +173,13 @@ Algumas primeiras propriedades da amostra, como média, mediana, valores extremo
 data.frame('Variância' = var(sample), 'Média' = mean(sample), 
                                 'Mediana' = median(sample), 'Mínimo' = min(sample), 
                                 'Máximo' = max(sample), 'Desvio' = sd(sample))
+
+getmode <- function(v) {
+   uniqv <- unique(v)
+   uniqv[which.max(tabulate(match(v, uniqv)))]
+}
+
+result <- getmode(sample)
 ```
 \noindent É importante ressaltar que a variância é significativamente menor que a considerada no cálculo do tamanho amostral $N$, assim, caso as premissas consideradas sejam válidas, a potência do teste será superior a desejada ($\pi > 0,8$).
 
@@ -188,6 +195,8 @@ mu_n <- mean(sample)
 sigma_n <- sd(sample)
 # Variance
 sigma2_n <- var(sample)
+
+
 ```
 
 ```{r histograma, fig.height = 1.9, fig.width = 1.9, fig.align = 'center', fig.cap = 'Histograma.', fig.pos = 'H'}
@@ -195,6 +204,7 @@ histogram <- ggplot(data = as.data.frame(sample), mapping = aes(x = sample))
 histogram + geom_histogram(lwd = 0.3, bins = 20, color = 'black', fill = 'gray') +
             scale_x_continuous(name = 'Custo de Execução') + 
             scale_y_continuous(name = 'Frequência')
+
 ```
 Posteriormente, o boxplot, também conhecido como gráfico de caixa, é considerado. Além de descrever simultaneamente várias propriedades importantes de um conjunto de dados, como centro, dispersão e desvio de simetria, ele também possiblita a identificação de valores atípicos \cite{Montgomery2010}. Para a amostra em questão, foi possível reforçar a presença das observações em torno da mediana levemente inferior a 50 (segundo quartil). Outro aspecto importante é a presença de uma assimetria positiva na distribuição, uma vez que a mediana está mais próxima do primeiro do que do terceiro quartil. A diferença nos comprimentos das linhas que saem da caixa pressupõe novamente a cauda acentuada à direita (Figura \ref{fig:boxplot}).
 
@@ -214,7 +224,7 @@ qqplot + geom_qq_line() + geom_qq() + scale_y_continuous(name = 'Quantis da Amos
 
 ### Validação de Premissas
 
-Devido à presumível falta de normalidade dos dados, o teste de Shapiro-Wilk foi feito para confirmação. A hipótese nula $H_0$ desse teste assume que a amostra veio de uma população com distribuição normal e para isso o parâmetro $W$ é calculado e comparado com um valor de referência. Caso a resultante de $W$ seja inferior ao valor tabelado, rejeita-se a hipótese de normalidade a um nível de significância $\alpha$. A aplicação do teste gerou como resultado $W = 0,94772$ e o valor de $p = 0,00755$, que confirmam a não normalidade dos dados ($p < 0,05$).
+Devido à presumível falta de normalidade dos dados, o teste de Shapiro-Wilk foi feito para confirmação. A hipótese nula $H_0$ desse teste assume que a amostra veio de uma população com distribuição normal e para isso o parâmetro $W$ é calculado e comparado com um valor de referência. Caso a resultante de $W$ seja inferior ao valor tabelado, rejeita-se a hipótese de normalidade a um nível de significância $\alpha$ \cite{hanusz2016shapiro}. A aplicação do teste gerou como resultado $W = 0,94772$ e o valor de $p = 0,00755$, que confirmam a não normalidade dos dados ($p < 0,05$).
 
 ```{r}
 (shapiro_test <- shapiro.test(x = sort(sample)))
@@ -332,9 +342,9 @@ boot.ci(boot.out = resampling, conf = 0.90, type = 'bca')
 
 ### Conclusões
 
-Com o objetivo de inferir sobre a melhora de desempenho da nova versão de um software em comparação com a versão atual, foi utilizado de conceitos e ferramentas estatísticas para investigar e concluir sobre esta comparação.
+Com o objetivo de inferir sobre a possível melhora de desempenho da nova versão de um software, quando comparado a versão atual, foi utilizado de conceitos e ferramentas estatísticas para investigar e concluir sobre o custo médio de execução e sobre a variância no custo de execução.
 
-Ficou a cargo de investigar sobre dois pontos principais, custo médio de execução e sobre a variância no custo de execução. Sobre o custo médio de execução, conclui-se que por não ter sido rejeitada a hipótese nula de que o custo médio de execução é igual a 50, neste caso, não pode-se inferir sobre a melhoria da nova versão sobre a versão atual. Vale lembrar que não rejeitar a hipótese nula não significa que ela é verdadeira, e sim que pelos testes realizados, com 95% de confiança, não conseguiu-se provar sua falsidade. Porém, sobre a variância do custo da execução, a hipótese nula de que a variância é igual a 100 foi rejeitada, neste caso, com os testes realizados, com 95% de confiança, a hipótese alternativa foi aceita. Assim, a partir da análise realizada, conclui-se que, por esse quesito, houve melhoria da nova versão do software com relação a versão atual.
+Sobre o custo médio de execução, conclui-se que por não ter sido rejeitada a hipótese nula de que o custo médio de execução é igual a 50, neste caso, não pode-se inferir sobre a melhoria da nova versão sobre a versão atual. Vale lembrar que não rejeitar a hipótese nula não significa que ela é verdadeira, e sim que pelos testes realizados, com 95% de confiança, não conseguiu-se provar sua falsidade. Porém, sobre a variância do custo da execução, a hipótese nula de que a variância é igual a 100 foi rejeitada, neste caso, com os testes realizados, com 95% de confiança, a hipótese alternativa foi aceita. Assim, a partir da análise realizada, conclui-se que, por esse quesito, houve melhoria da nova versão do software com relação a versão atual.
 
 Diante das inferências expostas, recomenda-se a utilização da nova versão do software em substituição da versão atual.
 
@@ -344,7 +354,7 @@ Alguns testes não puderam ser feitos pois a amostra não tem uma representaçã
 
 ### Questão Bônus
 
-O objetivo é obter o intervalo de tolerância que contem $90\%$ dos custos de execução do software, com um nível de confiança de $95\%$.Para tal, foi utilizado um método não paramétrico pois não foi possível assumir que a amostra é normalmente distribuída. O método utilizado requer apenas que os dados sejam contínuos.
+Os limites de tolerância fornecem os valores entre os quais uma específica proporção da populacional amostral pode ser encontrada dentro de um determinado nível de confiança \cite{rdrrio}. Diante disso, o objetivo deste experimento é obter o intervalo de tolerância que contenha $90\%$ dos custos de execução do software, com um nível de confiança de $95\%$. Para tal, foi utilizado um método não paramétrico pois não foi possível assumir que a amostra é normalmente distribuída. O método utilizado assume como premissa que os dados são contínuos. Tendo isso em vista, foi usado a função npregtol.int no R \cite{derek2020}, que calcula os limites de tolerância de regressão não paramétrica, onde foi utilizado o método de Wilks que gera o intervalo de tolerância simétrico ao centro dos dados, utilizando para isso uma distribuição beta \cite{rdrrio}.
 ```{r}
 # Questão Bônus
 out <- nptol.int(sort(sample), alpha = 0.05, P = 0.90, side = 2, method = "WILKS", upper = NULL, lower = NULL)
