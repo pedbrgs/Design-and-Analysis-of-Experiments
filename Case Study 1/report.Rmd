@@ -330,9 +330,9 @@ boot.ci(boot.out = resampling, conf = 0.90, type = 'bca')
 
 ### Conclusões
 
-Com o objetivo de inferir sobre a melhora de desempenho da nova versão de um software em comparação com a versão atual, utilizamos de conceitos e ferramentas estatísticas para investigar e concluir sobre esta comparação.
+Com o objetivo de inferir sobre a melhora de desempenho da nova versão de um software em comparação com a versão atual, foi utilizado de conceitos e ferramentas estatísticas para investigar e concluir sobre esta comparação.
 
-Ficamos a cargo de investigar sobre dois pontos principais, custo médio de execução e sobre a variância no custo de execução. Sobre o custo médio de execução, concluímos que por não rejeitarmos a hipótese nula de que o custo médio de execução é igual a 50, neste caso, não podemos inferir sobre a melhoria da nova versão sobre a versão atual. Vale lembrar que não rejeitar a hipótese nula não significa que ela é verdadeira, e sim que pelos testes que realizamos, com 95% de confiança, não conseguimos provar sua falsidade. Porem, sobre a variância do custo da execução, rejeitamos a hipótese nula, de que a variância é igual a 100, neste caso, com os testes realizados, com 95% de confiança, a hipótese alternativa foi aceita. Assim, a partir da nossa analise, concluímos que, por esse quesito, houve melhoria da nova versão do software com relação a versão atual.
+Ficou-se a cargo de investigar sobre dois pontos principais, custo médio de execução e sobre a variância no custo de execução. Sobre o custo médio de execução, conclui-se que por não ter sido rejeitada a hipótese nula de que o custo médio de execução é igual a 50, neste caso, não pode-se inferir sobre a melhoria da nova versão sobre a versão atual. Vale lembrar que não rejeitar a hipótese nula não significa que ela é verdadeira, e sim que pelos testes realizados, com 95% de confiança, não conseguiu-se provar sua falsidade. Porém, sobre a variância do custo da execução, a hipótese nula de que a variância é igual a 100 foi rejeitada, neste caso, com os testes realizados, com 95% de confiança, a hipótese alternativa foi aceita. Assim, a partir da análise realizada, conclui-se que, por esse quesito, houve melhoria da nova versão do software com relação a versão atual.
 
 
 
