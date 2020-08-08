@@ -334,6 +334,12 @@ Com o objetivo de inferir sobre a melhora de desempenho da nova versão de um so
 
 Ficou-se a cargo de investigar sobre dois pontos principais, custo médio de execução e sobre a variância no custo de execução. Sobre o custo médio de execução, conclui-se que por não ter sido rejeitada a hipótese nula de que o custo médio de execução é igual a 50, neste caso, não pode-se inferir sobre a melhoria da nova versão sobre a versão atual. Vale lembrar que não rejeitar a hipótese nula não significa que ela é verdadeira, e sim que pelos testes realizados, com 95% de confiança, não conseguiu-se provar sua falsidade. Porém, sobre a variância do custo da execução, a hipótese nula de que a variância é igual a 100 foi rejeitada, neste caso, com os testes realizados, com 95% de confiança, a hipótese alternativa foi aceita. Assim, a partir da análise realizada, conclui-se que, por esse quesito, houve melhoria da nova versão do software com relação a versão atual.
 
+Diante das inferências expostas, recomenda-se a utilização da nova versão do software em substituição da versão atual.
+
+### Aperfeiçoando os testes
+
+Alguns testes não foram feitos pois a amostra não tem uma representação normal associada. Já outros testes pelo fato de se ter somente uma amostra. Sugere-se possibilidade de extrair mais amostras na nova versão do software, a fim de comparar com a versão atual. De posse de mais amostras é possível utilizar de outros testes para calcular os estimadores de interesse, na possibilidade até de se evitar o uso da ferramenta de reamostragem, como foi usada no experimento acima.
+
 
 
 \renewcommand\refname{Referências}
