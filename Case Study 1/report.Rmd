@@ -6,10 +6,10 @@ title: |
 author: Pedro Vinícius, Samara Silva e Savio Vieira
 date: 10 de Agosto de 2020
 output:
-  html_document:
-    df_print: paged
   pdf_document:
     fig_caption: yes
+  html_document:
+    df_print: paged
 indent: true
 header-includes: 
     - \usepackage{indentfirst}
@@ -395,7 +395,7 @@ Alguns testes não puderam ser feitos devido a não-normalidade da amostra obtid
 
 ### Atividades Desempenhadas
 
-As hipóteses de teste para ambos experimentos foram definidas em concordância com os três autores. Em relação à primeira parte do estudo de caso, o cálculo do tamanho amostral e a coleta dos dados foram conduzidas pelo Pedro e discutidas com os demais autores. A análise exploratória teve participação de toda a equipe e a validação das premissas foi realizada pela Samara. Tanto a análise estatística quanto a discussão a posteriori da potência do teste e do tamanho amostral foram feitas pelo Pedro. A segunda parte do estudo caso, por sua vez, teve diversas discussões entre os membros até uma conclusão final. A Samara e o Sávio investigaram testes estatísticos de uma única amostra que não requisitassem a premissa de normalidade. Além disso, a Samara averiguou transformações não-lineares nos dados com o intuito de torná-los normais. Por fim, o Pedro implementou a reamostragem pela técnica *Bootstrap*, bem como analisou as premissas demandadas pelo tipo de intervalo de confiança não-paramétrico definido (BCa). A questão bônus e suas respectivas análises foram elaboradas pelo Sávio e pela Samara. Sávio ainda elaborou as conclusões e discussões de melhorias.
+As hipóteses de teste para ambos experimentos foram definidas em concordância com os três autores. Em relação à primeira parte do estudo de caso, o cálculo do tamanho amostral e a coleta dos dados foram conduzidas pelo Pedro e discutidas com os demais autores. A análise exploratória teve participação de toda a equipe e a validação das premissas foi realizada pela Samara. Tanto a análise estatística quanto a discussão a posteriori da potência do teste e do tamanho amostral foram feitas pelo Pedro. A segunda parte do estudo de caso, por sua vez, teve diversas discussões entre os membros até uma decisão final. A Samara e o Sávio investigaram testes estatísticos de uma única amostra que não requisitassem a premissa de normalidade. Além disso, a Samara averiguou transformações não-lineares nos dados com o intuito de torná-los normais. Por fim, o Pedro implementou a reamostragem pela técnica *Bootstrap*, bem como analisou as premissas demandadas pelo tipo de intervalo de confiança não-paramétrico definido (BCa). A questão bônus e suas respectivas análises foram elaboradas pelo Sávio e pela Samara. Sávio ainda elaborou as conclusões e discussões de melhorias.
 
 \renewcommand\refname{Referências}
 \bibliographystyle{plain}
