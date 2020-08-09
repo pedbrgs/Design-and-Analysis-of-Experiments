@@ -6,10 +6,10 @@ title: |
 author: Pedro Vinícius, Samara Silva e Savio Vieira
 date: 10 de Agosto de 2020
 output:
-  pdf_document:
-    fig_caption: yes
   html_document:
     df_print: paged
+  pdf_document:
+    fig_caption: yes
 indent: true
 header-includes: 
     - \usepackage{indentfirst}
@@ -239,7 +239,7 @@ qqplot + geom_qq_line() + geom_qq() + scale_y_continuous(name = 'Quantis da Amos
 
 ### Validação de Premissas
 
-Devido à presumível falta de normalidade dos dados, o teste de Shapiro-Wilk foi feito para confirmação. A hipótese nula $H_0$ desse teste assume que a amostra veio de uma população com distribuição normal e para isso o parâmetro $W$ é calculado e comparado com um valor de referência. Caso a resultante de $W$ seja inferior ao valor tabelado, rejeita-se a hipótese de normalidade a um nível de significância $\alpha$ \cite{hanusz2016shapiro}. A aplicação do teste gerou como resultado $W = 0,94772$ e o valor de $p = 0,00755$, que confirmam a não normalidade dos dados ($p < 0,05$).
+Devido à presumível falta de normalidade dos dados, o teste de Shapiro-Wilk foi feito para confirmação. A hipótese nula $H_0$ desse teste assume que a amostra veio de uma população com distribuição normal e para isso o parâmetro $W$ é calculado e comparado com um valor de referência. Caso a resultante de $W$ seja inferior ao valor tabelado, rejeita-se a hipótese de normalidade a um nível de significância $\alpha$ \cite{hanusz2016shapiro}. A aplicação do teste gerou como resultado $W = 0,94772$ e o valor de $p = 0,00755$, que confirmam a não normalidade dos dados ($p < 0,1$) \cite{ShapiroWilkTest}.
 
 ```{r}
 (shapiro_test <- shapiro.test(x = sort(sample)))
