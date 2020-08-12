@@ -1,0 +1,114 @@
+---
+title: |
+    | Planejamento e Análise de Experimentos (EEE933)
+    | Estudo de Caso 2
+#title: Planejamento e Análise de Experimentos (EEE933) Estudo de Caso 1
+author: Pedro Vinícius, Samara Silva e Savio Vieira
+date: 24 de Agosto de 2020
+output:
+  pdf_document:
+    fig_caption: yes
+  html_document:
+    df_print: paged
+indent: true
+header-includes: 
+    - \usepackage{indentfirst}
+    - \usepackage{float}
+bibliography: ref.bib
+doi: https://github.com/pedbrgs/Design-and-Analysis-of-Experiments
+pagetitle: Estudo de Caso 2
+---
+
+```{r setup, results='hide', warning=FALSE, include = FALSE, message = FALSE, echo=FALSE}
+# A few initial definitions just to make sure all required packages are installed. Change as needed.
+# NOTE: It may echo some weird messages to the PDF on the first compile (package installation messages). Run twice and the problem will (hopefully) go away. 
+if (!require(ggplot2, quietly = TRUE)){
+      install.packages("ggplot2")
+      }
+if (!require(devtools, quietly = TRUE)){
+      install.packages("devtools")
+      }
+ if (!require(broom, quietly = TRUE)){
+       devtools::install_github("dgrtwo/broom")
+      }
+if (!require(stats, quietly = TRUE)){
+      suppressMessages(install.packages("stats"))
+      }
+if (!require(plotly, quietly = TRUE)){
+      suppressMessages(install.packages("plotly"))
+      }
+```
+
+
+```{r, message = FALSE, warning = FALSE, results = 'hide', echo = FALSE}
+# Statistical package 
+library(stats)
+# Ggplot2 package
+library(ggplot2)
+# Plotly package
+library(plotly)
+# UFT-8 Encoding
+options(Encoding="UTF-8")
+```
+
+```{r, message = FALSE, warning = FALSE, results = 'hide', echo = FALSE}
+theme_update(axis.title = element_text(size = 8), axis.text = element_text(size = 8))
+```
+
+# Introdução
+
+## Planejamento dos Experimentos
+
+$$\begin{cases} H_0: \mu = ?&\\H_1: \mu<?\end{cases}$$
+
+## Tratamento dos Dados
+
+```{r}
+# Carrega dados relativos ao semestre de 2016/2
+data2016 <- read.csv('imc_20162.csv')
+# Seleciona apenas alunos do programa de pós-graduação
+ppgee2016 <- data2016[data2016['Course'] == 'PPGEE',]
+# Separa amostras por sexo
+female2016 <- ppgee2016[ppgee2016['Gender'] == 'F',]
+male2016 <- ppgee2016[ppgee2016['Gender'] == 'M',]
+```
+
+```{r}
+# Carrega dados relativos ao semestre de 2017/2
+data2017 <- read.csv('CS01_20172.csv', sep = ';')
+# Separa amostras por sexo
+female2017 <- data2017[data2017['Sex'] == 'F',]
+male2017 <- data2017[data2017['Sex'] == 'M',]
+```
+
+```{r}
+# Cálculo do Índice de Massa Corporal (IMC)
+
+# Alunos de 2016/2
+female2016['IMC.kg/m2'] <- female2016['Weight.kg']/(female2016['Height.m']^2)
+male2016['IMC.kg/m2'] <- male2016['Weight.kg']/(male2016['Height.m']^2)
+
+# Alunos de 2017/2
+female2017['IMC.kg/m2'] <- female2017['Weight.kg']/(female2017['height.m']^2)
+male2017['IMC.kg/m2'] <- male2017['Weight.kg']/(male2017['height.m']^2)
+```
+
+## Análise Exploratória de Dados
+
+
+## Validação de Premissas
+
+
+## Conclusões
+
+
+### Discussão de Melhorias
+
+
+### Atividades Desempenhadas
+
+
+
+\renewcommand\refname{Referências}
+\bibliographystyle{plain}
+\bibliography{ref}
