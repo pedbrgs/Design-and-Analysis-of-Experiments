@@ -6,10 +6,10 @@ title: |
 author: Pedro Vinícius, Samara Silva e Savio Vieira
 date: 24 de Agosto de 2020
 output:
-  html_document:
-    df_print: paged
   pdf_document:
     fig_caption: yes
+  html_document:
+    df_print: paged
 indent: true
 header-includes: 
     - \usepackage{indentfirst}
