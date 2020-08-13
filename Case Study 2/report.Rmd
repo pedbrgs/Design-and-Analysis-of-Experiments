@@ -6,10 +6,10 @@ title: |
 author: Pedro Vinícius, Samara Silva e Savio Vieira
 date: 24 de Agosto de 2020
 output:
-  pdf_document:
-    fig_caption: yes
   html_document:
     df_print: paged
+  pdf_document:
+    fig_caption: yes
 indent: true
 header-includes: 
     - \usepackage{indentfirst}
@@ -37,6 +37,9 @@ if (!require(stats, quietly = TRUE)){
 if (!require(plotly, quietly = TRUE)){
       suppressMessages(install.packages("plotly"))
       }
+if (!require(reshape2, quietly = TRUE)){
+      suppressMessages(install.packages("reshape2"))
+      }
 ```
 
 
@@ -47,12 +50,10 @@ library(stats)
 library(ggplot2)
 # Plotly package
 library(plotly)
+# Reshape2 package
+library(reshape2)
 # UFT-8 Encoding
 options(Encoding="UTF-8")
-```
-
-```{r, message = FALSE, warning = FALSE, results = 'hide', echo = FALSE}
-theme_update(axis.title = element_text(size = 8), axis.text = element_text(size = 8))
 ```
 
 # Introdução
@@ -93,11 +94,49 @@ female2017['IMC.kg/m2'] <- female2017['Weight.kg']/(female2017['height.m']^2)
 male2017['IMC.kg/m2'] <- male2017['Weight.kg']/(male2017['height.m']^2)
 ```
 
+```{r, results = 'hide', echo = FALSE}
+
+# Amostras de 2016/2
+F2016 <- female2016$`IMC.kg/m2`
+M2016 <- male2016$`IMC.kg/m2`
+
+# Amostras de 2017/2
+F2017 <- female2017$`IMC.kg/m2`
+M2017 <- male2017$`IMC.kg/m2`
+```
+
+```{r, results = 'hide', echo = FALSE}
+n_max <- max(length(F2016), length(F2017), length(M2016), length(M2017))
+length(F2016) <- n_max
+length(F2017) <- n_max
+length(M2016) <- n_max
+length(M2017) <- n_max
+
+IMCs <- data.frame('M2016' = M2016, 'M2017' = M2017, 'F2016' = F2016, 'F2017' = F2017)
+IMCs <- melt(IMCs, id.vars = NULL)
+IMCs <- na.omit(IMCs)
+```
+
 ## Análise Exploratória de Dados
 
+```{r plottol, fig.height = 3, fig.width = 6, fig.align = 'center', fig.cap = 'Boxplots.', fig.pos = 'H'}
+# Boxplot
+boxplot <- ggplot(data = IMCs, mapping = aes(x = variable, y = value)) + 
+          geom_boxplot(lwd = 0.3) 
+boxplot
+```
 
 ## Validação de Premissas
 
+```{r}
+shapiro.test(M2016)
+shapiro.test(M2017)
+```
+
+```{r}
+shapiro.test(F2016)
+shapiro.test(F2017)
+```
 
 ## Conclusões
 
