@@ -1645,7 +1645,7 @@ Estudo de Caso 2</div></h1>
 <h1>Introdução</h1>
 <div id="planejamento-dos-experimentos" class="section level2">
 <h2>Planejamento dos Experimentos</h2>
-<p><span class="math display">\[\begin{cases} H_0: \mu = ?&amp;\\H_1: \mu&lt;?\end{cases}\]</span></p>
+<p><span class="math display">\[\begin{cases} H_0: \mu_{2016} = \mu_{2017} &amp;\\H_1: \mu_{2016} \neq \mu_{2017} \end{cases}\]</span></p>
 </div>
 <div id="tratamento-dos-dados" class="section level2">
 <h2>Tratamento dos Dados</h2>
@@ -1710,6 +1710,34 @@ Boxplots.
 ## 
 ## data:  F2017
 ## W = 0.7475, p-value = 0.03659</code></pre>
+</div>
+<div id="análise-estatística" class="section level2">
+<h2>Análise Estatística</h2>
+<pre class="r"><code>(t_test &lt;- t.test(x = M2016, 
+                  y = M2017,
+                mu = 0, 
+                alternative = &quot;two.sided&quot;,
+                conf.level = 0.95))</code></pre>
+<pre><code>## 
+##  Welch Two Sample t-test
+## 
+## data:  M2016 and M2017
+## t = 0.53979, df = 38.057, p-value = 0.5925
+## alternative hypothesis: true difference in means is not equal to 0
+## 95 percent confidence interval:
+##  -1.788823  3.089716
+## sample estimates:
+## mean of x mean of y 
+##  24.93595  24.28551</code></pre>
+<pre class="r"><code>cat('Intervalo de confiança:', t_test$conf.int[1:2])</code></pre>
+<pre><code>## Intervalo de confiança: -1.788823 3.089716</code></pre>
+<pre class="r"><code>wilcox.test(x = F2016, y = F2017, alternative = &quot;two.sided&quot;)</code></pre>
+<pre><code>## 
+##  Wilcoxon rank sum test
+## 
+## data:  F2016 and F2017
+## W = 24, p-value = 0.07273
+## alternative hypothesis: true location shift is not equal to 0</code></pre>
 </div>
 <div id="conclusões" class="section level2">
 <h2>Conclusões</h2>
