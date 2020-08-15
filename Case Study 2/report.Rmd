@@ -6,11 +6,11 @@ title: |
 author: Pedro Vinícius, Samara Silva e Savio Vieira
 date: 24 de Agosto de 2020
 output:
-  html_document:
-    df_print: paged
   pdf_document:
     #latex_engine: xelatex
     fig_caption: yes
+  html_document:
+    df_print: paged
 indent: true
 header-includes: 
     - \usepackage{indentfirst}
@@ -200,6 +200,9 @@ ggplot(data = IMCs, aes(sample = value)) +
 
 
 ## Análise Estatística
+Uma vez analisado a normalidade das amostras, pode-se definir quais testes são aplicáveis para comparação das medias. Para as observações do IMC masculino, tanto a amostra do segundo semestre de $2016$ quando a do segundo semestre de $2017$ são normais, sendo assim, pode-se aplicar o teste T de Student para duas amostras. Porem, para as observações do IMC feminino, a amostra do segundo semestre de $2017$ não é normal, sendo assim, para teste das medias das amostras do grupo feminino, deve-se utilizar um teste não-paramétrico.
+O teste T de Student para duas amostras tem como premissa que as amostras a serem testadas tenham comportamento normal, como já mencionado. Os parâmetros de entrada, além das duas amostras envolvidas, devem conter que tipo da hipótese alternativa, se bilateral, unilateral esquerda ou direita, neste experimento, deseja-se que as medias tenham valores diferentes, sendo assim, bilateral. Outro parâmetro de entrada é o valor da diferença das medias, neste caso, como a hipótese nula é que as medias das duas amostras são iguais, a diferença das medias $\mu_{2016} - \mu_{2017} = 0$, e por fim, o nível de confiança adotado para os testes foi de $95\%$.
+
 
 ```{r}
 (t_test <- t.test(x = M2016, 
@@ -208,10 +211,19 @@ ggplot(data = IMCs, aes(sample = value)) +
                 conf.level = 0.95))
 cat('Intervalo de confiança:', t_test$conf.int[1:2])
 ```
+O resultado do teste T de Student retornou um p-valor de $0,5925$, maior que o nível de significância de $0,05$, isso significa que com $95\%$ de confiança, não deve-se rejeitar a hipótese nula $H_0$ de que as medias das duas amostras são iguais. Sendo a hipótese alternativa $H_1$ bilateral, o intervalo de confiança para a diferença das medias é [-1,788823 , 3,089716].
 
+O teste de Wilcoxon foi apontado para analise das amostras do grupo feminino, por uma das amostras não ser normal. É um teste não-paramétrico, equivalente ao teste Mann-Whitney quando as amostras não são pareadas. A hipótese nula $H_0$ é de que as medias são iguais, sendo assim, o que nos parâmetro do teste de Wilcoxon chama-se de mudança de localização, o valor deve ser igual a zero ($0$), como padrão o mesmo já é zero. A hipótese alternativa $H_1$ é de que as medias são diferentes, um teste bilateral, e o nivel de confiança para o teste tambem é de $95\%$.
 ```{r}
-wilcox.test(x = F2016, y = F2017, alternative = "two.sided")
+(wilcox_test <- wilcox.test(x = F2016, 
+                            y = F2017, 
+                            alternative = "two.sided", 
+                            conf.int = TRUE))
+cat('Intervalo de confiança:', wilcox_test$conf.int)
 ```
+Como o p-valor retornado foi maior que o nível de significância do experimento, $0,07273 > 0,05$, a hipótese nula $H_0$, com $95\%$ de confiança, não pode ser rejeitada. O intervalo de confiança para a diferença das medias é [-0,6374374, 5,22844].
+Para os testes tanto do grupo masculino quanto para o feminino, as hipóteses nulas $H_0$ foram aceitas, neste caso, hipóteses fracas que não foram rejeitadas. Não significa que são verdadeiras, mas que com os testes realizados a $95\%$  de confiança, não pode-se rejeitá-las.
+
 
 ## Validação de Premissas
 
