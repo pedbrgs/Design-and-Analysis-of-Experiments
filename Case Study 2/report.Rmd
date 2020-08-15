@@ -262,7 +262,9 @@ ggplot(data = IMCs, aes(sample = value)) +
 
 ## Tamanho de Efeito
 
-Comumente, os estudos científicos apresentam a significância dos resultados alcançados. Contudo, é aconselhável mensurar também a tamanho de efeito (importância real) concernente às diferenças encontradas em termos de média ou variância dos grupos avaliados \cite{kelley2012effect}. A literatura aborda algumas metodologias para isso, o Teste de Cohen, Teste de Glass, Teste de Hedges, Teste ($\psi$), dentre outros. Cada um desses testes têm diferentes maneiras de calcular o tamanho de efeito quanto a um determinado estimador, alguns fazendo uso da média (Cohen(d), Glass ($\Delta$), Hedges($g$), $\psi$) e outros usando as variâncias (Pearson, $\eta^2$, $\omega^2$ e Cohen($f^2$)). O teste de Cohen, por exemplo, calcula o tamanho de efeito $d$ quanto à média, obtendo o quociente da diferença entre as médias dos grupos pelo desvio padrão agrupado, conforme mostrado nas Equações \eqref{eq:d_cohen} e \eqref{eq:desvio_conjugado} \cite{juniortamanho}.
+Comumente, os estudos científicos apresentam a significância dos resultados alcançados, contudo, é aconselhável mensurar também a tamanho de efeito (importância real) concernente às diferenças encontradas em termos de média ou variância dos grupos avaliados \cite{kelley2012effect}. Embora o valor p seja importante por trazer a informação sobre a existência ou não de diferenças entre os grupos avaliados, considerando um nível de significância $\alpha$, ele não mensura o tamanho real deste efeito, ou seja, quão expressiva é a diferença encontrada. Por causa disso, recomenda-se que o tamanho de efeito esteja sempre presente em conjunto com o valor de p. \cite{sullivan2012using}
+
+A literatura aborda algumas metodologias para calculo do tamanho de efeito, como o Teste de Cohen, Teste de Glass, Teste de Hedges, Teste ($\psi$), dentre outros. Cada um desses testes têm diferentes maneiras de calcular o tamanho de efeito quanto a um determinado estimador, alguns fazendo uso da média (Cohen(d), Glass ($\Delta$), Hedges($g$), $\psi$) e outros usando as variâncias (Pearson, $\eta^2$, $\omega^2$ e Cohen($f^2$)). O teste de Cohen, por exemplo, calcula o tamanho de efeito $d$ quanto à média, obtendo o quociente da diferença entre as médias dos grupos pelo desvio padrão agrupado, conforme mostrado nas Equações \eqref{eq:d_cohen} e \eqref{eq:desvio_conjugado} \cite{juniortamanho}.
 
 \begin{equation}
   \label{eq:d_cohen}
@@ -274,7 +276,23 @@ Comumente, os estudos científicos apresentam a significância dos resultados al
   s = \sqrt{\frac{(n_1-1)s^2_1 + (n_2-1)s^2_2}{n_1+n_2 - 2}}
 \end{equation}
 
-A medida mais usada para calcular o tamanho de efeito para um teste t de Student é o $d$ de Cohen (Cohen 1998) \cite{datanovia}. A interpretação deste teste se dá a partir do $d$ calculado pela Equação \eqref{eq:d_cohen}. O efeito é considerado muito pequeno quando $d$ resulta entre $[0,01;0,20[$ \cite{sawilowsky2009new}, pequeno, médio e grande quando $d \in [0,20;0,50[$, $[0,50;0,80]$ e grande $[0,80;1,20[$, respectivamente \cite{cohen2013statistical}, muito grande se $d \in [1,20;2]$ \cite{sawilowsky2009new} e enorme a partir de $2,0$ \cite{sawilowsky2009new}. 
+A medida mais usada para calcular o tamanho de efeito para um teste t de Student é o $d$ de Cohen (Cohen 1998) \cite{datanovia}. A interpretação deste teste se dá a partir do $d$ calculado pela Equação \eqref{eq:d_cohen}. O efeito é considerado muito pequeno quando $d$ resulta entre $[0,01;0,20[$ \cite{sawilowsky2009new}, pequeno, médio e grande quando $d \in [0,20;0,50[$, $[0,50;0,80]$ e $[0,80;1,20[$, respectivamente \cite{cohen2013statistical}, muito grande se $d \in [1,20;2]$ \cite{sawilowsky2009new} e enorme a partir de $2,0$ \cite{sawilowsky2009new}.
+
+Para calcular o tamanho do efeito usando este método, algumas premissas assumidas: normalidade dos dados e homoscedasticidade. \cite{peng2014beyond} Usando o Teste de Shapiro-Wilk é possível inferir sobre a normalidade das amostras, haja vista que a Hipótese Nula deste teste é de que os dados provêm de uma distribuição normal \cite{ShapiroWilkTest}. A função shapiro.test do pacote stats do R considera o nível de confiança de 90% ($\alpha = 0,1$) para avaliação das amostras fornecidas \cite{shapiro}.
+
+### Tamanho do efeito para amostras masculinas
+
+O Teste de Shapiro-Wilk evidenciou que a ambas as amostras do grupo masculino M2016 e M2017 apresentam características de normalidade, pois a hipótese nula desse teste não pôde ser refutada, com nível de confiança de 90%. Nesse caso, o valor de p resultou em $p=0,1275$ e $p=0,6206$, respectivamente.
+
+Uma vez que a variância populacional não é conhecida, não se pode afirmar sobre a homoscedasticidade das amostras. Por isso, torna-se necessário a realização de um teste específico, como o Teste F para igualdade de variâncias. Esse teste tem como hipótese nula a proposição de que os grupos comparados têm a mesma variância, partindo do pressuposto de que os dados são normais. O teste estatístico F é calculado pelo quociente da variância do primeiro grupo pelo segundo. Se a resultante de F é maior que o valor crítico superior ou menor que o valor crítico inferior, a hipótese nula é rejeitada \cite{fang2018handbook}.
+
+```{r}
+# Teste F: homocedasticidade das amostras masculinas (assume normalidade)
+var.test(x = M2016, y = M2017, alternative = "two.sided")
+```
+
+A execução do teste F para o grupo de dados M2016 e M2017 resultou em $F=1,5838$ e $p = 0,3119$, que reflete que a igualdade de variância pode ser assumida para os dados em questão. Com isso, pode-se executar o Cohen's d para computar o tamanho de efeito para as tais amostras.
+
 
 Por meio do uso do pacote `effsize` do R \cite{torchiano2020package} foi calculado o tamanho de efeito referente aos dados estudados, com uso da função `cohen.d`.
 
@@ -284,7 +302,9 @@ cohen.d(sort(M2016),sort(M2017))
 cohen.d(sort(F2016),sort(F2017))
 ```
 
-Os resultados mostraram que, em relação à média do IMC do grupos masculinos, $d$ resultou em $0,1665831$, que evidencia que não existem diferenças significativas entre as médias estudadas. Já em relação ao IMC dos grupos femininos avaliadso, constatou-se que $d = 1,21019$, que permite inferir que há grandes diferenças entre as médias dos grupos em questão.
+Os resultados mostraram que, em relação à média do IMC do grupos masculinos, $d$ resultou em $0,1665831$, que evidencia que não existem diferenças significativas entre as médias estudadas. 
+
+### Tamanho do efeito para amostras femininas
 
 ## Análise Estatística
 Uma vez analisado a normalidade das amostras, pode-se definir quais testes são aplicáveis para comparação das médias. Para as observações do IMC masculino, tanto a amostra do segundo semestre de $2016$ quando a do segundo semestre de $2017$ são normais, sendo assim, pode-se aplicar o teste T de Welch para duas amostras. Porem, para as observações do IMC feminino, a amostra do segundo semestre de $2017$ não é normal, sendo assim, para teste das médias das amostras do grupo feminino, deve-se utilizar um teste não-paramétrico.
