@@ -46,7 +46,11 @@ if (!require(reshape2, quietly = TRUE)){
       }
 if (!require(tidyr, quietly = TRUE)){
       suppressMessages(install.packages("tidyr"))
-      }
+}
+if(!require(effsize)){install.packages("effsize")
+  }
+if(!require(lsr)){install.packages("lsr")
+  }
 ```
 
 
@@ -63,6 +67,10 @@ library(reshape2)
 library(GGally)
 # Tidyr package
 library(tidyr)
+#effect size
+library(effsize)
+#effect size cohens
+library(lsr)
 # UFT-8 Encoding
 options(Encoding="UTF-8")
 ```
@@ -236,6 +244,22 @@ shapiro.test(M2017)
 shapiro.test(F2016)
 shapiro.test(F2017)
 ```
+
+### Tamanho de efeito
+
+Comumente, os estudos científicos apresentam a significância dos resultados alcançados. Contudo, é aconselhável mensurar também a tamanho de efeito (importância real) concernente às diferenças encontradas em termos de média ou variância dos grupos avaliados \cite{kelley2012effect}. A literatura aborda algumas metodologias para isso, o Teste de Cohen, Teste de Glass, Teste de Hedges, Teste (Psi), dentre outros. Cada um desses testes têm diferentes maneiras de calcular o tamanho de efeito quanto a um determinado estimador, alguns fazendo uso da média (Cohen(d), Glass, Hedges(g), Psi) e outros usando as variâncias (Pearson, Eta², ômega² e Cohen(f²)). O teste de Cohen,  por exemplo, calcula o tamanho de efeito (d) quanto à média, obtendo o quociente da diferença entre as médias dos grupos pelo desvio padrão agrupado, conforme mostrado em X e Y \cite{juniortamanho}.
+
+A medida mais usada para calcular o tamanho de efeito para um teste t é o d de Cohen (Cohen 1998) \cite{datanovia}. A interpretação deste teste se dá a partir do d calculado por X. O efeito é considerado muito pequeno quando d resulta entre [0,01;0,20[ \cite{sawilowsky2009new}, pequeno, médio e grande quando d E [0,20;0,50[, [0,50;0,80]{e grande [0,80;1,20[, respectivamente \cite{cohen2013statistical}, muito grande se d E [1,20;2] \cite{sawilowsky2009new} e enorme a partir de 2,0 {sawilowsky2009new}. 
+
+Por meio do uso do pacote “effsize” do R \cite{torchiano2020package} foi calculado o tamanho de efeito referente aos dados estudados, com uso da função cohen.d.
+
+```{r}
+cohen.d(sort(M2016),sort(M2017))
+
+cohen.d(sort(F2016),sort(F2017))
+```
+
+Os resultados mostraram que, em relação à média do IMC do grupos masculinos, d resultou em 0,1665831, que evidencia que não existem diferenças significativas entre as médias estudadas. Já em relação ao IMC dos grupos femininos avaliadso, constatou-se que d= 1,21019, que permite inferir que há grandes diferenças entre as médias dos grupos em questão.
 
 
 ## Conclusões
