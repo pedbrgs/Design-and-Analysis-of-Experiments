@@ -15,6 +15,7 @@ indent: true
 header-includes: 
     - \usepackage{indentfirst}
     - \usepackage{float}
+    - \usepackage{multicol}
 bibliography: ref.bib
 doi: https://github.com/pedbrgs/Design-and-Analysis-of-Experiments
 pagetitle: Estudo de Caso 2
@@ -50,6 +51,9 @@ if (!require(tidyr, quietly = TRUE)){
 if (!require(effsize, quietly = TRUE)){
       suppressMessages(install.packages("effsize"))
       }
+if (!require(pwr, quietly = TRUE)){
+      suppressMessages(install.packages("pwr"))
+      }
 if (!require(lsr, quietly = TRUE)){
       suppressMessages(install.packages("lsr"))
       }
@@ -63,7 +67,7 @@ library(stats)
 library(ggplot2)
 # Plotly package
 library(plotly)
-# Reshape2 package
+# Reshape2 package  
 library(reshape2)
 # GGally package
 library(GGally)
@@ -75,6 +79,8 @@ library(effsize)
 library(lsr)
 # Car package
 library(car)
+# Pwr package
+library(pwr)
 # UFT-8 Encoding
 options(Encoding="UTF-8")
 ```
@@ -93,11 +99,15 @@ options(Encoding="UTF-8")
 
 \noindent em $kg/m^2$. Cada faixa de IMC permite classificar o indivíduo em uma das seguintes categorias \cite{Alexandra2007}:
 
-* Baixo peso: $< 18,5$
-* Peso normal: $18,5 - 25$
-* Sobrepeso: $25 - 30$
-* Obesidade: $30 - 35$
-* Obesidade mórbida: $> 40$
+\begin{multicols}{3}
+  \begin{itemize}
+    \item Baixo peso: $< 18,5$
+    \item Peso normal: $18,5 - 25$
+    \item Sobrepeso: $25 - 30$
+    \item Obesidade: $30 - 35$
+    \item Obesidade mórbida: $> 40$
+  \end{itemize}
+\end{multicols}
 
 Neste estudo de caso deseja-se comparar o IMC médio dos alunos de Pós-Graduação em Engenharia Elétrica (PPGEE) da Universidade Federal de Minas Gerais (UFMG) de dois semestres distintos: $2016/2$ e $2017/2$. Para tal fim, foram disponibilizadas duas amostras, contendo sexo, altura e peso de alguns alunos \cite{Campelo2018-LNDoE}. Assim, duas análises estatísticas independentes são propostas: (i) uma sobre o IMC médio dos alunos do sexo masculino e (ii) uma sobre o IMC médio dos alunos do sexo feminino. Para ambos os casos, a condução dos experimentos foram similares, no entanto, alguns testes estatísticos tiveram que ser adaptados de acordo com as propriedades das distribuições amostrais em investigação, que foram validadas previamente.
 
@@ -106,17 +116,29 @@ Neste estudo de caso deseja-se comparar o IMC médio dos alunos de Pós-Graduaç
 As hipóteses estatísticas foram definidas com o intuito de responder às questões propostas abaixo:
 
 * Há evidências de que o IMC médio dos alunos do PPGEE/UFMG de $2016/2$ é diferente do IMC médio dos alunos do PPGEE/UFMG de $2017/2$ no que se refere ao sexo masculino?
-* E quanto ao sexo feminino?
+* Há evidências de que a mediana do IMC dos alunos do PPGEE/UFMG de $2016/2$ é diferente da mediana do IMC dos alunos do PPGEE/UFMG de $2017/2$ no que se refere ao sexo feminino?
 
-Em concordância com a proposta de comparação do IMC médio entre os alunos de semestres distintos, as hipóteses de teste podem ser formuladas sobre o parâmetro média:
-$$\begin{cases} H_0: \mu_{2016} = \mu_{2017} &\\H_1: \mu_{2016} \neq \mu_{2017} \end{cases}$$
-\noindent onde a hipótese nula $H_0$ implica na igualdade entre os IMCs médios dos alunos de $2016/2$ e $2017/2$ e a hipótese alternativa bilateral $H_1$ na diferença dos IMCs médios e, portanto, em uma potencial diferença dos estilos de vida dos alunos.
+Em concordância com a proposta de comparação do IMC médio entre os alunos de semestres distintos e o IMC mediano entre as alunas de semestre distintos, as hipóteses de teste podem ser formuladas sobre o parâmetro média e mediana, respectivamente:
+
+$$
+  \begin{cases} 
+      H_0: \mu_{M2016} = \mu_{M2017} &\\H_1: \mu_{M2016} \neq \mu_{M2017} 
+  \end{cases}
+  \begin{cases} 
+      H_0: m_{F2016} = m_{F2017} &\\H_1: m_{F2016} \neq m_{F2017} 
+  \end{cases}
+$$
+
+\noindent onde a hipótese nula $H_0$ implica na igualdade entre os IMCs médios ou medianos dos alunos de $2016/2$ e $2017/2$ e a hipótese alternativa bilateral $H_1$ na diferença dos IMCs médios ou medianos e, portanto, em uma potencial diferença dos estilos de vida dos alunos.
 
 Os parâmetros experimentais para realização dos testes são:
 
 * A probabilidade admissível de rejeição da hipótese nula quando ela é verdadeira é de apenas $5\%$, isto é, o nível de significância do teste é $\alpha = 0,05$;
 * A potência do teste é de $\pi = 1 - \beta = 0,8$. Em outras palavras, deseja-se uma probabilidade de falha ao rejeitar a hipótese nula quando ela é falsa de $20\%$.
+
+<!-- 
 * O tamanho de efeito de mínima relevância prática será definito posteriormente na Subseção Tamanho de Efeito.
+-->
 
 ## Pré-Processamento dos Dados
 
@@ -277,12 +299,16 @@ em que $n_1$ e $n_2$ são, nessa ordem, os tamanhos amostrais dos grupos $1$ e $
 
 A medida mais usada para calcular o tamanho de efeito para um teste t de Student é o $d$ de Cohen \cite{Alboukadel2020}. A interpretação deste teste se dá a partir do $d$ calculado pela Equação \eqref{eq:d_cohen} conforme a seguinte classificação \cite{Sawilowsky2009}:
 
-* Muito pequeno: $0,01 \leq d < 0,20$
-* Pequeno: $0,20 \leq d < 0,50$
-* Médio: $0,50 \leq d < 0,80$
-* Grande: $0,80 \leq d < 1,20$
-* Muito grande: $1,20 \leq d < 2$
-* Enorme: $d \geq 2,0$
+\begin{multicols}{2}
+  \begin{itemize}
+    \item Muito pequeno: $0,01 \leq d < 0,20$
+    \item Pequeno: $0,20 \leq d < 0,50$
+    \item Médio: $0,50 \leq d < 0,80$
+    \item Grande: $0,80 \leq d < 1,20$
+    \item Muito grande: $1,20 \leq d < 2$
+    \item Enorme: $d \geq 2,0$
+  \end{itemize}
+\end{multicols}
 
 Para calcular o tamanho de efeito usando este método, algumas premissas devem ser assumidas sobre os dados: normalidade e homocedasticidade \cite{Peng2014}. Usando o Teste de Shapiro-Wilk é possível inferir sobre a normalidade das amostras, tendo em vista que a hipótese nula $H_0$ deste teste é de que os dados provêm de uma distribuição normal \cite{ShapiroWilkTest}. A função `shapiro.test` do pacote `stats` do R considera o nível de confiança de $90\%$ ($\alpha = 0,1$) para avaliação das amostras fornecidas \cite{ShapiroTestR}. A validação da homocedasticidade será realizada a posteriori, uma vez que a premissa de alguns dos testes capazes de verificar tal premissa assumem normalidade.
 
@@ -300,7 +326,7 @@ Uma vez que as variâncias populacionais não são conhecidas, nada se pode afir
 var.test(x = M2016, y = M2017, alternative = "two.sided")
 ```
 
-A execução do teste F para o grupo de dados M2016 e M2017 resultou em $F=1,5838$ e $p = 0,3119$, que reflete que a igualdade de variância pode ser assumida para os dados em questão. 
+A execução do teste F para o grupo de dados $M2016$ e $M2017$ resultou em $F=1,5838$ e $p = 0,3119$, que reflete que a igualdade de variância pode ser assumida para os dados em questão. 
 
 Com isso, pode-se calcular o $d$ de Cohen como uma boa estimativa de tamanho de efeito para as amostras masculinas. O pacote `effsize` do R \cite{Torchiano2020} permite tal cálculo a partir da função `cohen.d`. 
 
@@ -330,75 +356,101 @@ No entanto, o cálculo anterior não leva em consideração a potência desejada
 
 Supondo o desvio padrão conjugado $s_M = 3,9046$ calculado a partir da Equação \eqref{eq:desvio_conjugado}, o nível de significância $\alpha = 0,05$, o tamanho amostral $n_M$ e o $d$ de Cohen calculado anteriormente, a potência obtida pelo método `power.t.test` é de apenas $3,4\%$. Tal valor é cerca de $76,6$ p.p menor que a potência desejada e, portanto, não é aceitável para realização dos experimentos.
 
-```{r}
+```{r, echo = FALSE}
 power.t.test(n = 21, sd = 3.904637, sig.level = 0.05, delta = 0.1665831, 
              type = "two.sample", alternative = "two.sided")
 ```
 
 Para que fosse possível detectar efeitos iguais ou maiores que $d = 0,1665$ de forma a preservar os parâmetros experimentais desejados, seriam necessárias cerca de $8626$ amostras para cada um dos semestres.
 
-```{r}
+```{r, echo = FALSE}
 power.t.test(delta = 0.1665831, sd = s, sig.level = 0.05, power = 0.80, 
              type = "two.sample", alternative = "two.sided")
 ```
 
 Como não existem possibilidades de se obter mais amostras para os experimentos, é possível detectar, a um nível de significância $\alpha = 0,05$ e potência $\pi = 0,80$, um tamanho de efeito de mínima relevância prática de $d = 3,4596$.
 
-```{r}
+```{r, echo = FALSE}
 power.t.test(n = 21, sd = 3.904637, sig.level = 0.05, power = 0.80, 
              type = "two.sample", alternative = "two.sided")
 ```
 
 ## Análise Estatística
 
-Uma vez que as premissas de normalidade e homocedasticidade foram validadas, o teste estatístico t de Student pode ser efetuado para comparação das médias. Entretanto, o teste assumido foi o t de Welch para duas amostras, devido o seu caráter mais conservador. A hipótese nula é que a média da variável estudada (IMC) é igual nas duas populações, ou seja, a diferença entre a média das duas populações é igual a zero. Já a hipótese alternativa indica que há diferenças nas médias das populações, ou seja, $\mu_{2016} - \mu_{2017} \neq 0$. O nível de confiança adotado para os testes foi de $95\%$.
+Uma vez que as premissas de normalidade e homocedasticidade foram validadas, o teste estatístico t de Student pode ser efetuado para comparação das médias. A hipótese nula é que a média da variável estudada (IMC) é igual nas duas populações, ou seja, a diferença entre a média das duas populações é igual a zero. Já a hipótese alternativa indica que há diferenças nas médias das populações, ou seja, $\mu_{2016} - \mu_{2017} \neq 0$. O nível de confiança adotado para os testes foi de $95\%$.
 
 ```{r, echo = FALSE}
 (t_test <- t.test(x = M2016, 
                   y = M2017,
-                alternative = "two.sided",
-                conf.level = 0.95))
-cat('Intervalo de confiança:', t_test$conf.int[1:2])
+                  var.equal = TRUE,
+                  alternative = "two.sided",
+                  conf.level = 0.95))
 ```
-O resultado do teste t de Welch retornou um p-valor de $0,5925$, maior que o nível de significância de $0,05$. Assim, com $95\%$ de confiança não é possível rejeitar a hipótese nula $H_0$ de que as médias das duas populações são iguais. Sendo a hipótese alternativa $H_1$ bilateral, o intervalo de confiança para a diferença das médias é $[-1,788823; \ 3,089716]$. É interessante ressaltar que o resultado para o teste t de Student foi bastante similar e também falhou em rejeitar a hipótese nula.
+O resultado do teste t de Student retornou um p-valor de $0,5923$, maior que o nível de significância de $0,05$. Assim, com $95\%$ de confiança não é possível rejeitar a hipótese nula $H_0$ de que as médias das duas populações são iguais. Sendo a hipótese alternativa $H_1$ bilateral, o intervalo de confiança para a diferença das médias é $[-1,784943; \ 3,085836]$. É interessante ressaltar que o resultado para o teste t de Welch foi bastante similar em termos de p-valor e intervalo de confiança e, portanto, também falhou em rejeitar a hipótese nula.
 
 # Parte 2: Amostras Femininas
 
-## Tamanho de Efeito
+## Análise Estatística
+
+De forma a verificar as premissas de normalidade para as amostras femininas, foram realizados testes de Shapiro-Wilk para ambas amostras com um nível de significância de $\alpha = 0,10$ \cite{ShapiroWilkTest}.
 
 ```{r, echo = FALSE}
-shapiro.test(F2016)
-shapiro.test(F2017)
+shapiro.test(na.omit(F2016))
+shapiro.test(na.omit(F2017))
 ```
 
-```{r, results = 'hide', echo = FALSE}
-# Testes de Levene e Fligner-Killeen: homocedasticidade das amostras femininas (não assume normalidade)
+No que se refere à amostra feminina do semestre $2016/2$, cujo tamanho amostral é $n_{F2016} = 7$, não é possível rejeitar a hipótese nula de que a amostra proveio de uma população com distribuição normal ao nível de confiança de $90\%$ ($p > \alpha)$. Quanto a amostra feminina de $2017/2$, cujo tamanho amostral é $n_{F2017} = 4$, não se pode afirmar o mesmo, uma vez que a hipótese nula é rejeitada ao nível de confiança de $90\%$ ($p < \alpha$). Em outras palavras, pode-se afirmar com $90\%$ de confiança que $F2016$ provém de uma população normal e $F2017$ não.
+
+Com o intuito de averiguar também a premissa de homocedasticidade, utilizou-se o teste de Fligner-Killeen \cite{FlignerKilleenTest}, que não pressupõe amostras provenientes de população com distribuição normal. A hipótese nula desse teste é de que as variâncias das duas populações, das quais foram retiradas as amostras testadas, são iguais. Já a hipótese alternativa é de que essas varianças não são iguais. 
+
+```{r, echo = FALSE}
+# Teste de Fligner-Killeen: homocedasticidade das amostras femininas (não assume normalidade)
 F <- as.data.frame(cbind(F2016, F2017))
 F <- melt(F, na.rm = TRUE, id.vars = NULL)
-leveneTest(value ~ variable, data = F, center = mean)
 fligner.test(value ~ variable, data = F)
 ```
+Assim, a partir do p-valor substancialmente maior que o nível de significância, pode-se afirmar que não é possível refutar a hipótese nula ao nível de confiança de $95\%$ e, consequentemente, as amostras provêm de populações homocedásticas.
 
-```{r, results = 'hide', echo = FALSE}
-cohen.d(sort(F2016),sort(F2017))
+Por fim, o teste de Wilcoxon para amostras independentes foi definido para análise das populações femininas, uma vez que ele não pressupõe normalidade das amostras. Tal teste é não-paramétrico, equivalente ao teste Mann-Whitney quando as amostras não são pareadas, e sua hipótese nula é de que as medianas das populações são iguais. A hipótese alternativa é de que as medianas populacionais são diferentes. 
+```{r, echo = FALSE}
+(wilcox_test <- wilcox.test(x = na.omit(F2016), 
+                            y = na.omit(F2017), 
+                            alternative = "two.sided",
+                            paired = FALSE,
+                            conf.int = TRUE))
+cat('Intervalo de confiança:', wilcox_test$conf.int)
+```
+Como o p-valor retornado foi maior que o nível de significância do experimento, $0,07273 > 0,05$, a hipótese nula $H_0$ não pôde ser rejeitada ao nível de confiança de $95\%$. O intervalo de confiança bilateral para a diferença das medianas é $[-0,6374374; \ 5,22844]$.
+
+## Tamanho de Efeito
+
+\begin{equation}
+\label{eq:A_Measure}
+A = \frac{n_1 n_2-U}{n_1 n_2}
+\end{equation}
+onde $W = n_1 n_2 - U = 24$, reportado pela função `wilcox.test` em R \cite{Ruscio2008}.
+
+```{r, echo = FALSE}
+VD.A(na.omit(F2016), na.omit(F2017))
 ```
 
 ## Poder do Teste
 
-## Análise Estatística
+Dado que os tamanhos amostrais são distintos ($n_{F2016} \neq n_{F2017}$) e extremamente pequenos, é bem provável que a potência para efeitos maiores ou iguais a $A = 0,8571$ seja substancialmente menor que a desejada ($\pi = 0,80$). 
 
-<!--
-O teste de Wilcoxon foi apontado para análise das amostras do grupo feminino, por uma das amostras não ser normal. É um teste não-paramétrico, equivalente ao teste Mann-Whitney quando as amostras não são pareadas. A hipótese nula $H_0$ é de que as médias são iguais, sendo assim, o que nos parâmetro do teste de Wilcoxon chama-se de mudança de localização, o valor deve ser igual a zero, como, por padrão, já é. A hipótese alternativa $H_1$ é de que as médias são diferentes, um teste bilateral, e o nivel de confiança para o teste tambem é de $95\%$.
-```{r, echo = FALSE}
-(wilcox_test <- wilcox.test(x = F2016, 
-                            y = F2017, 
-                            alternative = "two.sided", 
-                            conf.int = TRUE))
-cat('Intervalo de confiança:', wilcox_test$conf.int)
+
+```{r, results = 'hide', echo = FALSE}
+# Variáveis
+n_1 = length(na.omit(F2016))
+n_2 = length(na.omit(F2017))
+x_1 = mean(na.omit(F2016))
+x_2 = mean(na.omit(F2017))
+s_1 = sd(na.omit(F2016))
+s_2 = sd(na.omit(F2017))
+
+# Desvio padrão conjugado
+s = sqrt(((n_1-1)*s_1^2 + (n_2-1)*s_2^2)/(n_1+n_2-2))
 ```
-Como o p-valor retornado foi maior que o nível de significância do experimento, $0,07273 > 0,05$, a hipótese nula $H_0$, com $95\%$ de confiança, não pode ser rejeitada. O intervalo de confiança para a diferença das médias é $[-0,6374374, \ 5,22844]$.
-Para os testes tanto do grupo masculino quanto para o feminino, as hipóteses nulas $H_0$ foram aceitas, neste caso, hipóteses fracas que não foram rejeitadas. Não significa que são verdadeiras, mas que com os testes realizados a $95\%$  de confiança, não pode-se rejeitá-las.
--->
 
 
 # Conclusões
@@ -406,10 +458,9 @@ Para os testes tanto do grupo masculino quanto para o feminino, as hipóteses nu
 
 ## Discussão de Melhorias
 
-
 ## Atividades Desempenhadas
 
-
+As hipóteses de teste para ambos experimentos foram definidas em concordância com os três autores. Em relação à primeira parte do estudo de caso, tanto o pré-processamento dos dados, quanto a análise exploratória e o poder do teste foram conduzidos pelo Pedro. A Samara realizou o cálculo do tamanho de efeito e a validação das premissas assumidas para os testes estatísticos. A análise estatística, por sua vez, foi feita pelo Sávio. A segunda parte do estudo de caso, referente às inferências sobre a distribuição feminina, foi realizada após sucessivas investigações. A análise estatística foi novamente realizada pelo Sávio e o cálculo do tamanho de efeito, bem como a validação das premissas inerentes, foram conduzidas em conjunto. Por fim, o Pedro realizou a análise de potência do teste e a Samara conclui o trabalho com as considerações finais e discussões de melhoria.
 
 \renewcommand\refname{Referências}
 \bibliographystyle{plain}
