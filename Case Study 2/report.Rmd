@@ -424,6 +424,12 @@ Como o p-valor retornado foi maior que o nível de significância do experimento
 
 ## Tamanho de Efeito
 
+Diferentemente do cálculo realizado quanto às amostras masculinas, no qual o método de d de Cohen pôde ser utilizado, ele não é adequado para estimação do tamanho de efeito das amostras femininas, pois F2017 não apresenta características de normalidade, como mostrado pelo teste de Shapiro Wilk. Devido a isso, outras abordagens presentes da bibliografia foram examinadas, dentre elas uma medida baseada em probabilidade, conhecida como A ou estatística do tamanho do efeito da linguagem comum (CL), que não é sensível à não normalidade dos dados ou diferença de variâncias, como o d de Cohen \cite{ruscio2008probability}.
+
+O valor de A pode ser calculado a partir do U obtido pelo teste de Mann–Whitney \cite{ruscio2008probability}, conforme mostrado na equação \ref{eq:A_Measure}. Como nesta aplicação foi utilizado uma equivalência deste teste, U pode ser obtido a partir da estatística do teste de Wilcoxon, como mostrado em sequência.
+
+Em situações onde os dados são paramétricos e homocedásticos é possível converter o parâmetro A na medida estatística do d de Cohen \cite{ruscio2008probability} , que não é aplicável neste contexto.
+
 \begin{equation}
 \label{eq:A_Measure}
 A = \frac{n_1 n_2-U}{n_1 n_2}
