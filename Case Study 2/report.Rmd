@@ -424,21 +424,35 @@ Como o p-valor retornado foi maior que o nível de significância do experimento
 
 ## Tamanho de Efeito
 
-Diferentemente do cálculo realizado quanto às amostras masculinas, no qual o método de d de Cohen pôde ser utilizado, ele não é adequado para estimação do tamanho de efeito das amostras femininas, pois F2017 não apresenta características de normalidade, como mostrado pelo teste de Shapiro Wilk. Devido a isso, outras abordagens presentes da bibliografia foram examinadas, dentre elas uma medida baseada em probabilidade, conhecida como A ou estatística do tamanho do efeito da linguagem comum (CL), que não é sensível à não normalidade dos dados ou diferença de variâncias, como o d de Cohen \cite{ruscio2008probability}.
+Diferentemente do cálculo realizado quanto às amostras masculinas, no qual o método de d de Cohen pôde ser utilizado, ele não é adequado para estimação do tamanho de efeito das amostras femininas, pois $F2017$ não apresenta características de normalidade, como mostrado pelo teste de Shapiro Wilk. Devido a isso, outras abordagens presentes da bibliografia foram examinadas, dentre elas uma medida baseada em probabilidade, conhecida como $A$ ou estatística do tamanho do efeito da linguagem comum ($CL$), que não é sensível à não normalidade dos dados ou diferença de variâncias, como o d de Cohen \cite{Ruscio2008}.
 
-O valor de A pode ser calculado a partir do U obtido pelo teste de Mann–Whitney \cite{ruscio2008probability}, conforme mostrado na equação \ref{eq:A_Measure}. Como nesta aplicação foi utilizado uma equivalência deste teste, U pode ser obtido a partir da estatística do teste de Wilcoxon, como mostrado em sequência.
+$A$ está intimamente relacionado a várias outras estatísticas que requerem apenas dados ordinais para estimar a diferença entre dois grupos, incluindo as estatísticas de teste não paramétrico Wilcoxon Rank Sum e Mann-Whitney U, bem como a área sob uma curva de característica de operação do receptor ($ROC$) calculada usando o método trapezoidal Hanley & McNeil de 1982 \cite{Ruscio2008}.
 
-Em situações onde os dados são paramétricos e homocedásticos é possível converter o parâmetro A na medida estatística do d de Cohen \cite{ruscio2008probability} , que não é aplicável neste contexto.
+O valor de $A$ pode ser calculado a partir do $U$ obtido pelo teste de Mann–Whitney \cite{Ruscio2008}, conforme mostrado na equação \ref{eq:A_Measure}. Como nesta aplicação foi utilizado uma equivalência deste teste, U pode ser obtido a partir da estatística do teste de Wilcoxon, como mostrado em sequência.
+
+$A$ está relacionado aos teste de Mann-Whitney e Wilcoxon pois, em outras palavras, ele representa a probabilidade de X1 ser maior que X2 mais $50\%$ da probabilidade de X1 ser igual a X2, sendo X1 e X2 as amostras ou população que estão sendo comparadas. E $U$ é a probabilidade de X1 ser menor que X2 mais $50\%$ da probabilidade de X1 = X2 \cite{Ruscio2008}.
+
+Em situações onde os dados são paramétricos e homocedásticos é possível converter o parâmetro A na medida estatística do d de Cohen \cite{Ruscio2008} , que não é aplicável neste contexto.
 
 \begin{equation}
 \label{eq:A_Measure}
 A = \frac{n_1 n_2-U}{n_1 n_2}
 \end{equation}
-onde $W = n_1 n_2 - U = 24$, reportado pela função `wilcox.test` em R \cite{Ruscio2008}.
+onde $U = n_1 n_2 - W$, sendo $W = 24$, reportado pela função `wilcox.test` em R \cite{Ruscio2008}.
+
+Na equação \ref{eq:A_Measure}, n1 e n2 são os tamanhos amostrais de $F2016$ e $F2017$, respectivamente. Sendo assim, ao resolve-la, obtém-se $A =  0,8571429$. 
+
+O mesmo valor pode ser encontrado a partir da execução do teste de $Vargha \& Delaney$, `VD.A` em R \cite{Delaney2002}. Esta função também retorna o valor de uma avaliação qualitativa da magnitude do tamanho do efeito, sendo este igual a 4.
+
 
 ```{r, echo = FALSE}
-VD.A(na.omit(F2016), na.omit(F2017))
+(vd_a <- VD.A(na.omit(F2016), na.omit(F2017)))
+
+cat('Magnitude:', vd_a$magnitude)
 ```
+Com a medida de $A$ baseada em probabilidade, os valores nas populações 1 e 2 são considerados do mesmo tamanho, diferenças igual a zero, se $A = 0,5$ \cite{Delaney2002}. Considerando então que $A =  0,8571429$, podemos identificar diferenças maiores que $4$ entre as amostras femininas, $F2016$ e $F2017$.
+
+
 
 ## Poder do Teste
 
