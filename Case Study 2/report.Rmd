@@ -424,9 +424,9 @@ Como o p-valor retornado foi maior que o nível de significância do experimento
 
 ## Tamanho de Efeito
 
-Diferentemente do cálculo realizado quanto às amostras masculinas, no qual o método de d de Cohen pôde ser utilizado, ele não é adequado para estimação do tamanho de efeito das amostras femininas, pois $F2017$ não apresenta características de normalidade, como mostrado pelo teste de Shapiro Wilk. Devido a isso, outras abordagens presentes da bibliografia foram examinadas, dentre elas uma medida baseada em probabilidade, conhecida como $A$ ou estatística do tamanho do efeito da linguagem comum ($CL$), que não é sensível à não normalidade dos dados ou diferença de variâncias, como o d de Cohen \cite{Ruscio2008}.
+Diferentemente do cálculo realizado quanto às amostras masculinas, no qual o método de d de Cohen pôde ser utilizado, ele não é adequado para estimação do tamanho de efeito das amostras femininas, pois $F2017$ não apresenta características de normalidade, como mostrado pelo teste de Shapiro Wilk. Devido a isso, outras abordagens presentes da bibliografia foram examinadas, dentre elas uma medida baseada em probabilidade, conhecida como $A$ ou estatística não paramétrica do tamanho do efeito da linguagem comum ($CL$), que não é sensível à não normalidade dos dados ou diferença de variâncias, como o d de Cohen \cite{Ruscio2008}.
 
-$A$ está intimamente relacionado a várias outras estatísticas que requerem apenas dados ordinais para estimar a diferença entre dois grupos, incluindo as estatísticas de teste não paramétrico Wilcoxon Rank Sum e Mann-Whitney U, bem como a área sob uma curva de característica de operação do receptor ($ROC$) calculada usando o método trapezoidal Hanley & McNeil de 1982 \cite{Ruscio2008}.
+A medida $A$ está intimamente relacionada a outras medidas estatísticas que usam apenas dados ordinais para estimar a diferença entre dois grupos, incluindo as estatísticas de teste não paramétrico Wilcoxon Rank Sum e Mann-Whitney U, bem como a área sob uma curva de característica de operação do receptor ($ROC$) calculada usando o método trapezoidal de Hanley & McNeil de 1982 \cite{Ruscio2008}.
 
 O valor de $A$ pode ser calculado a partir do $U$ obtido pelo teste de Mann–Whitney \cite{Ruscio2008}, conforme mostrado na equação \ref{eq:A_Measure}. Como nesta aplicação foi utilizado uma equivalência deste teste, U pode ser obtido a partir da estatística do teste de Wilcoxon, como mostrado em sequência.
 
@@ -442,7 +442,7 @@ onde $U = n_1 n_2 - W$, sendo $W = 24$, reportado pela função `wilcox.test` em
 
 Na equação \ref{eq:A_Measure}, n1 e n2 são os tamanhos amostrais de $F2016$ e $F2017$, respectivamente. Sendo assim, ao resolve-la, obtém-se $A =  0,8571429$. 
 
-O mesmo valor pode ser encontrado a partir da execução do teste de $Vargha \& Delaney$, `VD.A` em R \cite{Delaney2002}. Esta função também retorna o valor de uma avaliação qualitativa da magnitude do tamanho do efeito, sendo este igual a 4.
+O mesmo valor pode ser encontrado a partir da execução do teste de $Vargha \& Delaney$, `VD.A` em R \cite{Delaney2002}. Esta função também retorna o valor de uma avaliação qualitativa da magnitude do tamanho do efeito, sendo este igual a $4$.
 
 
 ```{r, echo = FALSE}
@@ -450,13 +450,14 @@ O mesmo valor pode ser encontrado a partir da execução do teste de $Vargha \& 
 
 cat('Magnitude:', vd_a$magnitude)
 ```
-Com a medida de $A$ baseada em probabilidade, os valores nas populações 1 e 2 são considerados do mesmo tamanho, diferenças igual a zero, se $A = 0,5$ \cite{Delaney2002}. Considerando então que $A =  0,8571429$, podemos identificar diferenças maiores que $4$ entre as amostras femininas, $F2016$ e $F2017$.
-
+A medida $A$ é um valor entre $0$ e $1$ quando aplicada a duas populações: quando a medida $A$ é exatamente $0,5$, então as duas populações tem diferenças igual a zero. Quando $A$ é menor que $0,5$, a primeira tem valores menores, e quando $A$ é maior que $0,5$, a segunda tem valores menores. Quanto mais próximo de $0,5$, menor a diferença entre as populações, e quanto mais distante de $0,5$, maior a diferença \cite{vargha2000}.
+Em $85\%$ das vezes, alunas de $2016/2$ têm maior mediana do índice de massa corporal que as alunas do $2017/2$, podendo encontrar diferencas maior que $4 (kg/m²)$, haja vista que a avaliação qualitativa do tamanho de efeito é ($4 (kg/m²)$).
 
 
 ## Poder do Teste
 
-Dado que os tamanhos amostrais são distintos ($n_{F2016} \neq n_{F2017}$) e extremamente pequenos, é bem provável que a potência para efeitos maiores ou iguais a $A = 0,8571$ seja substancialmente menor que a desejada ($\pi = 0,80$). 
+A falta de normalidade dos dados também impede a aplicação da função power.t.test para análise estatística das amostras femininas, nesse caso, o apropriado é calcular o poder do teste a partir de derivações do teste de Wilcoxon. No R existem algumas possibilidades dentro do pacote ‘wmwpow’ \cite{wmwpow}, são elas: calcular o poder usando a abordagem de Shieh et. Al  \cite{shieh2006power} e o método de Monte Carlo para obtê-lo. Todavia, ambas as abordagem requerem que o tipo de distribuição seja passado por parâmetro, e portanto, conhecido previamente. Em vista disso, o cálculo do poder não pôde ser aplicado, pois o tipo de distribuição não pôde ser estabelecido devido ao baixo tamanho amostral.
+Dado que os tamanhos amostrais são distintos ($n_{F2016} \neq n_{F2017}$) e extremamente pequenos, é bem provável que a potência para efeitos maiores ou iguais a $A = 0,8571$ seja substancialmente menor que a desejada ($\pi = 0,80$).
 
 
 ```{r, results = 'hide', echo = FALSE}
