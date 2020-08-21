@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.21 (MiKTeX 20.6.29) (preloaded format=pdflatex 2020.7.29)  20 AUG 2020 22:28
+This is pdfTeX, Version 3.14159265-2.6-1.40.21 (MiKTeX 20.6.29) (preloaded format=pdflatex 2020.7.29)  20 AUG 2020 22:51
 entering extended mode
 **./report.tex
 (report.tex
@@ -738,53 +738,30 @@ LaTeX Warning: Command \texttwosuperior invalid in math mode on input line 701.
 LaTeX Warning: Command \texttwosuperior invalid in math mode on input line 701.
 
 
+[9]
 
-LaTeX Warning: Command \texttwosuperior invalid in math mode on input line 738.
-
-
-
-LaTeX Warning: Command \texttwosuperior invalid in math mode on input line 738.
+LaTeX Warning: Command \texttwosuperior invalid in math mode on input line 755.
 
 
 
-LaTeX Warning: Command \texttwosuperior invalid in math mode on input line 740.
+LaTeX Warning: Command \texttwosuperior invalid in math mode on input line 755.
 
 
-
-LaTeX Warning: Command \texttwosuperior invalid in math mode on input line 740.
-
-
-
-LaTeX Warning: Command \texttwosuperior invalid in math mode on input line 742.
-
-
-
-LaTeX Warning: Command \texttwosuperior invalid in math mode on input line 742.
-
-
-
-LaTeX Warning: Command \texttwosuperior invalid in math mode on input line 752.
-
-
-
-LaTeX Warning: Command \texttwosuperior invalid in math mode on input line 752.
-
-
-[9] (report.bbl [10])
-Package atveryend Info: Empty hook `BeforeClearDocument' on input line 778.
+(report.bbl [10])
+Package atveryend Info: Empty hook `BeforeClearDocument' on input line 792.
 [11]
-Package atveryend Info: Empty hook `AfterLastShipout' on input line 778.
+Package atveryend Info: Empty hook `AfterLastShipout' on input line 792.
 (report.aux)
-Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 778.
-Package atveryend Info: Empty hook `AtEndAfterFileList' on input line 778.
-Package atveryend Info: Empty hook `AtVeryVeryEnd' on input line 778.
+Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 792.
+Package atveryend Info: Empty hook `AtEndAfterFileList' on input line 792.
+Package atveryend Info: Empty hook `AtVeryVeryEnd' on input line 792.
  ) 
 Here is how much of TeX's memory you used:
- 13082 strings out of 481306
- 196554 string characters out of 2907918
- 480826 words of memory out of 3000000
+ 13078 strings out of 481306
+ 196512 string characters out of 2907918
+ 479826 words of memory out of 3000000
  28127 multiletter control sequences out of 15000+200000
- 586324 words of font info for 139 fonts, out of 3000000 for 9000
+ 586158 words of font info for 137 fonts, out of 3000000 for 9000
  1141 hyphenation exceptions out of 8191
  41i,7n,42p,444b,472s stack positions out of 5000i,500n,10000p,200000b,50000s
 {C:/Users/samar/AppData/Local/Programs/MiKTeX 2.9/fonts/enc/dvips/lm/lm-ts1.e
@@ -805,7 +782,7 @@ iKTeX 2.9/fonts/type1/public/lm/lmr7.pfb><C:/Users/samar/AppData/Local/Programs
 /MiKTeX 2.9/fonts/type1/public/lm/lmri10.pfb><C:/Users/samar/AppData/Local/Prog
 rams/MiKTeX 2.9/fonts/type1/public/lm/lmsy10.pfb><C:/Users/samar/AppData/Local/
 Programs/MiKTeX 2.9/fonts/type1/public/lm/lmtt10.pfb>
-Output written on report.pdf (11 pages, 304211 bytes).
+Output written on report.pdf (11 pages, 304787 bytes).
 PDF statistics:
  287 PDF objects out of 1000 (max. 8388607)
  67 named destinations out of 1000 (max. 500000)
