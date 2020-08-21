@@ -51,11 +51,14 @@ if (!require(tidyr, quietly = TRUE)){
 if (!require(effsize, quietly = TRUE)){
       suppressMessages(install.packages("effsize"))
       }
-if (!require(pwr, quietly = TRUE)){
-      suppressMessages(install.packages("pwr"))
-      }
 if (!require(lsr, quietly = TRUE)){
       suppressMessages(install.packages("lsr"))
+      }
+if (!require(car, quietly = TRUE)){
+      suppressMessages(install.packages("car"))
+      }
+if (!require(pwr, quietly = TRUE)){
+      suppressMessages(install.packages("pwr"))
       }
 ```
 
@@ -109,7 +112,7 @@ options(Encoding="UTF-8")
   \end{itemize}
 \end{multicols}
 
-Neste estudo de caso deseja-se comparar o IMC médio dos alunos de Pós-Graduação em Engenharia Elétrica (PPGEE) da Universidade Federal de Minas Gerais (UFMG) de dois semestres distintos: $2016/2$ e $2017/2$. Para tal fim, foram disponibilizadas duas amostras, contendo sexo, altura e peso de alguns alunos \cite{Campelo2018-LNDoE}. Assim, duas análises estatísticas independentes são propostas: (i) uma sobre o IMC médio dos alunos do sexo masculino e (ii) uma sobre o IMC médio dos alunos do sexo feminino. Para ambos os casos, a condução dos experimentos foram similares, no entanto, alguns testes estatísticos tiveram que ser adaptados de acordo com as propriedades das distribuições amostrais em investigação, que foram validadas previamente.
+Neste estudo de caso deseja-se comparar o IMC médio dos alunos de Pós-Graduação em Engenharia Elétrica (PPGEE) da Universidade Federal de Minas Gerais (UFMG) de dois semestres distintos: $2016/2$ e $2017/2$. Para tal fim, foram disponibilizadas duas amostras, contendo sexo, altura e peso de alguns alunos \cite{Campelo2018-LNDoE}. Assim, duas análises estatísticas independentes são propostas: (i) uma sobre o IMC médio dos alunos do sexo masculino e (ii) uma sobre o IMC mediano dos alunos do sexo feminino. Para ambos os casos, a condução dos experimentos foram similares, no entanto, alguns testes estatísticos tiveram que ser adaptados de acordo com as propriedades das distribuições amostrais em investigação, que foram validadas previamente.
 
 # Planejamento dos Experimentos
 
@@ -244,7 +247,7 @@ stats <- data.frame(rbind(stats_M2016, stats_M2017, stats_F2016, stats_F2017),
 stats
 ```
 
-A priori, é possível evidenciar que a diferença entre as médias amostrais masculinas ($\Delta \bar{x}_{M} = 0,6504$) é bem menos discrepante que a diferença entre as médias amostrais femininas ($\Delta \bar{x}_{F} = 2,6378$). No que se refere a diferença entre as variâncias amostrais, tanto a disparidade do gênero masculino quanto do gênero feminino são bastante expressivas, sendo $\Delta s_{M} = 6,8904$ e $\Delta s_{F} = 3,2657$, respectivamente. Outro fato interessante é que as observações coletadas retratam que, na média, os alunos entrevistados de ambos os sexos seguem um padrão de vida ideal ($\overline{IMC} \in \ [18,5; \ 25]$), onde os homens estão mais próximos do limite superior (sobrepeso) e as mulheres estão mais próximas do limite inferior (baixo peso).
+A priori, é possível evidenciar que a diferença entre as médias amostrais masculinas ($\Delta \overline{x}_{M} = 0,6504$) é bem menos discrepante que a diferença entre as médias amostrais femininas ($\Delta \overline{x}_{F} = 2,6378$). No que se refere a diferença entre as medianas amostrais, a disparidade do gênero feminino é bem mais expressiva do que a masculina, sendo $\Delta \overline{m}_{M} = 0,6078$ e $\Delta \overline{m}_{F} = 2,3987$, respectivamente. Outro fato interessante é que as observações coletadas retratam que, na média, os alunos entrevistados de ambos os sexos seguem um padrão de vida ideal ($\overline{IMC} \in \ [18,5; \ 25]$), onde os homens estão mais próximos do limite superior (sobrepeso) e as mulheres estão mais próximas do limite inferior (baixo peso).
 
 A fim de compreender melhor os dados em estudo e, posteriormente, inferir sobre as populações de onde as amostras provêm, serão analisadas algumas representações gráficas. No que tange a distribuição de frequência das observações, pode-se constatar que as amostras masculinas apresentam um comportamento bastante similar ao de uma distribuição normal. No caso da amostra $M2016$, em específico, tal característica seria melhor assimilada caso não houvesse o *outlier* cujo IMC é $37.55\ kg/m^2$. Em relação às amostras femininas, não é possível identificar indícios de normalidade a partir de seus histogramas, uma vez que os seus respectivos tamanhos amostrais são muito pequenos.
 
@@ -283,7 +286,7 @@ ggplot(data = IMCs, aes(sample = value)) +
 
 ## Tamanho de Efeito
 
-Geralmente, os estudos científicos relatam a significância dos resultados alcançados. Contudo, é aconselhável mensurar também o tamanho de efeito (importância real) pertinente às diferenças encontradas em termos de média ou variância dos grupos avaliados \cite{Kelley2012}. A literatura aborda algumas metodologias para isso, como o Teste de Cohen, Teste de Glass, Teste de Hedges, dentre outros. Cada um desses testes têm diferentes maneiras de calcular o tamanho de efeito quanto a um determinado estimador, alguns fazendo uso da média (Cohen($d$), Glass ($\Delta$), Hedges($g$), $\psi$) e outros a partir das variâncias (Pearson, $\eta^2$, $\omega^2$ e Cohen($f^2$)). O primeiro teste de Cohen mencionado, por exemplo, calcula o tamanho de efeito $d$ quanto à média, obtendo o quociente da diferença entre as médias dos grupos pelo desvio padrão agrupado, conforme a Equação \eqref{eq:d_cohen} \cite{Vieira2003}:
+Geralmente, os estudos científicos relatam a significância dos resultados alcançados. Contudo, é aconselhável mensurar também o tamanho de efeito (importância real) pertinente às diferenças encontradas em termos de média, variância ou mediana dos grupos avaliados \cite{Kelley2012}. A literatura aborda algumas metodologias para isso, como o Teste de Cohen, Teste de Glass, Teste de Hedges, dentre outros. Cada um desses testes têm diferentes maneiras de calcular o tamanho de efeito quanto a um determinado estimador, alguns fazendo uso da média (Cohen($d$), Glass ($\Delta$), Hedges($g$), $\psi$) e outros a partir das variâncias (Pearson, $\eta^2$, $\omega^2$ e Cohen($f^2$)). O primeiro teste de Cohen mencionado, por exemplo, calcula o tamanho de efeito $d$ quanto à média, obtendo o quociente da diferença entre as médias dos grupos pelo desvio padrão agrupado, conforme a Equação \eqref{eq:d_cohen} \cite{Vieira2003}:
 
 \begin{equation}
   \label{eq:d_cohen}
@@ -424,41 +427,32 @@ Como o p-valor retornado foi maior que o nível de significância do experimento
 
 ## Tamanho de Efeito
 
-Diferentemente do cálculo realizado quanto às amostras masculinas, no qual o método de d de Cohen pôde ser utilizado, ele não é adequado para estimação do tamanho de efeito das amostras femininas, pois $F2017$ não apresenta características de normalidade, como mostrado pelo teste de Shapiro Wilk. Devido a isso, outras abordagens presentes da bibliografia foram examinadas, dentre elas uma medida baseada em probabilidade, conhecida como $A$ ou estatística não paramétrica do tamanho do efeito da linguagem comum ($CL$), que não é sensível à não normalidade dos dados ou diferença de variâncias, como o d de Cohen \cite{Ruscio2008}.
+Diferentemente do cálculo realizado para as amostras masculinas, não é adequado utilizar o método de $d$ de Cohen para estimação do tamanho de efeito das amostras femininas, pois a premissa de normalidade dos dados não é válida para a amostra $F2017$, conforme validado pelo teste de Shapiro Wilk. Diante disso, outras abordagens presentes da literatura foram examinadas, dentre elas uma medida robusta à heterocedasticidade e a não normalidade dos dados denominada medida $A$. Em casos onde é possível corroborar a normalidade da distribuição populacional, a medida $A$ é similar ao tamanho do efeito da linguagem comum ($CL$) \cite{Ruscio2008}.
 
-A medida $A$ está intimamente relacionada a outras medidas estatísticas que usam apenas dados ordinais para estimar a diferença entre dois grupos, incluindo as estatísticas de teste não paramétrico Wilcoxon Rank Sum e Mann-Whitney U, bem como a área sob uma curva de característica de operação do receptor ($ROC$) calculada usando o método trapezoidal de Hanley & McNeil de 1982 \cite{Ruscio2008}.
+A medida $A$ está intimamente relacionada a outras medidas estatísticas que usam apenas dados ordinais para estimar a diferença entre dois grupos, incluindo as estatísticas de teste não paramétrico Wilcoxon Rank Sum e Mann-Whitney, bem como a área sob a curva *Receiver Operating Characteristic* ($ROC$) calculada por meio do método trapezoidal \cite{Ruscio2008}. No entanto, a métrica $A$ é bastante versátil e, portanto, compatível também com números reais (contínuos ou não) \cite{AMeasure}.
 
-O valor de $A$ pode ser calculado a partir do $U$ obtido pelo teste de Mann–Whitney \cite{Ruscio2008}, conforme mostrado na equação \ref{eq:A_Measure}. Como nesta aplicação foi utilizado uma equivalência deste teste, U pode ser obtido a partir da estatística do teste de Wilcoxon, como mostrado em sequência.
-
-$A$ está relacionado aos teste de Mann-Whitney e Wilcoxon pois, em outras palavras, ele representa a probabilidade de X1 ser maior que X2 mais $50\%$ da probabilidade de X1 ser igual a X2, sendo X1 e X2 as amostras ou população que estão sendo comparadas. E $U$ é a probabilidade de X1 ser menor que X2 mais $50\%$ da probabilidade de X1 = X2 \cite{Ruscio2008}.
-
-Em situações onde os dados são paramétricos e homocedásticos é possível converter o parâmetro A na medida estatística do d de Cohen \cite{Ruscio2008} , que não é aplicável neste contexto.
+A medida $A$ está relacionada aos teste de Mann-Whitney e Wilcoxon, uma vez que ela representa a probabilidade de $P(X_1 > X_2) + 0.5P(X_1=X_2)$, sendo $X_1$ e $X_2$ as populações que estão sendo comparadas. A estatítisca $U$, por sua vez, é a probabilidade de $P(X_1 < X_2) + 0.5P(X_1=X_2)$ \cite{Ruscio2008}. O valor de $A$ pode ser calculado a partir da estatística $U$ do teste de Mann–Whitney \cite{Ruscio2008}, conforme mostrado na Equação \eqref{eq:A_Measure}: 
 
 \begin{equation}
-\label{eq:A_Measure}
-A = \frac{n_1 n_2-U}{n_1 n_2}
+  \label{eq:A_Measure}
+  A = \frac{n_1 n_2-U}{n_1 n_2}
 \end{equation}
-onde $U = n_1 n_2 - W$, sendo $W = 24$, reportado pela função `wilcox.test` em R \cite{Ruscio2008}.
+\noindent onde $n_1$ e $n_2$ são os tamanhos amostrais de $F2016$ e $F2017$, respectivamente. 
 
-Na equação \ref{eq:A_Measure}, n1 e n2 são os tamanhos amostrais de $F2016$ e $F2017$, respectivamente. Sendo assim, ao resolve-la, obtém-se $A =  0,8571429$. 
-
-O mesmo valor pode ser encontrado a partir da execução do teste de $Vargha \& Delaney$, `VD.A` em R \cite{Delaney2002}. Esta função também retorna o valor de uma avaliação qualitativa da magnitude do tamanho do efeito, sendo este igual a $4$.
-
+Como neste experimento foi utilizado uma alternativa ao teste de Mann-Whitney para amostras não-pareadas, $U$ pode ser obtido a partir da estatística do teste de Wilcoxon, onde $U = n_1 n_2 - W$ \cite{Ruscio2008}. Conforme reportado pela função `wilcox.test` em R, $W = 24$ e, consequentemente, $A = 0,8571$. Tal valor pode ser obtido também a partir da execução do teste `VD.A` (Vargha e Delaney) do pacote `effsize` em R \cite{Delaney2002}. Esta função também retorna o valor de uma avaliação qualitativa da magnitude do tamanho de efeito igual a $4$.
 
 ```{r, echo = FALSE}
 (vd_a <- VD.A(na.omit(F2016), na.omit(F2017)))
 
 cat('Magnitude:', vd_a$magnitude)
 ```
-A medida $A$ é um valor entre $0$ e $1$ quando aplicada a duas populações: quando a medida $A$ é exatamente $0,5$, então as duas populações tem diferenças igual a zero. Quando $A$ é menor que $0,5$, a primeira tem valores menores, e quando $A$ é maior que $0,5$, a segunda tem valores menores. Quanto mais próximo de $0,5$, menor a diferença entre as populações, e quanto mais distante de $0,5$, maior a diferença \cite{vargha2000}.
-Em $85\%$ das vezes, alunas de $2016/2$ têm maior mediana do índice de massa corporal que as alunas do $2017/2$, podendo encontrar diferencas maior que $4 (kg/m²)$, haja vista que a avaliação qualitativa do tamanho de efeito é ($4 (kg/m²)$).
 
+A medida $A$ pertence ao domínio $[0, \ 1]$. No caso em que a medida $A = 0,5$, pode-se afirmar que as duas populações não possuem diferenças evidentes na estatística de interesse. Quando $A < 0,5$, a primeira população apresenta valores menores da estatística de interesse, e quando $A > 0,5$, a segunda apresenta valores menores. Quanto mais próximo de $0,5$, menor a diferença entre as estatísticas das populações, e quanto mais distante de $0,5$, maior é essa diferença \cite{Vargha2000}.
+Assim, pode-se concluir que, em $85\%$ das vezes, alunas de $2016/2$ têm maior Índice de Massa Corporal mediano que as alunas do $2017/2$, podendo encontrar diferenças maiores ou iguais a $4 \ kg/m^2$.
 
 ## Poder do Teste
 
-A falta de normalidade dos dados também impede a aplicação da função power.t.test para análise estatística das amostras femininas, nesse caso, o apropriado é calcular o poder do teste a partir de derivações do teste de Wilcoxon. No R existem algumas possibilidades dentro do pacote ‘wmwpow’ \cite{wmwpow}, são elas: calcular o poder usando a abordagem de Shieh et. Al  \cite{shieh2006power} e o método de Monte Carlo. Todavia, ambas as abordagens requerem que o tipo de distribuição seja passado por parâmetro, e portanto, conhecido previamente. Em vista disso, o cálculo do poder não pôde ser aplicado, pois o tipo de distribuição não pôde ser estabelecido devido ao baixo tamanho amostral.
-
-Dado que os tamanhos amostrais são distintos ($n_{F2016} \neq n_{F2017}$) e extremamente pequenos, é bem provável que a potência para efeitos maiores ou iguais a $A = 0,8571$ seja substancialmente menor que a desejada ($\pi = 0,80$).
+A ausência de normalidade da distribuição feminina do segundo semestre de $2017$ impossibilita a aplicação da função `power.t.test` para análise do poder do teste, uma vez que esse cálculo de potência é específico para o teste t de Student. Nesse caso, o apropriado é calcular o poder do teste a partir de variações dessa função para o teste de Wilcoxon. No R existem algumas possibilidades dentro do pacote `wmwpow` \cite{wmwpow}, como o cálculo do poder usando a abordagem de Shieh \cite{Shieh2006} e outros dois baseados no método de Monte Carlo. Todavia, tais abordagens requerem que o tipo de distribuição seja passado por parâmetro, e portanto, conhecido previamente. Em vista disso e principalmente pelo baixo tamanho amostral que impossibilita a estimativa empírica da distribuição amostral, o cálculo do poder não pôde ser realizado. No entanto, dado que os tamanhos amostrais são distintos ($n_{F2016} \neq n_{F2017}$) e extremamente pequenos, é bem provável que a potência para efeitos maiores ou iguais a $4 \ kg/m^2$ seja substancialmente menor que a desejada ($\pi = 0,80$).
 
 
 ```{r, results = 'hide', echo = FALSE}
@@ -477,18 +471,21 @@ s = sqrt(((n_1-1)*s_1^2 + (n_2-1)*s_2^2)/(n_1+n_2-2))
 
 # Conclusões
 
-Com o objetivo de comparar o Índice de Massa Corpórea (IMC) médio de duas populações de estudantes do Programa de Pós Graduação em Engenharia Elétrica da Universidade Federal de Minas Gerais (PPGEE UFMG), segundo semestre de 2016 e segundo de 2017, foram utilizados conceitos e ferramentas estatísticas para inferir sobre IMC médio dessas populações. Para facilitar o estudo, as amostras foram separadas entre masculino e feminino, e só então foram comparados os IMCs masculino de 2016/2 e 2017/2, feminino de 2016/2 e 2017/2. 
+Com o objetivo de investigar o estilo de vida dos estudantes do Programa de Pós Graduação em Engenharia Elétrica da Universidade Federal de Minas Gerais (PPGEE/UFMG), referentes aos semestres de $2016/2$ e $2017/2$, foram utilizadas ferramentas estatísticas para inferir sobre o Índice de Massa Corporal (IMC) dessas populações. Para tornar o estudo mais interessante, as amostras foram separadas entre os gêneros e então comparadas segundo os IMCs médios masculinos de $2016/2$ e $2017/2$ e os IMCs medianos femininos de $2016/2$ e $2017/2$.
 
-A distribuição das amostras masculinas de ambos períodos tem características normais e de homocedacidade, conforme explorado graficamente e comprovado via testes. Sobre esta população conclui-se com $95\%$ de confiança que as médias das duas populações são iguais, visto que não se pôde rejeitar a hipotese nula $H0$. Nesse contexto, para atender os $95\%$ de confiança e a potência de $80\%$, o tamanho de efeito deveria ser capaz de identificar diferenças maiores que $3,90 (Kg/m^2)$, porém a ferramenta de cálculo $d$ de Cohen estimou que era possivel identificar diferenças maiores que $0,16 (Kg/m^2)$. Contudo, este tamanho de efeito não permite atender ao poder do teste especificado, pois a potência do teste obtida foi igual a $0,034(Kg/m^2)$. Para manter a mesma potência do teste, $80\%$, seria necessário um tamanho amostral igual a 8626.
+A distribuição das amostras masculinas de ambos períodos apresentam características normais e homocedásticas, conforme explorado graficamente e comprovado via testes estatísticos. Sobre esta população, conclui-se ao nível de confiança de $95\%$ de que as médias das duas populações são iguais, visto que não se pôde rejeitar a hipotese nula $H_0$. Posteriormente, uma boa estimativa de tamanho de efeito foi identificada como $d = 0,16 kg/m^2$. No entanto, ao atender os $95\%$ de confiança e a potência desejada de $80\%$, o teste estatístico só é capaz de detectar diferenças maiores ou iguais a $3,45 \ kg/m^2$. Para manter a mesma potência do teste $(\pi = 0,80)$ para efeitos maiores ou iguais que o recomendado pelo $d$ de Cohen, seria necessário um tamanho amostral igual a $8626$ observações.
 
-Já a distribuição da amostra feminina do segundo semestre de 2017 comporta de forma não normal, enquanto que amostra feminina do segundo semestre de 2016 segue normalidade, e ambas são homocedadicas entre si. Como uma das amostras femininas não segue distribuição normal, optou-se pela utilização de testes não parametricos. Por causa disso, a análise foi feita sobre a mediana, e o teste permitiu concluir com $95%$ de confiança que as populações femininas têm medianas iguais, e é possivel observar diferenças maiores que $4 (Kg/m²)$.
+Já a distribuição da amostra feminina do segundo semestre de $2017$ se comporta de forma não normal, enquanto que amostra feminina do segundo semestre de $2016$ segue uma distribuição normal, sendo ambas homocedásticas entre si. Como uma das amostras femininas não segue distribuição normal, optou-se pela utilização de testes não parametricos. Por causa disso, a análise foi feita sobre a mediana, cujo teste permitiu concluir com $95\%$ de confiança que as populações femininas têm medianas iguais, sendo possivel observar diferenças maiores ou iguais que $4 \ kg/m^2$. É interessante ressaltar que a diferença entre o valor $p$ e o nível de significância $\alpha$ para a comparação das medianas foi bem pequena e, portanto, trata-se de uma conclusão fraca.
 
 ## Discussão de Melhorias
-O pequeno tamanho amostral das amostras femininas apresentar ser o principal fator que contribuiu para a não normalidade dos dados e consequentemente sugeriu a utilização de testes não paramétricos. E mesmo de posse desses testes, não foi possível calcular o poder do teste por não haver evidências suficientes para inferir sobre a distribuição amostral, que era uma das premissas necessárias para utilização do teste utilizado para esta finalidade. Dessa forma, a obtenção de mais amostras contribui diretamente para que mais premissas possam ser validadas, e tende a aumentar o repertório de testes e métodos que podem ser utilizados para validações estatísticas.
+
+O tamanho amostral substancialmente pequeno para o gênero feminino apresenta ser o principal fator que limita a análise de experimentos, juntamente com os tamanhos amostrais distintos entre os semestres para o mesmo gênero ($n_{F2016} \neq n_{F2017}$). É possível que isso tenha comprometido a validação da premissa de normalidade dos dados, bem como a falha em rejeitar a hipótese nula no teste de Wilcoxon ($p \approx \alpha$). 
+
+Além disso, não foi possível calcular o poder do teste por não haver observações suficientes para definir o tipo de distribuição amostral, que era uma das premissas necessárias para utilização do teste `shiehpow`, por exemplo. Dessa forma, a obtenção de mais amostras contribui diretamente para que as premissas dos testes possam ser melhor investigadas, assim como pode permitir um aumento significativo do repertório de testes estatísticos com os métodos paramétricos, caso se confirme a normalidade.
 
 ## Atividades Desempenhadas
 
-As hipóteses de teste para ambos experimentos foram definidas em concordância com os três autores. Em relação à primeira parte do estudo de caso, tanto o pré-processamento dos dados, quanto a análise exploratória e o poder do teste foram conduzidos pelo Pedro. A Samara realizou o cálculo do tamanho de efeito e a validação das premissas assumidas para os testes estatísticos. A análise estatística, por sua vez, foi feita pelo Sávio. A segunda parte do estudo de caso, referente às inferências sobre a distribuição feminina, foi realizada após sucessivas investigações. A análise estatística foi novamente realizada pelo Sávio e o cálculo do tamanho de efeito, bem como a validação das premissas inerentes, foram conduzidas em conjunto. Por fim, o Pedro realizou a análise de potência do teste e a Samara conclui o trabalho com as considerações finais e discussões de melhoria.
+As hipóteses de teste para ambos experimentos foram definidas em concordância com os três autores. Em relação à primeira parte do estudo de caso, tanto o pré-processamento dos dados, quanto a análise exploratória e o poder do teste foram conduzidos pelo Pedro. A Samara realizou o cálculo do tamanho de efeito e a validação das premissas assumidas para os testes estatísticos. A análise estatística, por sua vez, foi feita pelo Sávio. A segunda parte do estudo de caso, referente às inferências sobre a distribuição feminina, foi realizada após sucessivas investigações. O cálculo do tamanho de efeito foi realizado pelo Sávio e a análise estatística, bem como a validação das premissas inerentes, foram conduzidas pelo Pedro. Por fim, a Samara realizou a análise de potência do teste e concluiu o trabalho com as considerações finais e discussões de melhoria.
 
 \renewcommand\refname{Referências}
 \bibliographystyle{plain}
