@@ -1,0 +1,193 @@
+---
+title: |
+    | Planejamento e Análise de Experimentos (EEE933)
+    | Estudo de Caso 3
+author: Pedro Vinícius, Samara Silva e Savio Vieira
+date: 14 de Setembro de 2020
+output:
+  pdf_document:
+    #latex_engine: xelatex
+    fig_caption: yes
+  html_document:
+    df_print: paged
+indent: true
+header-includes: 
+    - \usepackage{indentfirst}
+    - \usepackage{float}
+    - \usepackage{multicol}
+bibliography: ref.bib
+doi: https://github.com/pedbrgs/Design-and-Analysis-of-Experiments
+pagetitle: Estudo de Caso 3
+---
+
+```{r setup, results='hide', warning=FALSE, include = FALSE, message = FALSE, echo=FALSE}
+# A few initial definitions just to make sure all required packages are installed. Change as needed.
+# NOTE: It may echo some weird messages to the PDF on the first compile (package installation messages). Run twice and the problem will (hopefully) go away. 
+if (!require(ggplot2, quietly = TRUE)){
+      install.packages("ggplot2")
+      }
+if (!require(devtools, quietly = TRUE)){
+      install.packages("devtools")
+}
+if (!require(GGally, quietly = TRUE)){
+      install.packages("GGally")
+      }
+ if (!require(broom, quietly = TRUE)){
+       devtools::install_github("dgrtwo/broom")
+      }
+if (!require(stats, quietly = TRUE)){
+      suppressMessages(install.packages("stats"))
+      }
+if (!require(plotly, quietly = TRUE)){
+      suppressMessages(install.packages("plotly"))
+      }
+if (!require(reshape2, quietly = TRUE)){
+      suppressMessages(install.packages("reshape2"))
+      }
+if (!require(tidyr, quietly = TRUE)){
+      suppressMessages(install.packages("tidyr"))
+}
+if (!require(effsize, quietly = TRUE)){
+      suppressMessages(install.packages("effsize"))
+      }
+if (!require(lsr, quietly = TRUE)){
+      suppressMessages(install.packages("lsr"))
+      }
+if (!require(car, quietly = TRUE)){
+      suppressMessages(install.packages("car"))
+      }
+if (!require(pwr, quietly = TRUE)){
+      suppressMessages(install.packages("pwr"))
+      }
+```
+
+
+```{r, message = FALSE, warning = FALSE, results = 'hide', echo = FALSE}
+# Statistical package 
+library(stats)
+# Ggplot2 package
+library(ggplot2)
+# Plotly package
+library(plotly)
+# Reshape2 package  
+library(reshape2)
+# GGally package
+library(GGally)
+# Tidyr package
+library(tidyr)
+# Effect size package
+library(effsize)
+# Lsr package
+library(lsr)
+# Car package
+library(car)
+# Pwr package
+library(pwr)
+# UFT-8 Encoding
+options(Encoding="UTF-8")
+```
+
+\renewcommand{\figurename}{Figura}
+\renewcommand{\tablename}{Tabela}
+
+# Introdução
+
+# Análise Exploratória de Dados
+
+```{r, results = 'hide', echo = FALSE}
+# Carrega 5 ações com 36 observações cada
+sample <- read.csv('DadosAcoesGrupoD.csv', sep = ',', header = FALSE, col.names = c('A1','A2','A3','A4','A5'))
+
+# Tratamento de vírgula como separador decimal
+sample$A1 <- as.numeric(sub(pattern = ',', replacement = '.', sample$A1))
+sample$A2 <- as.numeric(sub(pattern = ',', replacement = '.', sample$A2))
+sample$A3 <- as.numeric(sub(pattern = ',', replacement = '.', sample$A3))
+sample$A4 <- as.numeric(sub(pattern = ',', replacement = '.', sample$A4))
+sample$A5 <- as.numeric(sub(pattern = ',', replacement = '.', sample$A5))
+```
+
+```{r, results = 'hide', echo = FALSE}
+# Função que calcula a moda
+getmode <- function(v) {
+   uniqv <- unique(v)
+   uniqv[which.max(tabulate(match(v, uniqv)))]
+}
+```
+
+```{r, results = 'hide', echo = FALSE}
+# Estatísticas iniciais da ação 1
+stats_A1 <- data.frame('Variância' = var(sample$A1), 'Média' = mean(sample$A1), 'Moda' = getmode(sample$A1), 'Mediana' = median(sample$A1), 'Mínimo' = min(sample$A1), 'Máximo' = max(sample$A1), 'Desvio' = sd(sample$A1))
+
+# Estatísticas iniciais da ação 2
+stats_A2 <- data.frame('Variância' = var(sample$A2), 'Média' = mean(sample$A2), 'Moda' = getmode(sample$A2), 'Mediana' = median(sample$A2), 'Mínimo' = min(sample$A2), 'Máximo' = max(sample$A2), 'Desvio' = sd(sample$A2))
+
+# Estatísticas iniciais da ação 3
+stats_A3 <- data.frame('Variância' = var(na.omit(sample$A3)), 'Média' = mean(na.omit(sample$A3)), 'Moda'  = getmode(na.omit(sample$A3)), 'Mediana' = median(na.omit(sample$A3)), 'Mínimo' = min(na.omit(sample$A3)), 'Máximo' = max(na.omit(sample$A3)), 'Desvio' = sd(na.omit(sample$A3)))
+
+# Estatísticas iniciais da ação 4
+stats_A4 <- data.frame('Variância' = var(na.omit(sample$A4)), 'Média' = mean(na.omit(sample$A4)), 'Moda'  = getmode(na.omit(sample$A4)), 'Mediana' = median(na.omit(sample$A4)), 'Mínimo' = min(na.omit(sample$A4)), 'Máximo' = max(na.omit(sample$A4)), 'Desvio' = sd(na.omit(sample$A4)))
+
+# Estatísticas iniciais da ação 5
+stats_A5 <- data.frame('Variância' = var(na.omit(sample$A5)), 'Média' = mean(na.omit(sample$A5)), 'Moda'  = getmode(na.omit(sample$A5)), 'Mediana' = median(na.omit(sample$A5)), 'Mínimo' = min(na.omit(sample$A5)), 'Máximo' = max(na.omit(sample$A5)), 'Desvio' = sd(na.omit(sample$A5)))
+```
+
+```{r, echo = FALSE}
+stats <- data.frame(rbind(stats_A1, stats_A2, stats_A3, stats_A4, stats_A5),
+                    row.names = c("A1", "A2", "A3", "A4", "A5"))
+stats
+```
+
+```{r, results = 'hide', echo = FALSE}
+As <- melt(sample, id.vars = NULL)
+```
+
+```{r histogram, echo = FALSE, fig.height = 2.8, fig.width = 6, fig.align = 'center', fig.cap = 'Histogramas.', fig.pos = 'H'}
+# Histogramas
+ggplot(As, aes(value)) + xlab("Preço") + 
+    ylab("Frequência") + geom_histogram(bins = 20) + 
+    facet_wrap(~variable, scales = 'free')
+```
+
+```{r boxplot, echo = FALSE, fig.height = 2.8, fig.width = 6, fig.align = 'center', fig.cap = 'Boxplots.', fig.pos = 'H'}
+# Boxplots
+ggplot(data = As, aes(y = "", x = value)) + xlab("Preço") + 
+    ylab("") + geom_boxplot(lwd = 0.3) + 
+    facet_wrap(~variable, scales = 'free') + coord_flip()
+```
+
+```{r qqplot, echo = FALSE, fig.height = 2.8, fig.width = 6, fig.align = 'center', fig.cap = 'QQ-Plots', fig.pos = 'H'}
+# QQ-Plots
+ggplot(data = As, aes(sample = value)) +
+  facet_wrap(~variable, scales = "free") +
+  stat_qq() + stat_qq_line() + scale_y_continuous(name = 'Quantis da Amostra') + 
+  scale_x_continuous(name = 'Quantis Teóricos Normais')
+```
+
+# Validação de Premissas
+
+```{r, echo = FALSE}
+# Testes de Normalidade
+shapiro.test(sample$A1)
+shapiro.test(sample$A2)
+shapiro.test(sample$A3)
+shapiro.test(sample$A4)
+shapiro.test(sample$A5)
+```
+
+Teorema do Limite Central pode ser evocado, uma vez que $(n = 36) > 30$.
+
+```{r, echo = FALSE}
+# Teste de Homocedasticidade
+bartlett.test(x = sample)
+```
+
+# Conclusões
+
+## Discussão de Melhorias
+
+## Atividades Desempenhadas
+
+
+\renewcommand\refname{Referências}
+\bibliographystyle{plain}
+\bibliography{ref}
