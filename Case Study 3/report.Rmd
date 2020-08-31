@@ -59,6 +59,9 @@ if (!require(car, quietly = TRUE)){
 if (!require(pwr, quietly = TRUE)){
       suppressMessages(install.packages("pwr"))
       }
+if (!require(pwr, quietly = TRUE)){
+      suppressMessages(install.packages("multcompView"))
+      }
 ```
 
 
@@ -83,6 +86,8 @@ library(lsr)
 library(car)
 # Pwr package
 library(pwr)
+#tukey package
+library(multcompView)
 # UFT-8 Encoding
 options(Encoding="UTF-8")
 ```
@@ -91,6 +96,32 @@ options(Encoding="UTF-8")
 \renewcommand{\tablename}{Tabela}
 
 # Introdução
+
+O mercado de ações é uma forma de investimento onde uma das maneiras de se obter lucratividade é vender as ações quando as mesmas apresentam alta em relação ao preço ao qual foram adquiridas \cite{toro}. Embora a rentabilidade passada não seja garantia de rentabilidade futura \cite{bb}, normalmente o histórico de rentabilidade é um fator a ser considerado.
+
+Nesse estudo de caso deseja-se verificar, com base no histórico conhecido de um grupo de cinco ações, qual delas possui maior probabilidade de ganho ao investidor. Para isso, foram disponibilizadas amostras contendo 36 observações de cada um das 5 ações consideradas nesse estudo. 
+
+
+# Planejamento dos Experimentos
+
+As hipóteses estatísticas foram definidas com objetivo de verificar as seguintes proposições:\\
+
+\begin{itemize}
+\item Dentre o grupo de ações pré-definido, qual delas possui maior potencial de rentabilidade mensal para o investidor?
+\item Caso haja mais de uma, quais outras também apresentam evidências estatísticas desse potencial?
+\end{itemize}
+
+Considerando as questões propostas, foram estabelecidas as hipóteses de teste sobre o parâmetro média:
+
+$$
+  \begin{cases} 
+      H_0: \mu_{A_{1}} = \mu_{A_{2}} =  \mu_{A_{3}} =  \mu_{A_{4}} =  \mu_{A_{5}} &\\H_1: $ duas ou mais médias são diferentes das demais$
+  \end{cases}
+$$
+
+
+
+
 
 # Análise Exploratória de Dados
 
@@ -179,8 +210,23 @@ Teorema do Limite Central pode ser evocado, uma vez que $(n = 36) > 30$.
 ```{r, echo = FALSE}
 # Teste de Homocedasticidade
 bartlett.test(x = sample)
-```
 
+
+```
+```{r, echo = FALSE}
+combined_groups <- data.frame(cbind(sample$A1,sample$A2,sample$A3,sample$A4,sample$A5))
+summary(combined_groups)
+stacked_groups <- stack(combined_groups)
+anova_results <- aov(values ~ ind, data=stacked_groups)
+summary(anova_results)
+anova_results
+
+TUKEY <- TukeyHSD(x=anova_results, conf.level=0.95)
+TUKEY
+plot(TUKEY , las=1 , col="brown")
+
+
+```
 # Conclusões
 
 ## Discussão de Melhorias
