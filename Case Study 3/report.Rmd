@@ -214,7 +214,11 @@ bartlett.test(x = sample)
 
 ```
 ```{r, echo = FALSE}
-combined_groups <- data.frame(cbind(sample$A1,sample$A2,sample$A3,sample$A4,sample$A5))
+
+
+
+
+combined_groups <- data.frame(cbind(sample$A1/sample$A1[36],sample$A2/sample$A2[36], sample$A3/sample$A3[36],sample$A4/sample$A4[36],sample$A5/sample$A5[36]))
 summary(combined_groups)
 stacked_groups <- stack(combined_groups)
 anova_results <- aov(values ~ ind, data=stacked_groups)
@@ -225,6 +229,19 @@ TUKEY <- TukeyHSD(x=anova_results, conf.level=0.95)
 TUKEY
 plot(TUKEY , las=1 , col="brown")
 
+#Savio example
+savio <- read.csv('TP3.csv')
+head(savio)
+grupos <- data.frame(cbind(savio$X1, savio$X1.1, savio$X1.2, savio$X1.3, savio$X1.4))
+summary(grupos)
+grupos <- stack(grupos)
+anova_savio <- aov(values ~ind, data=grupos)
+summary(anova_savio)
+anova_savio
+
+TUKEY <- TukeyHSD(x=anova_savio, conf.level=0.95)
+TUKEY
+plot(TUKEY , las=1 , col="brown")
 
 ```
 # Conclusões
