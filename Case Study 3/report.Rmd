@@ -59,8 +59,11 @@ if (!require(car, quietly = TRUE)){
 if (!require(pwr, quietly = TRUE)){
       suppressMessages(install.packages("pwr"))
       }
-if (!require(pwr, quietly = TRUE)){
+if (!require(multcompView, quietly = TRUE)){
       suppressMessages(install.packages("multcompView"))
+      }
+if (!require(lmtest, quietly = TRUE)){
+      suppressMessages(install.packages("lmtest"))
       }
 ```
 
@@ -86,8 +89,10 @@ library(lsr)
 library(car)
 # Pwr package
 library(pwr)
-#tukey package
+# Tukey package
 library(multcompView)
+# Durbin Watson Test package
+library(lmtest)
 # UFT-8 Encoding
 options(Encoding="UTF-8")
 ```
@@ -97,33 +102,41 @@ options(Encoding="UTF-8")
 
 # Introdução
 
-O mercado de ações é uma forma de investimento onde uma das maneiras de se obter lucratividade é vender as ações quando as mesmas apresentam alta em relação ao preço ao qual foram adquiridas \cite{toro}. Embora a rentabilidade passada não seja garantia de rentabilidade futura \cite{bb}, normalmente o histórico de rentabilidade é um fator a ser considerado.
+O mercado de ações é uma forma de investimento onde uma das maneiras de se obter lucratividade é vender as ações quando seus preços atuais estiverem acima do preço no qual foram adquiridas \cite{toro}. Embora a rentabilidade passada não seja garantia de rentabilidade futura, normalmente o histórico de rentabilidade é um fator a ser considerado \cite{bb}.
 
-Nesse estudo de caso deseja-se verificar, com base no histórico conhecido de um grupo de cinco ações, qual delas possui maior probabilidade de ganho ao investidor. Para isso, foram disponibilizadas amostras contendo 36 observações de cada um das 5 ações consideradas nesse estudo. 
-
+Nesse estudo de caso deseja-se verificar, qual ação dentre cinco candidatas possui maior potencial de **ganho mensal** ao investidor quando escolhidas com exclusividade, isto é, quando o montante é investido por completo em uma única ação. Para isso, considera-se o fechamento das cinco ações nos últimos 36 meses.
 
 # Planejamento dos Experimentos
 
-As hipóteses estatísticas foram definidas com objetivo de verificar as seguintes proposições:\\
+Dado que o investidor deseja a maior rentabilidade mensal possível, a série temporal dos preços de fechamento das ações foram utilizadas para calcular a taxa de retorno das cinco ações em cada um dos meses. Tal índice permite avaliar o lucro de uma ação durante um mês, expresso como uma proporção do investimento no mês anterior. A taxa de retorno de uma ação $i$ em um determinado mês $j$ é dada por \eqref{eq:ror}:
 
+\begin{equation}
+\label{eq:ror}
+r_j^i = \frac{p^i_j - p^i_{j-1}}{p^i_{j-1}}
+\end{equation}
+onde $p^i_j$ é o preço de fechamento da ação $i$ no mês atual $j$ e $p^i_{j-1}$ é o preço de fechamento da ação $i$ no mês anterior $j-1$.
+
+Quando o preço de fechamento da ação no mês corrente é superior ao preço de fechamento da ação no mês anterior ($p^i_j > p^i_{j-1}$), o retorno expressará a perda líquida obtida do mês $j-1$ para o mês $j$. Em contrapartida, se o preço de fechamento da ação no mês corrente é inferior ao preço de fechamento da ação no mês anterior ($p^i_j < p^i_{j-1}$), o retorno expressará o ganho líquido obtido nessa mesma transição mensal. Uma vez que o presente cálculo considera diferenças entre cotações adjacentes, o tamanho amostral é reduzido em uma unidade ($n = 35$).
+
+As hipóteses estatísticas foram definidas com objetivo de verificar as seguintes proposições:
 \begin{itemize}
-\item Dentre o grupo de ações pré-definido, qual delas possui maior potencial de rentabilidade mensal para o investidor?
-\item Caso haja mais de uma, quais outras também apresentam evidências estatísticas desse potencial?
+\item Dentre o grupo de ações candidatas, qual delas possui maior potencial de rentabilidade mensal para o investidor?
+\item Caso haja mais de uma ação em destaque, quais são elas e qual deveria ser escolhida entre elas?
 \end{itemize}
 
-Considerando as questões propostas, foram estabelecidas as hipóteses de teste sobre o parâmetro média:
-
+Considerando as questões propostas, foram estabelecidas as hipóteses de teste sobre o retorno médio mensal das ações:
 $$
   \begin{cases} 
-      H_0: \mu_{A_{1}} = \mu_{A_{2}} =  \mu_{A_{3}} =  \mu_{A_{4}} =  \mu_{A_{5}} &\\H_1: $ duas ou mais médias são diferentes das demais$
+      H_0: \mu_{A_{1}} = \mu_{A_{2}} =  \mu_{A_{3}} =  \mu_{A_{4}} =  \mu_{A_{5}} &\\H_1: \text{duas ou mais médias são diferentes das demais}
   \end{cases}
 $$
+onde a hipótese nula $H_0$ implica na igualdade entre os retornos médios mensais das cinco ações ao nível de confiança $1-\alpha$ e a hipótese alternativa bilateral $H_1$ na diferença entre duas ou mais ações em relação ao retorno médio mensal também ao nível de confiança $1-\alpha$.
 
-
-
-
+Os parâmetros experimentais considerados para realização dos testes são nível de significância $\alpha = 0,05$ e potência do teste $\pi = 1-\beta = 0,80$.
 
 # Análise Exploratória de Dados
+
+Algumas primeiras propriedades amostrais referentes ao retorno mensal das cinco ações, como média, moda, mediana, valores extremos, variância e desvio podem ser obtidas de imediato. A fim de facilitar a interpretabilidade dessas estatísticas amostrais, os retornos médios mensais são apresentados em porcentagem, ou seja, os valores originais obtidos pela Equação \eqref{eq:ror} foram multiplicados por 100. 
 
 ```{r, results = 'hide', echo = FALSE}
 # Carrega 5 ações com 36 observações cada
@@ -135,6 +148,12 @@ sample$A2 <- as.numeric(sub(pattern = ',', replacement = '.', sample$A2))
 sample$A3 <- as.numeric(sub(pattern = ',', replacement = '.', sample$A3))
 sample$A4 <- as.numeric(sub(pattern = ',', replacement = '.', sample$A4))
 sample$A5 <- as.numeric(sub(pattern = ',', replacement = '.', sample$A5))
+```
+
+```{r, echo = FALSE}
+# Cálculo do Retorno Mensal
+differences <- diff(as.matrix(sample))
+sample <- differences/sample[2:36,]
 ```
 
 ```{r, results = 'hide', echo = FALSE}
@@ -165,8 +184,32 @@ stats_A5 <- data.frame('Variância' = var(na.omit(sample$A5)), 'Média' = mean(n
 ```{r, echo = FALSE}
 stats <- data.frame(rbind(stats_A1, stats_A2, stats_A3, stats_A4, stats_A5),
                     row.names = c("A1", "A2", "A3", "A4", "A5"))
-stats
+show(stats*100)
 ```
+
+```{r, results = 'hide', echo = FALSE}
+
+# Meses que ocorreram os extremos, lembrando que as linhas de menor índice se referem aos meses mais atuais
+cat('Máximos\n')
+cat('Mês:', 36 - which.max(sample$A1), 'Retorno:', max(sample$A1)*100, '\n')
+cat('Mês:',36 - which.max(sample$A2), 'Retorno:', max(sample$A2)*100, '\n')
+cat('Mês:',36 - which.max(sample$A3), 'Retorno:', max(sample$A3)*100, '\n')
+cat('Mês:',36 - which.max(sample$A4), 'Retorno:', max(sample$A4)*100, '\n')
+cat('Mês:',36 - which.max(sample$A5), 'Retorno:', max(sample$A5)*100, '\n')
+cat('Mínimos\n')
+cat('Mês:',36 - which.min(sample$A1), 'Retorno:', min(sample$A1)*100, '\n')
+cat('Mês:',36 - which.min(sample$A2), 'Retorno:', min(sample$A2)*100, '\n')
+cat('Mês:',36 - which.min(sample$A3), 'Retorno:', min(sample$A3)*100, '\n')
+cat('Mês:',36 - which.min(sample$A4), 'Retorno:', min(sample$A4)*100, '\n')
+cat('Mês:',36 - which.min(sample$A5), 'Retorno:', min(sample$A5)*100, '\n')
+
+```
+
+A princípio, é possível observar que, durante os últimos 3 anos, os retornos mensais de três dentre as cinco ações candidatas apresentaram, em média, retorno negativo, são elas $A_2$, $A_4$ e $A_5$. No entanto, é interessante ressaltar que todas as ações tiveram retornos mensais negativos em algum momento da série histórica. O maior retorno negativo constatado foi o da ação $A_2$ com uma perda de $-4,24\%$ no 16º mês e o menor retorno negativo foi $-1,52\%$ da ação $A_1$ no 11º mês. A ação $A_3$ obteve o maior ganho líquido médio, cerca de $1,17\%$, bem como também apresentou o maior retorno máximo mensal, $3,79\%$ no 20º mês. O pior rendimento máximo foi de $0,2639\%$ pela ação $A_4$ no 17º mês.
+
+Um fator interessante é que as diferenças absolutas entre os retornos amostrais mensais médios e os retornos amostrais mensais medianos de todas as ações foram bem próximas de zero, isto é, $\Delta_i = |\overline{\mu_i} - \overline{m_i}| \approx 0$ para $i \in \{1,5\}$. A maior diferença obtida, por exemplo, foi de $0,14\%$ para a ação $A_3$. Apesar de ser uma suposição fracamente sustentada, isso sugere que as distribuições de probabilidade amostrais podem ser aproximadas, a priori, por uma distribuição normal. No que se refere às variâncias amostrais das ações, percebe-se que os valores são bastante similares e aproximadamente iguais a $0,01\%$, o que indica que as amostras também são homocedásticas.
+
+Com o intuito de compreender melhor os dados em estudo e, posteriormente, inferir sobre as populações de onde as amostras provêm, serão analisadas algumas representações gráficas. No que tange a distribuição de frequência das observações, com exceção da ação $A_4$, todas as demais ações apresentam curvas em formato de sino, o que fortalece o pressuposto de normalidade mencionado anteriormente. 
 
 ```{r, results = 'hide', echo = FALSE}
 As <- melt(sample, id.vars = NULL)
@@ -174,19 +217,25 @@ As <- melt(sample, id.vars = NULL)
 
 ```{r histogram, echo = FALSE, fig.height = 2.8, fig.width = 6, fig.align = 'center', fig.cap = 'Histogramas.', fig.pos = 'H'}
 # Histogramas
-ggplot(As, aes(value)) + xlab("Preço") + 
+ggplot(As, aes(value)) + xlab("Retorno Mensal") + 
     ylab("Frequência") + geom_histogram(bins = 20) + 
     facet_wrap(~variable, scales = 'free')
 ```
 
+\noindent Ainda a partir dos histogramas, pode-se evidenciar que durante os 36 meses coletados, as ações $A_1$ e $A_3$ tiveram a maioria dos rendimentos mensais no domínio positivo (ganho líquido) e as ações $A_2$, $A_4$ e $A_5$ apresentaram a maioria dos rendimentos mensais no domínio negativo (perda líquida). 
+
+Segundo os diagramas de caixa, apenas a distribuição de retornos mensais da amostra $A_1$ é visualmente simétrica e, portanto apresenta evidências de normalidade. No caso das demais ações, as medianas não estão tão próximas da média, uma vez que os segundos quartis estão deslocados dos respectivos centros das caixas. Essa dubiedade de interpretações entre os histogramas e os *boxplots* acerca da normalidade dos dados instiga análises mais aprofundadas, como serão realizadas a seguir. Além dessas verificações, outra circunstância notável é a presença de *outliers* apenas nas distribuições amostrais das ações $A_2$ e $A_3$.
+
 ```{r boxplot, echo = FALSE, fig.height = 2.8, fig.width = 6, fig.align = 'center', fig.cap = 'Boxplots.', fig.pos = 'H'}
 # Boxplots
-ggplot(data = As, aes(y = "", x = value)) + xlab("Preço") + 
+ggplot(data = As, aes(y = "", x = value)) + xlab("Retorno Mensal") + 
     ylab("") + geom_boxplot(lwd = 0.3) + 
     facet_wrap(~variable, scales = 'free') + coord_flip()
 ```
 
-```{r qqplot, echo = FALSE, fig.height = 2.8, fig.width = 6, fig.align = 'center', fig.cap = 'QQ-Plots', fig.pos = 'H'}
+Outra possibilidade para examinar a normalidade é considerar gráficos quantil-quantil. Essa representação permite comparar as distribuições de probabilidade de cada uma das ações (eixo das ordenadas) com uma distribuição normal (eixo das abcissas). Mediante a boa qualidade do ajuste da reta nos pontos para todas as ações, pode-se concluir que há fortes indícios de que os resíduos das distribuições são normais.
+
+```{r qqplot, echo = FALSE, fig.height = 2.8, fig.width = 6, fig.align = 'center', fig.cap = 'QQ-Plots.', fig.pos = 'H'}
 # QQ-Plots
 ggplot(data = As, aes(sample = value)) +
   facet_wrap(~variable, scales = "free") +
@@ -196,54 +245,46 @@ ggplot(data = As, aes(sample = value)) +
 
 # Validação de Premissas
 
+A premissa de normalidade será validada pelo teste não-paramétrico de Shapiro-Wilk. A hipótese nula desse teste afirma que a amostra proveio de uma população com distribuição normal e a hipótese alternativa é de que a amostra não proveio de uma distribuição normal \cite{ShapiroWilkTest}. O nível de significância utilizado para cada teste foi de $\alpha = 0,10$.
+
 ```{r, echo = FALSE}
 # Testes de Normalidade
-shapiro.test(sample$A1)
-shapiro.test(sample$A2)
-shapiro.test(sample$A3)
-shapiro.test(sample$A4)
-shapiro.test(sample$A5)
+show(rbind(shapiro.test(sample$A1), shapiro.test(sample$A2), shapiro.test(sample$A3), shapiro.test(sample$A4), shapiro.test(sample$A5)))
 ```
 
-Teorema do Limite Central pode ser evocado, uma vez que $(n = 36) > 30$.
+Não foi possível rejeitar a hipótese nula em nenhum dos casos, visto que os p-valores obtidos são maiores que o nível de significância pré-estabelecido ($p > \alpha$). Assim, pode-se afirmar ao nível de confiança de $90\%$ que as amostras de todas as ações provêm de populações com distribuição normal. Como a premissa de normalidade foi validada, não é necessário evocar o Teorema Central do Limite (TCL), que ainda assim seria viável devido o tamanho amostral ser suficiente $(n = 35) > 30$.
+
+Alguns testes estatísticos de múltiplas amostras, cujas hipóteses nulas são construídas a partir do parâmetro média amostral, são altamente sensíveis a premissa de independência das amostras, como é o caso do ANOVA. Embora não exista um procedimento específico para testar a independência das amostras no caso geral, o caso especial de autocorrelações em série nos dados pode ser testado pelo Teste de Durbin-Watson \cite{Campelo2018-LNDoE}. A hipótese nula desse teste declara que não há correlação entre os resíduos, isto é, os resíduos são independentes. A hipótese alternativa, por sua vez, afirma que os resíduos são correlacionados \cite{DurbinWatsonTest}. Assim, a correlação entre os resíduos foi tomada segundo a abordagem de todos contra todos, cujo intuito é avaliar as correlações entre todas as 10 possíveis combinações par a par das ações ($A_1 \times A_2$, $A_1 \times A_3$, $A_1 \times A_4$, $A_1 \times A_5$, $A_2 \times A_3$, $A_2 \times A_4$, $A_2 \times A_5$, $A_3 \times A_4$, $A_3 \times A_5$ e $A_4 \times A_5$). O nível de significância utilizado para esse teste foi $\alpha = 0,05$.
+
+```{r, echo = FALSE}
+# Teste de independência dos resíduos (todos contra todos)
+durbin_watson_tests <- data.frame(rbind(dwtest(sample$A1 ~ sample$A2), dwtest(sample$A1 ~ sample$A3), dwtest(sample$A1 ~ sample$A4), dwtest(sample$A1 ~ sample$A5), dwtest(sample$A2 ~ sample$A3), dwtest(sample$A2 ~ sample$A4), dwtest(sample$A2 ~ sample$A5), dwtest(sample$A3 ~ sample$A4), dwtest(sample$A3 ~ sample$A5), dwtest(sample$A4 ~ sample$A5)))
+
+show(durbin_watson_tests[c('data.name', 'method', 'p.value', 'statistic')])
+```
+
+Não é possível rejeitar a hipótese nula ao nível de confiança estabelecido para nenhuma das combinações par a par das ações, uma vez que os p-valores foram todos superiores ao nível de significância. Assim, pode-se afirmar que os resíduos amostrais entre todos os pares de ações são independentes ao nível de confiança de $95\%$.
+
+Com a finalidade de avaliar a premissa de homocedasticidade, o teste paramétrico de Bartlett foi empregado. Esse teste permite comparar as variâncias de três ou mais grupos e possui como premissa tanto a independência quanto a normalidade das amostras, que foram anteriormente validadas. A hipótese nula desse teste afirma que as variâncias de todas as populações das quais vieram as amostras são iguais e a hipótese alternativa afirma que há pelo menos uma diferença entre as variâncias dessas populações \cite{BartlettTest}. O nível de significância foi definido em $\alpha = 0,05$.
 
 ```{r, echo = FALSE}
 # Teste de Homocedasticidade
 bartlett.test(x = sample)
-
-
 ```
-```{r, echo = FALSE}
+A partir do p-valor substancialmente maior que o nível de significância ($0,7798 >\!\!> 0,05$), não se pode refutar a hipótese nula e, portanto, ao nível de confiança de $95\%$, tem-se que as variâncias populacionais de todas as ações são iguais.
 
+# Análise Estatística
 
-
-
-combined_groups <- data.frame(cbind(sample$A1/sample$A1[36],sample$A2/sample$A2[36], sample$A3/sample$A3[36],sample$A4/sample$A4[36],sample$A5/sample$A5[36]))
-summary(combined_groups)
-stacked_groups <- stack(combined_groups)
-anova_results <- aov(values ~ ind, data=stacked_groups)
-summary(anova_results)
-anova_results
-
-TUKEY <- TukeyHSD(x=anova_results, conf.level=0.95)
-TUKEY
-plot(TUKEY , las=1 , col="brown")
-
-#Savio example
-savio <- read.csv('TP3.csv')
-head(savio)
-grupos <- data.frame(cbind(savio$X1, savio$X1.1, savio$X1.2, savio$X1.3, savio$X1.4))
-summary(grupos)
+```{r, echo = FALSE, fig.height = 4, fig.width = 6, fig.align = 'center'}
+# ANOVA
+grupos <- data.frame(cbind(sample[,1], sample[,2], sample[,3], sample[,4], sample[,5]))
 grupos <- stack(grupos)
-anova_savio <- aov(values ~ind, data=grupos)
-summary(anova_savio)
-anova_savio
+anova <- aov(values ~ind, data=grupos)
 
-TUKEY <- TukeyHSD(x=anova_savio, conf.level=0.95)
-TUKEY
+TUKEY <- TukeyHSD(x=anova, conf.level=0.95)
 plot(TUKEY , las=1 , col="brown")
-
 ```
+
 # Conclusões
 
 ## Discussão de Melhorias
