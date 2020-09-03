@@ -325,7 +325,11 @@ plot(TUKEY , las = 1 , col = "blue")
 ```
 Os dados extraídos do teste de Tukey são apresentados graficamente. Baseado no intervalo de confiança das diferenças das médias dos rendimentos, verifica-se que as ações ($X3$ e $X1$) e ($X4$ e $X2$) não são significativamente diferentes, pois este dois intervalos contém o zero (0). Já os demais intervalos ($X2$ e $X1$), ($X4$ e $X1$), ($X5$ e $X1$), ($X3$ e $X2$), ($X5$ e $X2$), ($X4$ e $X3$), ($X5$ e $X3$) e ($X5$ e $X4$) têm rendimentos significativamente diferentes, como mostrado graficamente.
 
-Pela analise do p valor, tem-se a mesma conclusão, visto que os intervalos dos rendimentos das ações ($X3$ e $X1$) e ($X4$ e $X2$) retornou p valor maior que $0,05$. Os demais p valores são menores que o nível de significância igual a $0,05$, enfatizando que têm rendimentos são significativamente diferentes.
+Pela analise do p valor, tem-se a mesma conclusão, visto que os intervalos dos rendimentos das ações ($X3$ e $X1$) e ($X4$ e $X2$) retornou p valor maior que $0,05$. Os demais p valores são menores que o nível de significância igual a $0,05$, enfatizando que têm rendimentos significativamente diferentes.
+
+Nesse sentido, o teste Tukey deixa em evidência que as ações $X2$ e $X4$ foram as que obtiveram rendimentos médios melhores em detrimento das demais, e embora $X4$ tenha média levemente mais alta que $X2$, não trata-se de uma diferença significativa estatisticamente. Sendo assim, mais análises são demandadas para inferir qual das duas possui maior potencial de rendimento.
+
+
 
 # Tamanho de Efeito
 
@@ -406,6 +410,7 @@ O poder do teste foi bastante alto para o experimento conduzido ($\pi = 0,9999$)
 ```{r, echo = FALSE}
 # Cálculo da Potência
 pwr.anova.test(k = ncol(sample), n = nrow(sample), sig.level = 0.05, power = 0.8)
+
 ```
 
 # Conclusões
