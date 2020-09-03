@@ -47,9 +47,6 @@ if (!require(reshape2, quietly = TRUE)){
 if (!require(tidyr, quietly = TRUE)){
       suppressMessages(install.packages("tidyr"))
 }
-if (!require(effsize, quietly = TRUE)){
-      suppressMessages(install.packages("effsize"))
-      }
 if (!require(lsr, quietly = TRUE)){
       suppressMessages(install.packages("lsr"))
       }
@@ -64,6 +61,9 @@ if (!require(multcompView, quietly = TRUE)){
       }
 if (!require(lmtest, quietly = TRUE)){
       suppressMessages(install.packages("lmtest"))
+      }
+if (!require(effectsize, quietly = TRUE)){
+      suppressMessages(install.packages("effectsize"))
       }
 ```
 
@@ -81,8 +81,6 @@ library(reshape2)
 library(GGally)
 # Tidyr package
 library(tidyr)
-# Effect size package
-library(effsize)
 # Lsr package
 library(lsr)
 # Car package
@@ -93,6 +91,8 @@ library(pwr)
 library(multcompView)
 # Durbin Watson Test package
 library(lmtest)
+# Effect Size for ANOVA
+library(effectsize)
 # UFT-8 Encoding
 options(Encoding="UTF-8")
 ```
@@ -132,7 +132,7 @@ $$
 $$
 onde a hipótese nula $H_0$ implica na igualdade entre os retornos médios mensais das cinco ações ao nível de confiança $1-\alpha$ e a hipótese alternativa bilateral $H_1$ na diferença entre duas ou mais ações em relação ao retorno médio mensal também ao nível de confiança $1-\alpha$.
 
-Os parâmetros experimentais considerados para realização dos testes são nível de significância $\alpha = 0,05$ e potência do teste $\pi = 1-\beta = 0,80$.
+Os parâmetros experimentais considerados para realização dos testes são nível de significância $\alpha = 0,05$ e potência desejada do teste $\pi^{*} = 1-\beta = 0,80$.
 
 # Análise Exploratória de Dados
 
@@ -151,9 +151,26 @@ sample$A5 <- as.numeric(sub(pattern = ',', replacement = '.', sample$A5))
 ```
 
 ```{r, echo = FALSE}
-# Cálculo do Retorno Mensal
+# Cálculo do Retorno Mensal (loop)
+rate_of_return_loop <- matrix(0, nrow = nrow(sample)-1, ncol = ncol(sample))
+for (j in 1:ncol(sample)) {
+  for (i in 1:((nrow(sample)-1))){
+    rate_of_return_loop[i,j] = (sample[i,j] - sample[i+1,j])/(sample[i+1,j])
+  }
+}
+```
+
+```{r, echo = FALSE}
+# Cálculo do Retorno Mensal (matricial)
 differences <- diff(as.matrix(sample))
-sample <- differences/sample[2:36,]
+rate_of_return_matrix <- -differences/sample[2:36,]
+```
+
+```{r, echo = FALSE}
+# Se os cálculos matriciais e por loop coincidirem em todas as posições, atualiza a minha amostra
+if (all(rate_of_return_loop == rate_of_return_matrix) == TRUE){
+  sample <- rate_of_return_matrix
+}
 ```
 
 ```{r, results = 'hide', echo = FALSE}
@@ -205,9 +222,9 @@ cat('Mês:',36 - which.min(sample$A5), 'Retorno:', min(sample$A5)*100, '\n')
 
 ```
 
-A princípio, é possível observar que, durante os últimos 3 anos, os retornos mensais de três dentre as cinco ações candidatas apresentaram, em média, retorno negativo, são elas $A_2$, $A_4$ e $A_5$. No entanto, é interessante ressaltar que todas as ações tiveram retornos mensais negativos em algum momento da série histórica. O maior retorno negativo constatado foi o da ação $A_2$ com uma perda de $-4,24\%$ no 16º mês e o menor retorno negativo foi $-1,52\%$ da ação $A_1$ no 11º mês. A ação $A_3$ obteve o maior ganho líquido médio, cerca de $1,17\%$, bem como também apresentou o maior retorno máximo mensal, $3,79\%$ no 20º mês. O pior rendimento máximo foi de $0,2639\%$ pela ação $A_4$ no 17º mês.
+A princípio, é possível observar que, durante os últimos 3 anos, os retornos mensais de duas dentre as cinco ações candidatas apresentaram, em média, retorno negativo, são elas $A_1$ e $A_3$. No entanto, é interessante ressaltar que todas as ações tiveram retornos mensais negativos em algum momento da série histórica. O maior retorno negativo constatado foi o da ação $A_3$ com uma perda de $-3,79\%$ no 20º mês e o menor retorno negativo foi $-0,26\%$ da ação $A_4$ no 17º mês. A ação $A_4$ obteve o maior ganho líquido médio, cerca de $1,20\%$ e a ação $A_2$ apresentou o maior retorno máximo mensal, $4,24\%$ no 16º mês. O pior rendimento máximo foi de $1,85\%$ pela ação $A_3$ no 9º mês.
 
-Um fator interessante é que as diferenças absolutas entre os retornos amostrais mensais médios e os retornos amostrais mensais medianos de todas as ações foram bem próximas de zero, isto é, $\Delta_i = |\overline{\mu_i} - \overline{m_i}| \approx 0$ para $i \in \{1,5\}$. A maior diferença obtida, por exemplo, foi de $0,14\%$ para a ação $A_3$. Apesar de ser uma suposição fracamente sustentada, isso sugere que as distribuições de probabilidade amostrais podem ser aproximadas, a priori, por uma distribuição normal. No que se refere às variâncias amostrais das ações, percebe-se que os valores são bastante similares e aproximadamente iguais a $0,01\%$, o que indica que as amostras também são homocedásticas.
+Um fator interessante é que as diferenças absolutas entre os retornos amostrais mensais médios e os retornos amostrais mensais medianos de todas as ações foram bem próximas de zero, isto é, $\Delta_i = |\overline{\mu_i} - \overline{m_i}| \approx 0$ para $i \in \{1,5\}$. A maior diferença obtida, por exemplo, foi de $0,14\%$ para a ação $A_3$. Apesar de ser uma suposição fracamente sustentada, isso sugere que as distribuições de probabilidade amostrais podem ser aproximadas, a priori, por uma distribuição normal. No que se refere às variâncias amostrais das ações, percebe-se que os valores são bastante similares e aproximadamente iguais a $0,01\%$, o que também sugere que as amostras são homocedásticas.
 
 Com o intuito de compreender melhor os dados em estudo e, posteriormente, inferir sobre as populações de onde as amostras provêm, serão analisadas algumas representações gráficas. No que tange a distribuição de frequência das observações, com exceção da ação $A_4$, todas as demais ações apresentam curvas em formato de sino, o que fortalece o pressuposto de normalidade mencionado anteriormente. 
 
@@ -222,7 +239,7 @@ ggplot(As, aes(value)) + xlab("Retorno Mensal") +
     facet_wrap(~variable, scales = 'free')
 ```
 
-\noindent Ainda a partir dos histogramas, pode-se evidenciar que durante os 36 meses coletados, as ações $A_1$ e $A_3$ tiveram a maioria dos rendimentos mensais no domínio positivo (ganho líquido) e as ações $A_2$, $A_4$ e $A_5$ apresentaram a maioria dos rendimentos mensais no domínio negativo (perda líquida). 
+\noindent Ainda a partir dos histogramas, pode-se evidenciar que durante os 36 meses coletados, as ações $A_1$ e $A_3$ tiveram a maioria dos rendimentos mensais no domínio negativo (perda líquida) e as ações $A_2$, $A_4$ e $A_5$ apresentaram a maioria dos rendimentos mensais no domínio positivo (ganho líquido). 
 
 Segundo os diagramas de caixa, apenas a distribuição de retornos mensais da amostra $A_1$ é visualmente simétrica e, portanto apresenta evidências de normalidade. No caso das demais ações, as medianas não estão tão próximas da média, uma vez que os segundos quartis estão deslocados dos respectivos centros das caixas. Essa dubiedade de interpretações entre os histogramas e os *boxplots* acerca da normalidade dos dados instiga análises mais aprofundadas, como serão realizadas a seguir. Além dessas verificações, outra circunstância notável é a presença de *outliers* apenas nas distribuições amostrais das ações $A_2$ e $A_3$.
 
@@ -254,7 +271,7 @@ show(rbind(shapiro.test(sample$A1), shapiro.test(sample$A2), shapiro.test(sample
 
 Não foi possível rejeitar a hipótese nula em nenhum dos casos, visto que os p-valores obtidos são maiores que o nível de significância pré-estabelecido ($p > \alpha$). Assim, pode-se afirmar ao nível de confiança de $90\%$ que as amostras de todas as ações provêm de populações com distribuição normal. Como a premissa de normalidade foi validada, não é necessário evocar o Teorema Central do Limite (TCL), que ainda assim seria viável devido o tamanho amostral ser suficiente $(n = 35) > 30$.
 
-Alguns testes estatísticos de múltiplas amostras, cujas hipóteses nulas são construídas a partir do parâmetro média amostral, são altamente sensíveis a premissa de independência das amostras, como é o caso do ANOVA. Embora não exista um procedimento específico para testar a independência das amostras no caso geral, o caso especial de autocorrelações em série nos dados pode ser testado pelo Teste de Durbin-Watson \cite{Campelo2018-LNDoE}. A hipótese nula desse teste declara que não há correlação entre os resíduos, isto é, os resíduos são independentes. A hipótese alternativa, por sua vez, afirma que os resíduos são correlacionados \cite{DurbinWatsonTest}. Assim, a correlação entre os resíduos foi tomada segundo a abordagem de todos contra todos, cujo intuito é avaliar as correlações entre todas as 10 possíveis combinações par a par das ações ($A_1 \times A_2$, $A_1 \times A_3$, $A_1 \times A_4$, $A_1 \times A_5$, $A_2 \times A_3$, $A_2 \times A_4$, $A_2 \times A_5$, $A_3 \times A_4$, $A_3 \times A_5$ e $A_4 \times A_5$). O nível de significância utilizado para esse teste foi $\alpha = 0,05$.
+Alguns testes estatísticos de múltiplas amostras, cujas hipóteses nulas são construídas a partir do parâmetro média amostral, são altamente sensíveis a premissa de independência das amostras, como é o caso do ANOVA. Embora não exista um procedimento específico para testar a independência das amostras no caso geral, o caso especial de autocorrelações em série nos dados pode ser testado pelo Teste de Durbin-Watson \cite{Campelo2018-LNDoE}. A hipótese nula desse teste declara que não há correlação entre os resíduos, isto é, os resíduos são independentes. A hipótese alternativa, por sua vez, afirma que os resíduos são correlacionados \cite{DurbinWatsonTest}. Assim, a correlação entre os resíduos foi tomada segundo a abordagem de todos contra todos, cujo intuito é avaliar as correlações entre todas as 10 possíveis combinações das ações par a par ($A_1 \times A_2$, $A_1 \times A_3$, $A_1 \times A_4$, $A_1 \times A_5$, $A_2 \times A_3$, $A_2 \times A_4$, $A_2 \times A_5$, $A_3 \times A_4$, $A_3 \times A_5$ e $A_4 \times A_5$). O nível de significância utilizado para esse teste foi $\alpha = 0,05$.
 
 ```{r, echo = FALSE}
 # Teste de independência dos resíduos (todos contra todos)
@@ -278,7 +295,7 @@ A partir do p-valor substancialmente maior que o nível de significância ($0,77
 
 Para prosseguimento do estudo entre os rendimentos das ações, foi proposto a comparação de médias utilizando-se o Anova. Apesar de ser considerado robusto às violações moderadas da normalidade e homoscedasticidade \cite{}, foram provados através dos testes anteriores que as amostras preenchem esses requisitos. Quanto à independência, a ANOVA é sensível a essa violação, no entanto, essa premissa também foi testada e validada. Assim, pode-se utilizar esse teste para comparação das médias.
 
-O teste proposto, também conhecido como One Way, tem como hipótese nula que as médias dos grupos em análise é a mesma, e como hipótese alternativa de pelo menos duas ou mais médias se distingue das demais. Para isso, é verificado se a diferença entre os tratamentos é muito maior que a diferença no tratamento, e isso é possível fazendo a comparação da variância entre os grupos com a variância dentro do próprio grupo, o que dá nome ao teste \cite{}.
+O teste proposto, também conhecido como *One Way*, tem como hipótese nula que as médias dos grupos em análise é a mesma, e como hipótese alternativa de pelo menos duas ou mais médias se distingue das demais. Para isso, é verificado se a diferença entre os tratamentos é muito maior que a diferença no tratamento, e isso é possível fazendo a comparação da variância entre os grupos com a variância dentro do próprio grupo, o que dá nome ao teste.
 
 
 ```{r, echo = FALSE, fig.height = 4, fig.width = 6, fig.align = 'center'}
@@ -289,9 +306,9 @@ anova <- aov(values ~ind, data=grupos)
 summary(anova)
 
 ```
-No experimento em questão, o p valor retornado foi $p = 2e-16$, o que significa que com 95% de confiança, a hipótese nula de que as medias dos rendimentos são iguais, é rejeitada. Ou seja, foram detectadas diferenças significativas entre as medias dos rendimentos das ações em estudo.
+No experimento em questão, o p valor retornado foi $p = 2 \times 10^{-16}$, o que significa que com 95% de confiança, a hipótese nula de que as medias dos rendimentos são iguais, é rejeitada. Ou seja, foram detectadas diferenças significativas entre as medias dos rendimentos das ações em estudo.
 
-Além do valor p, também é retornado $F = 34.17$, que é calculado a partir do quociente do quadrado médio entre os tratamentos ($0,003966$) pelo quadrado dos resíduos ($0,000116$). Nota-se que o numerador desta operação é muito maior que o denominador, que consequentemente resulta em um F grande. Nesse sentido, quanto maior essa proporção, maior a confiança em rejeitar a hipótese nula.
+Além do valor p, também é retornado $F = 34.17$, que é calculado a partir do quociente do quadrado médio entre os tratamentos ($0,003966$) pelo quadrado dos resíduos ($0,000116$). Nota-se que o numerador desta operação é muito maior que o denominador, que consequentemente resulta em um $F$ grande. Nesse sentido, quanto maior essa proporção, maior a confiança em rejeitar a hipótese nula.
  
 Embora o teste seja capaz de identificar a existência dessa distinção entre médias, quando a hipótese nula é rejeita, é preciso identificar quais foram diferenças significativas. Para isso são utilizados ferramentas de comparações múltiplas ou ferramentas de correções de significância.
 Para encontrar quais ações tem media significantemente diferente será aplicado o teste de Tukey, uma ferramenta de comparações múltiplas.
@@ -299,15 +316,95 @@ Para encontrar quais ações tem media significantemente diferente será aplicad
 
 ```{r, echo = FALSE, fig.height = 4, fig.width = 6, fig.align = 'center'}
 # TURKEY
-TUKEY <- TukeyHSD(x=anova, conf.level=0.95)
+TUKEY <- TukeyHSD(x = anova, conf.level = 0.95)
 TUKEY
-plot(TUKEY , las=1 , col="brown")
+plot(TUKEY , las = 1 , col = "blue")
 
 ```
 Os dados extraídos do teste de Tuckey são apresentados graficamente. Baseado no intervalo de confiança das diferenças das médias dos rendimentos, verifica-se que as ações ($X3$ e $X1$) e ($X4$ e $X2$) não são significativamente diferentes, pois este dois intervalos contém o zero (0). Já os demais intervalos ($X2$ e $X1$), ($X4$ e $X1$), ($X5$ e $X1$), ($X3$ e $X2$), ($X5$ e $X2$), ($X4$ e $X3$), ($X5$ e $X3$) e ($X5$ e $X4$) têm rendimentos significativamente diferentes, como mostrado graficamente.
 
 Pela analise do p valor, tem-se a mesma conclusão, visto que os intervalos dos rendimentos das ações ($X3$ e $X1$) e ($X4$ e $X2$) retornou p valor maior que $0,05$. Os demais p valores são menores que $0,05$, concluindo que têm rendimentos significativamente diferentes.
 
+# Tamanho de Efeito
+
+A fim de investigar o tamanho de efeito para as diferenças de médias de três grupos ou mais, diversas medidas foram desenvolvidas, entre elas *Eta-Squared* ($\eta^2$), *Partial Eta-Squared* ($\eta_p^2$), *Omega-Squared* ($\omega^2$) e *Epsilon-Squared* ($\epsilon^2$). Dada a preferência de uso na literatura pela *Eta-Squared*, essa será a medida utilizada para estimar o tamanho de efeito no presente experimento \cite{Yigit2018}. Além disso, para o ANOVA de uma única via (*One Way*), *Eta-Squared* é equivalente ao *Partial Eta-Squared* e é dado por \eqref{eq:eta-squared} \cite{Yigit2018}:
+
+\begin{equation}
+  \label{eq:eta-squared}
+  \eta^2 = \frac{SS_{Effect}}{SS_{Total}}
+\end{equation}
+onde $SS_{Total}$ é igual a somas dos quadrados totais e $SS_{Effect}$ é a soma dos quadrados dos efeitos. O pacote `effectsize` do R permite calcular diretamente o $\eta^2$ a partir da tabela de resultados do ANOVA \cite{EffectSize}.
+
+```{r, echo = FALSE}
+# Cálculo do Tamanho de Efeito
+effect_size <- eta_squared(anova)
+show(effect_size)
+```
+A estimativa pontual obtida para o tamanho de efeito foi $\eta^2 = 0,45$. Ao nível de confiança de $90\%$, tem-se ainda que o intervalo de confiança bilateral do tamanho de efeito é $[0,35; \ 0,52]$. 
+
+Uma das maneiras mais usuais de analisar o tamanho de efeito *Eta-Squared* é convertê-lo para a estimativa $f$ de Cohen, cujos valores são tabelados segundo interpretações qualitativas \cite{fCohenTable}:
+
+\begin{multicols}{3}
+  \begin{itemize}
+    \item Pequeno: $f \leq 0,10$;
+    \item Médio: $0,10 < f \leq 0,25$;
+    \item Grande: $f \geq 0,25$.
+  \end{itemize}
+\end{multicols}
+
+A relação entre $\eta^2$ e $f$ é dada pela Equação \eqref{eq:f_to_eta} \cite{Yigit2018}:
+
+\begin{equation}
+  \label{eq:f_to_eta}
+  \eta^2 = \frac{f^2}{1+f^2}
+\end{equation}
+
+```{r, echo = FALSE, results = 'hide'}
+# Cálculo do f de Cohen
+f <- sqrt((effect_size$Eta_Sq_partial^2)/(1-effect_size$Eta_Sq_partial^2))
+```
+
+\noindent Como a relação inversa é necessária, basta manipular algebricamente a Equação \eqref{eq:f_to_eta}, de modo a obter a Equação \eqref{eq:eta_to_f}:
+
+\begin{equation}
+  \label{eq:eta_to_f}
+  f = \sqrt{\frac{\eta^2}{1-\eta^2}} 
+\end{equation}
+\noindent Assim, tem-se uma estimativa pontual de tamanho de efeito grande e igual a $f = 0,4978$. Quanto ao intervalo de confiança bilateral ao nível de confiança de $90\%$, tem-se $f \in [0,3745; \ 0,5941]$. A relação entre os tamanhos de efeito das medidas $f$ e $\eta^2$ no intervalo de confiança pode ser visualizada na Figura 4.
+
+```{r, echo = FALSE, results = 'hide'}
+# Intervalo de confiança de f ao nível de confiança de 90%
+etas <- seq(effect_size$CI_low, effect_size$CI_high, 0.01)
+fs <- c()
+for (i in 1:length(etas)) {
+  fs[i] <- sqrt((etas[i]^2)/(1-etas[i]^2))
+}
+df <- data.frame(etas = etas, fs = fs)
+```
+
+```{r f_eta, echo = FALSE, fig.height = 2.2, fig.width = 3, fig.align = 'center', fig.cap = 'Relação entre o $f$ de Cohen e o $\\eta^2$ no intervalo de confiança.', fig.pos = 'H'}
+ggplot(data = df, aes(x = etas, y = fs, group = 1)) +
+  xlab((expression(eta^2))) + 
+  ylab(expression(italic(f))) + 
+  geom_line(linetype = 'dashed')+
+  geom_point()
+```
+
+# Poder do Teste
+
+Tendo em vista o número de grupos $k = 5$, o número de amostras em cada grupo $n = 35$, o nível de significância previamente estabelecido $\alpha = 0,05$ e o tamanho de efeito $f = 0,4978$, torna-se possível verificar se a potência desejada do teste foi alcançada. Para tal, foi utilizado o método `pwr.anova.test` do pacote `pwr` \cite{PowerAnovaTest}.
+
+```{r, echo = FALSE}
+# Cálculo da Potência
+pwr.anova.test(k = ncol(sample), n = nrow(sample), sig.level = 0.05, f = f)
+```
+
+O poder do teste foi bastante alto para o experimento conduzido ($\pi = 0,9999$), sendo substancialmente superior ao valor desejado ($\pi^{*} = 0,80$). Obter exatamente a potência desejada implicaria em detectar ganhos maiores ou iguais a $f = 0,2648$, isto é, ter um tamanho de efeito mais próximo do que é considerado um tamanho de efeito médio.
+
+```{r, echo = FALSE}
+# Cálculo da Potência
+pwr.anova.test(k = ncol(sample), n = nrow(sample), sig.level = 0.05, power = 0.8)
+```
 
 # Conclusões
 
@@ -315,6 +412,7 @@ Pela analise do p valor, tem-se a mesma conclusão, visto que os intervalos dos 
 
 ## Atividades Desempenhadas
 
+A hipótese de teste foi definida em concordância com os três autores, bem como a definição de conversão dos preços de fechamento mensais em taxas de retorno mensais para melhor condução do experimento. O pré-processamento dos dados, a análise exploratória e a validação das premissas foram conduzidas pelo Pedro. A análise estatística, por sua vez, que inclui tanto a verificação da existência de diferenças entre as médias das cinco ações quanto o teste de comparações múltiplas a posteriori, foi realizada pelo Savio e pela Samara. A estimativa do tamanho de efeito e o cálculo do poder de teste foram elaborados pelo Pedro. Por fim, a Samara e o Savio concluiram o trabalho com as considerações finais e discussões de melhoria.
 
 \renewcommand\refname{Referências}
 \bibliographystyle{plain}
