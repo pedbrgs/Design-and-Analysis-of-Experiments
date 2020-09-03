@@ -415,7 +415,11 @@ pwr.anova.test(k = ncol(sample), n = nrow(sample), sig.level = 0.05, power = 0.8
 
 # Conclusões
 
+A aplicação do Anova para comparação das médias dos rendimentos das ações, mostrou que havia distinção em pelo menos uma média, dentre o grupo avaliado. Com intuito de determinar onde essas diferenças se encontravam, foi realizado o teste de Tukey, que faz a comparação do tipo todos contra todos, e permite identificar, com base no valor de $p$, se as diferenças encontradas são estatisticamente significativas, ao nível de confiança de $95\%$. Nesse contexto, duas ações destacaram-se em relação às demais, $X2$ e $X4$, porém, não apresentaram diferenças significativas quando comparadas entre si. Haja vista que além das médias, as variâncias das suas amostras também é estatisticamente igual, somente com esses dados, não é possível inferir, estatisticamente, qual delas traria o maior retorno financeiro.
+
 ## Discussão de Melhorias
+
+Quando se trata de investimentos em ações, alguns indicadores são sujeridos pelo mercado. No estudo em questão, após analise dos rendimentos, foi observado duas ações em destaque. Como sugestão para definição da mais indicada entre as duas, foi proposto o Indice Preço sobre Lucro (P/L), porém para cálculo deste indicador, entre outros parâmetros, é necessario conhecer o número de papéis que a empresa detentora destas ações disponibilizaram ao mercado.
 
 ## Atividades Desempenhadas
 
