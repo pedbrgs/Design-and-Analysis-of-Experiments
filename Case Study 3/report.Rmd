@@ -327,7 +327,7 @@ Os dados extraídos do teste de Tukey são apresentados graficamente. Baseado no
 
 Pela analise do p valor, tem-se a mesma conclusão, visto que os intervalos dos rendimentos das ações ($X3$ e $X1$) e ($X4$ e $X2$) retornou p valor maior que $0,05$. Os demais p valores são menores que o nível de significância igual a $0,05$, enfatizando que têm rendimentos significativamente diferentes.
 
-Nesse sentido, o teste Tukey deixa em evidência que as ações $X2$ e $X4$ foram as que obtiveram rendimentos médios melhores em detrimento das demais, e embora $X4$ tenha média levemente mais alta que $X2$, não trata-se de uma diferença significativa estatisticamente. Sendo assim, mais análises são demandadas para inferir qual das duas possui maior potencial de rendimento.
+Nesse sentido, o teste Tukey deixa em evidência que as ações $X2$ e $X4$ foram as que obtiveram rendimentos médios melhores em detrimento das demais, e embora $X4$ tenha média levemente mais alta que $X2$, não trata-se de uma diferença significativa estatisticamente. Ressalta que o valor de p para a comparação realizada pelo teste de Tukey foi muito alto ($p = 0,98355$), que reforça que estatisticamente os rendimentos obtidos ao investir em qualquer uma das duas, na média, são iguais. Sendo assim, caso o rendimento passado venha ser usado nessa escolha, dentre os grupos de ações fornecidos, a análise estatística realizada não permite identificar uma melhor, dentre as duas em evidência  ($X2$ e $X3$).
 
 
 
