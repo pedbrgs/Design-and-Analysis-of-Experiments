@@ -104,7 +104,7 @@ options(Encoding="UTF-8")
 
 O mercado de ações é uma forma de investimento onde uma das maneiras de se obter lucratividade é vender as ações quando seus preços atuais estiverem acima do preço no qual foram adquiridas \cite{toro}. Embora a rentabilidade passada não seja garantia de rentabilidade futura, normalmente o histórico de rentabilidade é um fator a ser considerado \cite{bb}.
 
-Nesse estudo de caso deseja-se verificar, qual ação dentre cinco candidatas possui maior potencial de **ganho mensal** ao investidor quando escolhidas com exclusividade, isto é, quando o montante é investido por completo em uma única ação. Para isso, considera-se o fechamento das cinco ações nos últimos 36 meses.
+Neste estudo de caso deseja-se verificar, qual ação dentre cinco candidatas possui maior potencial de **ganho mensal** ao investidor quando escolhida com exclusividade, isto é, quando o montante é investido por completo em uma única ação. Para isso, considera-se o fechamento das cinco ações nos últimos 36 meses.
 
 # Planejamento dos Experimentos
 
@@ -116,7 +116,7 @@ r_j^i = \frac{p^i_j - p^i_{j-1}}{p^i_{j-1}}
 \end{equation}
 onde $p^i_j$ é o preço de fechamento da ação $i$ no mês atual $j$ e $p^i_{j-1}$ é o preço de fechamento da ação $i$ no mês anterior $j-1$.
 
-Quando o preço de fechamento da ação no mês corrente é superior ao preço de fechamento da ação no mês anterior ($p^i_j > p^i_{j-1}$), o retorno expressará a perda líquida obtida do mês $j-1$ para o mês $j$. Em contrapartida, se o preço de fechamento da ação no mês corrente é inferior ao preço de fechamento da ação no mês anterior ($p^i_j < p^i_{j-1}$), o retorno expressará o ganho líquido obtido nessa mesma transição mensal. Uma vez que o presente cálculo considera diferenças entre cotações adjacentes, o tamanho amostral é reduzido em uma unidade ($n = 35$).
+Quando o preço de fechamento da ação no mês corrente é superior ao preço de fechamento da ação no mês anterior ($p^i_j > p^i_{j-1}$), o retorno expressará o ganho líquido obtido do mês $j-1$ para o mês $j$. Em contrapartida, se o preço de fechamento da ação no mês corrente é inferior ao preço de fechamento da ação no mês anterior ($p^i_j < p^i_{j-1}$), o retorno expressará a perda líquida obtida nessa mesma transição mensal. Uma vez que o presente cálculo considera diferenças entre cotações adjacentes, o tamanho amostral é reduzido em uma unidade ($n = 35$).
 
 As hipóteses estatísticas foram definidas com objetivo de verificar as seguintes proposições:
 \begin{itemize}
@@ -275,15 +275,39 @@ A partir do p-valor substancialmente maior que o nível de significância ($0,77
 
 # Análise Estatística
 
+
+Para prosseguimento do estudo entre os rendimentos das ações, foi proposto a comparação de médias utilizando-se o Anova. Apesar de ser considerado robusto às violações moderadas da normalidade e homoscedasticidade \cite{}, foram provados através dos testes anteriores que as amostras preenchem esses requisitos. Quanto à independência, a ANOVA é sensível a essa violação, no entanto, essa premissa também foi testada e validada. Assim, pode-se utilizar esse teste para comparação das médias.
+
+O teste proposto, também conhecido como One Way, tem como hipótese nula que as médias dos grupos em análise é a mesma, e como hipótese alternativa de pelo menos duas ou mais médias se distingue das demais. Para isso, é verificado se a diferença entre os tratamentos é muito maior que a diferença no tratamento, e isso é possível fazendo a comparação da variância entre os grupos com a variância dentro do próprio grupo, o que dá nome ao teste \cite{}.
+
+
 ```{r, echo = FALSE, fig.height = 4, fig.width = 6, fig.align = 'center'}
 # ANOVA
 grupos <- data.frame(cbind(sample[,1], sample[,2], sample[,3], sample[,4], sample[,5]))
 grupos <- stack(grupos)
 anova <- aov(values ~ind, data=grupos)
+summary(anova)
 
-TUKEY <- TukeyHSD(x=anova, conf.level=0.95)
-plot(TUKEY , las=1 , col="brown")
 ```
+No experimento em questão, o p valor retornado foi $p = 2e-16$, o que significa que com 95% de confiança, a hipótese nula de que as medias dos rendimentos são iguais, é rejeitada. Ou seja, foram detectadas diferenças significativas entre as medias dos rendimentos das ações em estudo.
+
+Além do valor p, também é retornado $F = 34.17$, que é calculado a partir do quociente do quadrado médio entre os tratamentos ($0,003966$) pelo quadrado dos resíduos ($0,000116$). Nota-se que o numerador desta operação é muito maior que o denominador, que consequentemente resulta em um F grande. Nesse sentido, quanto maior essa proporção, maior a confiança em rejeitar a hipótese nula.
+ 
+Embora o teste seja capaz de identificar a existência dessa distinção entre médias, quando a hipótese nula é rejeita, é preciso identificar quais foram diferenças significativas. Para isso são utilizados ferramentas de comparações múltiplas ou ferramentas de correções de significância.
+Para encontrar quais ações tem media significantemente diferente será aplicado o teste de Tukey, uma ferramenta de comparações múltiplas.
+
+
+```{r, echo = FALSE, fig.height = 4, fig.width = 6, fig.align = 'center'}
+# TURKEY
+TUKEY <- TukeyHSD(x=anova, conf.level=0.95)
+TUKEY
+plot(TUKEY , las=1 , col="brown")
+
+```
+Os dados extraídos do teste de Tuckey são apresentados graficamente. Baseado no intervalo de confiança das diferenças das médias dos rendimentos, verifica-se que as ações ($X3$ e $X1$) e ($X4$ e $X2$) não são significativamente diferentes, pois este dois intervalos contém o zero (0). Já os demais intervalos ($X2$ e $X1$), ($X4$ e $X1$), ($X5$ e $X1$), ($X3$ e $X2$), ($X5$ e $X2$), ($X4$ e $X3$), ($X5$ e $X3$) e ($X5$ e $X4$) têm rendimentos significativamente diferentes, como mostrado graficamente.
+
+Pela analise do p valor, tem-se a mesma conclusão, visto que os intervalos dos rendimentos das ações ($X3$ e $X1$) e ($X4$ e $X2$) retornou p valor maior que $0,05$. Os demais p valores são menores que $0,05$, concluindo que têm rendimentos significativamente diferentes.
+
 
 # Conclusões
 
