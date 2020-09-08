@@ -329,7 +329,29 @@ Pela analise do p valor, tem-se a mesma conclusão, visto que os intervalos dos 
 
 Nesse sentido, o teste Tukey deixa em evidência que as ações $X2$ e $X4$ foram as que obtiveram rendimentos médios melhores em detrimento das demais, e embora $X4$ tenha média levemente mais alta que $X2$, não trata-se de uma diferença significativa estatisticamente. Ressalta que o valor de p para a comparação realizada pelo teste de Tukey foi muito alto ($p = 0,98355$), que reforça que estatisticamente os rendimentos obtidos ao investir em qualquer uma das duas, na média, são iguais. Sendo assim, caso o rendimento passado venha ser usado nessa escolha, dentre os grupos de ações fornecidos, a análise estatística realizada não permite identificar uma melhor, dentre as duas em evidência  ($X2$ e $X3$).
 
+# Dispersão de X2
+```{r scatterplot_X2, echo = FALSE, fig.height = 2.8, fig.width = 6, fig.align = 'center', fig.pos = 'H'}
+int_scatterplot <- 35:1
+ggplot(data = sample, aes(x = int_scatterplot, y = sample[,2])) + 
+          ggtitle("Rentabilidade nos ultimos 36 meses") +
+          labs(x = "Mês de analise", y = "Rentabilidade da Ação X2")+
+          geom_line()
+```
 
+# Dispersão de X4
+```{r scatterplot_X4, echo = FALSE, fig.height = 2.8, fig.width = 6, fig.align = 'center', fig.pos = 'H'}
+ggplot(data = sample, aes(x = int_scatterplot, y = sample[,4])) + 
+          ggtitle("Rentabilidade nos ultimos 36 meses") +
+          labs(x = "Mês de analise", y = "Rentabilidade da Ação X4")+
+          geom_line()
+```
+
+
+Como critério para definição de qual ação deve-se invertir entre as duas, visto que estatisticamente elas oferecem mesmo rendimento, foi utilizado como critério de desempate aquela que oferece menos risco ao investimento. Entre os indicadores de risco foi selecionado o numero de vezes em que a rentabilidade das ações foi negativo e a tendencia da ação para os proximos meses.
+Dessa forma, em comparação, a ação $X2$ com seis momentos de rentabilidade negativa, ou seja, que queda no valor da ação em relação a interação anterior. Já a ação $X4$ somente com três momentos onde houve queda no valor da ação em relação ao mês anterior. 
+Já com relação a perpectiva para os proximos meses, o grafico de dispersção sugere que devido a queda na rentabilidade da ação $X4$ nos ultimos três meses, em oposto a ação $X2$, a ação $X4$ tende a voltar a subir para manter a média de investimento observada no estudo.
+
+Por estes motivos, a ação com melhor desempenho e caracteristicas é a ação $X4$.
 
 # Tamanho de Efeito
 
@@ -416,6 +438,7 @@ pwr.anova.test(k = ncol(sample), n = nrow(sample), sig.level = 0.05, power = 0.8
 # Conclusões
 
 A aplicação do Anova para comparação das médias dos rendimentos das ações, mostrou que havia distinção em pelo menos uma média, dentre o grupo avaliado. Com intuito de determinar onde essas diferenças se encontravam, foi realizado o teste de Tukey, que faz a comparação do tipo todos contra todos, e permite identificar, com base no valor de $p$, se as diferenças encontradas são estatisticamente significativas, ao nível de confiança de $95\%$. Nesse contexto, duas ações destacaram-se em relação às demais, $X2$ e $X4$, porém, não apresentaram diferenças significativas quando comparadas entre si. Haja vista que além das médias, as variâncias das suas amostras também é estatisticamente igual, somente com esses dados, não é possível inferir, estatisticamente, qual delas traria o maior retorno financeiro.
+A fim de escolher dentre as duas que tem melhor rentabilidade, foi utilizado critérios que caracterizam o nivel de risco ao investir nessas ações. Após analise do risco, a ação $X4$ apresentou menor risco ao investimento perante a ação $X2$, tento como ação final para investimento no proximo mês.
 
 ## Discussão de Melhorias
 
