@@ -329,7 +329,7 @@ Pela analise do p valor, tem-se a mesma conclusão, visto que os intervalos dos 
 
 Nesse sentido, o teste Tukey deixa em evidência que as ações $X2$ e $X4$ foram as que obtiveram rendimentos médios melhores em detrimento das demais, e embora $X4$ tenha média levemente mais alta que $X2$, não trata-se de uma diferença significativa estatisticamente. Ressalta que o valor de p para a comparação realizada pelo teste de Tukey foi muito alto ($p = 0,98355$), que reforça que estatisticamente os rendimentos obtidos ao investir em qualquer uma das duas, na média, são iguais. Sendo assim, caso o rendimento passado venha ser usado nessa escolha, dentre os grupos de ações fornecidos, a análise estatística realizada não permite identificar uma melhor, dentre as duas em evidência  ($X2$ e $X3$).
 
-# Dispersão de X2
+## Dispersão de X2
 ```{r scatterplot_X2, echo = FALSE, fig.height = 2.8, fig.width = 6, fig.align = 'center', fig.pos = 'H'}
 int_scatterplot <- 35:1
 ggplot(data = sample, aes(x = int_scatterplot, y = sample[,2])) + 
@@ -338,7 +338,7 @@ ggplot(data = sample, aes(x = int_scatterplot, y = sample[,2])) +
           geom_line()
 ```
 
-# Dispersão de X4
+## Dispersão de X4
 ```{r scatterplot_X4, echo = FALSE, fig.height = 2.8, fig.width = 6, fig.align = 'center', fig.pos = 'H'}
 ggplot(data = sample, aes(x = int_scatterplot, y = sample[,4])) + 
           ggtitle("Rentabilidade nos ultimos 36 meses") +
