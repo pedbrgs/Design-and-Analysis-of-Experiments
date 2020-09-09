@@ -396,7 +396,7 @@ Uma das maneiras mais usuais de analisar o tamanho de efeito *Eta-Squared* é co
 \begin{multicols}{3}
   \begin{itemize}
     \item Pequeno: $f \leq 0,10$;
-    \item Médio: $0,10 < f \leq 0,25$;
+    \item Médio: $0,10 < f < 0,25$;
     \item Grande: $f \geq 0,25$.
   \end{itemize}
 \end{multicols}
