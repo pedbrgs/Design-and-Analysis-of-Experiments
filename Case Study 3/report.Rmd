@@ -104,7 +104,7 @@ options(Encoding="UTF-8")
 
 O mercado de ações é uma forma de investimento onde uma das maneiras de se obter lucratividade é vender as ações quando seus preços atuais estiverem acima do preço no qual foram adquiridas \cite{toro}. Embora a rentabilidade passada não seja garantia de rentabilidade futura, normalmente o histórico de rentabilidade é um fator a ser considerado \cite{bb}.
 
-Neste estudo de caso deseja-se verificar, qual ação dentre cinco candidatas possui maior potencial de **ganho mensal** ao investidor quando escolhida com exclusividade, isto é, quando o montante é investido por completo em uma única ação. Para isso, considera-se o fechamento das cinco ações nos últimos 36 meses.
+Neste estudo de caso, deseja-se verificar qual ação, dentre cinco candidatas, possui maior potencial de **ganho mensal** ao investidor quando escolhida com exclusividade, isto é, quando o montante é investido por completo em uma única ação. Para isso, considera-se o fechamento das cinco ações nos últimos 36 meses.
 
 # Planejamento dos Experimentos
 
@@ -226,7 +226,7 @@ A princípio, é possível observar que, durante os últimos 3 anos, os retornos
 
 Um fator interessante é que as diferenças absolutas entre os retornos amostrais mensais médios e os retornos amostrais mensais medianos de todas as ações foram bem próximas de zero, isto é, $\Delta_i = |\overline{\mu_i} - \overline{m_i}| \approx 0$ para $i \in \{1,5\}$. A maior diferença obtida, por exemplo, foi de $0,14\%$ para a ação $A_3$. Apesar de ser uma suposição fracamente sustentada, isso sugere que as distribuições de probabilidade amostrais podem ser aproximadas, a priori, por uma distribuição normal. No que se refere às variâncias amostrais das ações, percebe-se que os valores são bastante similares e aproximadamente iguais a $0,01\%$, o que também sugere que as amostras são homocedásticas.
 
-Com o intuito de compreender melhor os dados em estudo e, posteriormente, inferir sobre as populações de onde as amostras provêm, serão analisadas algumas representações gráficas. No que tange a distribuição de frequência das observações, com exceção da ação $A_4$, todas as demais ações apresentam curvas em formato de sino, o que fortalece o pressuposto de normalidade mencionado anteriormente. 
+Com o intuito de compreender melhor os dados em estudo e, posteriormente, inferir sobre as populações de onde as amostras provêm, serão analisadas algumas representações gráficas. No que tange à distribuição de frequência das observações, com exceção da ação $A_4$, os rendimentos de todas as demais ações apresentam curvas em formato de sino, o que fortalece o pressuposto de normalidade mencionado anteriormente. 
 
 ```{r, results = 'hide', echo = FALSE}
 As <- melt(sample, id.vars = NULL)
@@ -295,7 +295,7 @@ A partir do p-valor substancialmente maior que o nível de significância ($0,77
 
 Para prosseguimento do estudo a respeito dos rendimentos das ações, foi proposto a comparação de médias utilizando-se o Anova. Apesar de ser considerado robusto às violações moderadas da normalidade e homoscedasticidade \cite{carrano}, foram provados através dos testes anteriores que as amostras preenchem esses requisitos. Quanto à independência, a ANOVA é sensível a essa violação, no entanto, essa premissa também foi testada e validada. Assim, pode-se utilizar esse teste para comparação das médias.
 
-O teste proposto, também conhecido como *One Way*, tem como hipótese nula que as médias dos grupos em análise é a mesma, e como hipótese alternativa de pelo menos duas ou mais médias se distingue das demais.  Dessa forma, este método verifica se as diferenças observadas na média são grandes o suficiente para ser o resultado da seleção aleatória, e pra isso além de considerar a diferença absoluta entre as amostras, também é considerado a variabilidade dentro de cada tratamento. Assim, verifica-se se a diferença entre os tratamentos é muito maior que a diferença no tratamento, e isso é possível fazendo a comparação da variância entre os grupos com a variância dentro do próprio grupo, o que dá nome ao teste \cite{stan}. A seguir, é possível ver o resultado do emprego deste teste, por meio da função aov() do pacote *stats* do R \cite{aov}. 
+O teste proposto, também conhecido como *One Way*, tem como hipótese nula que as médias dos grupos em análise é a mesma, e como hipótese alternativa de pelo menos duas ou mais médias se distingue das demais.  Dessa forma, este método verifica se as diferenças observadas na média são grandes o suficiente para ser o resultado da seleção aleatória, e pra isso além de considerar a diferença absoluta entre as amostras, também é levado em conta a variabilidade dentro de cada tratamento. Assim, verifica-se se a diferença entre os tratamentos é muito maior que a diferença no tratamento, e isso é possível fazendo a comparação da variância entre os grupos com a variância dentro do próprio grupo, o que dá nome ao teste \cite{stan}. A seguir, é possível ver o resultado do emprego deste teste, por meio da função aov() do pacote *stats* do R \cite{aov}. 
 
 
 ```{r, echo = FALSE, fig.height = 4, fig.width = 6, fig.align = 'center'}
@@ -307,13 +307,11 @@ summary(anova)
 
 
 ```
-No experimento em questão, o p valor retornado foi $p = 2 \times 10^{-16}$, o que significa que com 95% de confiança, a hipótese nula de que as médias dos rendimentos são iguais, é rejeitada. Ou seja, foram detectadas diferenças significativas entre as medias dos rendimentos das ações em estudo.
+No experimento em questão, o p valor retornado foi $p = 2 \times 10^{-16}$, o que significa que com 95% de confiança, a hipótese nula de que as médias dos rendimentos são iguais, é rejeitada. Ou seja, foram detectadas diferenças significativas entre as médias dos rendimentos das ações em estudo.
 
 Além do valor p, também é retornado $F = 34.17$, que é calculado a partir do quociente do quadrado médio entre os tratamentos ($0,003966$) pelo quadrado dos resíduos ($0,000116$). Nota-se que o numerador desta operação é muito maior que o denominador, que consequentemente resulta em um $F$ grande. Nesse sentido, quanto maior essa proporção, maior a confiança em rejeitar a hipótese nula.
  
-Todavia, embora o Anova seja capaz de identificar a existência dessa distinção entre médias, quando a hipótese nula é rejeita, é preciso identificar quais foram diferenças significativas, que não é uma das atribuições deste método. Para isso são utilizados ferramentas de comparações múltiplas ou ferramentas de correções de significância.
-
-Para encontrar quais ações tem média de rendimento significantemente diferente será aplicado o teste de Tukey, uma ferramenta de comparações múltiplas. Este executa comparações do tipo todos com todos e demonstra ser interessante para este propósito, pois além de ser de fácil aplicação, é considerado um método poderoso. Em grupos amostrais balanceado ele é um teste exato, ou seja, a taxa de erro do grupo testado é exatamente o parâmetro $\alpha$. Isso constitui uma grande vantagem do método, pois esse tipo de precisão é considerado raro dentre os testes para essa finalidade \cite{oper}.
+Todavia, embora o Anova seja capaz de identificar a existência dessa distinção entre médias, quando a hipótese nula é rejeita, é preciso determinar onde essas diferenças ocorreram, o que não é uma das atribuições deste método. Para isso são utilizadas ferramentas de comparações múltiplas ou de correções de significância. Nesse contexto, será utilizado o teste de Tukey, que realiza comparações múltiplas. Este executa comparações do tipo todos com todos e demonstra ser interessante para este propósito, pois além de ser de fácil aplicação, é considerado um método poderoso. Em grupos amostrais balanceado ele é um teste exato, ou seja, a taxa de erro do grupo testado é exatamente o parâmetro $\alpha$. Isso constitui uma grande vantagem do método, pois esse tipo de precisão é considerado raro dentre os testes para essa finalidade \cite{oper}.
 
 
 ```{r, echo = FALSE, fig.height = 4, fig.width = 6, fig.align = 'center'}
@@ -327,7 +325,7 @@ Os dados extraídos do teste de Tukey são apresentados graficamente. Baseado no
 
 Pela analise do p valor, tem-se a mesma conclusão, visto que os intervalos dos rendimentos das ações ($X3$ e $X1$) e ($X4$ e $X2$) retornou p valor maior que $0,05$. Os demais p valores são menores que o nível de significância igual a $0,05$, enfatizando que têm rendimentos significativamente diferentes.
 
-Nesse sentido, o teste Tukey deixa em evidência que as ações $X2$ e $X4$ foram as que obtiveram rendimentos médios melhores em detrimento das demais, e embora $X4$ tenha média levemente mais alta que $X2$, não trata-se de uma diferença significativa estatisticamente. Ressalta que o valor de p para a comparação realizada pelo teste de Tukey foi muito alto ($p = 0,98355$), que reforça que estatisticamente os rendimentos obtidos ao investir em qualquer uma das duas, na média, são iguais. Sendo assim, caso o rendimento passado venha ser usado nessa escolha, dentre os grupos de ações fornecidos, a análise estatística realizada não permite identificar uma melhor, dentre as duas em evidência  ($X2$ e $X3$).
+Nesse sentido, o teste Tukey deixa em evidência que as ações $X2$ e $X4$ foram as que obtiveram rendimentos médios melhores em detrimento das demais, e embora $X4$ tenha média levemente mais alta que $X2$, não trata-se de uma diferença significativa estatisticamente. Ressalta que o valor de p para a comparação entre as duas foi muito alto ($p = 0,98355 >\!\!> 0,05$)), que reforça que estatisticamente os rendimentos obtidos ao investir em qualquer uma das duas, na média, são iguais. Sendo assim, caso o rendimento passado venha ser usado nessa escolha, dentre os grupos de ações fornecidos, a análise estatística realizada não permite identificar uma melhor, dentre as duas em evidência  ($X2$ e $X4$).
 
 ## Dispersão de X2
 ```{r scatterplot_X2, echo = FALSE, fig.height = 2.8, fig.width = 6, fig.align = 'center', fig.pos = 'H'}
@@ -347,11 +345,10 @@ ggplot(data = sample, aes(x = int_scatterplot, y = sample[,4])) +
 ```
 
 
-Como critério para definição de qual ação deve-se invertir entre as duas, visto que estatisticamente elas oferecem mesmo rendimento, foi utilizado como critério de desempate aquela que oferece menos risco ao investimento. Entre os indicadores de risco foi selecionado o numero de vezes em que a rentabilidade das ações foi negativo e a tendencia da ação para os proximos meses.
-Dessa forma, em comparação, a ação $X2$ com seis momentos de rentabilidade negativa, ou seja, que queda no valor da ação em relação a interação anterior. Já a ação $X4$ somente com três momentos onde houve queda no valor da ação em relação ao mês anterior. 
-Já com relação a perpectiva para os proximos meses, o grafico de dispersção sugere que devido a queda na rentabilidade da ação $X4$ nos ultimos três meses, em oposto a ação $X2$, a ação $X4$ tende a voltar a subir para manter a média de investimento observada no estudo.
+Como critério para definição de qual ação deve-se invertir entre as duas, visto que estatisticamente elas oferecem mesmo rendimento, foi utilizado como critério de desempate aquela que aparentemente oferece menos risco. Entre os indicadores de risco, foi selecionado o número de vezes que a rentabilidade das ações foi negativo e a tendência da ação para os próximos meses. Dessa forma, em comparação, a ação $X2$ teve seis momentos de rentabilidade negativa, enquanto a ação $X4$ teve somente três momentos onde ocorreu queda no valor da ação em relação ao mês anterior. 
+No que diz respeito à perpectiva para os próximos meses, o gráfico de disperção sugere que devido à queda na rentabilidade da ação $X4$ nos últimos três meses, em oposto a ação $X2$, a ação $X4$ tende a voltar a subir para manter a média de investimento observada no estudo.
 
-Por estes motivos, a ação com melhor desempenho e caracteristicas é a ação $X4$.
+Por estes motivos, embora estatisticamente $X2$ e $X4$ possuam rentabilidade equivalentes, a ação com melhores características em relação à risco, é a ação $X4$, e portanto, é a indicada para a realização do investimento em questão.
 
 # Tamanho de Efeito
 
@@ -437,12 +434,14 @@ pwr.anova.test(k = ncol(sample), n = nrow(sample), sig.level = 0.05, power = 0.8
 
 # Conclusões
 
-A aplicação do Anova para comparação das médias dos rendimentos das ações, mostrou que havia distinção em pelo menos uma média, dentre o grupo avaliado. Com intuito de determinar onde essas diferenças se encontravam, foi realizado o teste de Tukey, que faz a comparação do tipo todos contra todos, e permite identificar, com base no valor de $p$, se as diferenças encontradas são estatisticamente significativas, ao nível de confiança de $95\%$. Nesse contexto, duas ações destacaram-se em relação às demais, $X2$ e $X4$, porém, não apresentaram diferenças significativas quando comparadas entre si. Haja vista que além das médias, as variâncias das suas amostras também é estatisticamente igual, somente com esses dados, não é possível inferir, estatisticamente, qual delas traria o maior retorno financeiro.
-A fim de escolher dentre as duas que tem melhor rentabilidade, foi utilizado critérios que caracterizam o nivel de risco ao investir nessas ações. Após analise do risco, a ação $X4$ apresentou menor risco ao investimento perante a ação $X2$, tento como ação final para investimento no proximo mês.
+A aplicação do Anova para comparação das médias dos rendimentos das ações, mostrou que havia distinção em pelo menos uma média, dentre os grupos avaliados. Com intuito de determinar onde essas diferenças se encontravam, foi realizado o teste de Tukey, que faz a comparação do tipo todos contra todos, e permite identificar, com base no valor de $p$, se as diferenças encontradas são estatisticamente significativas, ao nível de confiança de $95\%$. Nesse contexto, duas ações destacaram-se em relação às demais, $X2$ e $X4$, porém, não apresentaram diferenças significativas quando comparadas entre si. Haja vista que além das médias, as variâncias das suas amostras também é estatisticamente igual, somente com esses dados, não é possível inferir, estatisticamente, qual delas traria o maior retorno financeiro. Sendo assim, a fim de escolher dentre as duas, foi utilizado critérios que caracterizam o nível de risco ao investir nessas ações. Após essa análise, a ação $X4$ apresentou menor risco ao investimento perante a ação $X2$, e portanto é a indicada investimento para o mês seguinte.
 
 ## Discussão de Melhorias
 
-Quando se trata de investimentos em ações, alguns indicadores são sujeridos pelo mercado. No estudo em questão, após analise dos rendimentos, foi observado duas ações em destaque. Como sugestão para definição da mais indicada entre as duas, foi proposto o Indice Preço sobre Lucro (P/L), porém para cálculo deste indicador, entre outros parâmetros, é necessario conhecer o número de papéis que a empresa detentora destas ações disponibilizaram ao mercado.
+Quando se trata de investimentos em ações, alguns indicadores são sujeridos pelo mercado. No estudo em questão, após analise dos rendimentos, foi observado duas ações em destaque. Como sugestão para definição da mais indicada entre as duas, foi proposto o Indice Preço sobre Lucro (P/L), porém para cálculo deste indicador, entre outros parâmetros, é necessario conhecer o número de papéis que a empresa detentora destas ações disponibilizaram ao mercado, informação essa que não é passível de ser obtida.
+
+Além isso, o mercado de ações apresenta características peculiares que indicam que este tipo de estudo deve ser aprofundado, visto que diversos fatores podem influenciar o valor de uma ação, desde a tomada de decisão da própria companhia detentora dos papéis, bem como parâmetros influenciados em termos governamentais, sejam econômicos, ambientais, legislacionais, dentre outros. Dessa forma, para uma análise mais abrangente, mais informações são demandadas.
+
 
 ## Atividades Desempenhadas
 
