@@ -1,0 +1,367 @@
+---
+title: |
+    | Planejamento e Análise de Experimentos (EEE933)
+    | Estudo de Caso 4
+author: Pedro Vinícius, Samara Silva e Savio Vieira
+date: 5 de Outubro de 2020
+output:
+  pdf_document:
+    #latex_engine: xelatex
+    fig_caption: yes
+  html_document:
+    df_print: paged
+indent: true
+header-includes: 
+    - \usepackage{indentfirst}
+    - \usepackage{float}
+    - \usepackage{multicol}
+    - \usepackage{framed}
+bibliography: ref.bib
+doi: https://github.com/pedbrgs/Design-and-Analysis-of-Experiments
+pagetitle: Estudo de Caso 4
+---
+
+```{r setup, results='hide', warning=FALSE, include = FALSE, message = FALSE, echo=FALSE}
+# A few initial definitions just to make sure all required packages are installed. Change as needed.
+# NOTE: It may echo some weird messages to the PDF on the first compile (package installation messages). Run twice and the problem will (hopefully) go away. 
+if (!require(ggplot2, quietly = TRUE)){
+      install.packages("ggplot2")
+      }
+if (!require(devtools, quietly = TRUE)){
+      install.packages("devtools")
+}
+if (!require(GGally, quietly = TRUE)){
+      install.packages("GGally")
+      }
+ if (!require(broom, quietly = TRUE)){
+       devtools::install_github("dgrtwo/broom")
+      }
+if (!require(stats, quietly = TRUE)){
+      suppressMessages(install.packages("stats"))
+      }
+if (!require(plotly, quietly = TRUE)){
+      suppressMessages(install.packages("plotly"))
+      }
+if (!require(reshape2, quietly = TRUE)){
+      suppressMessages(install.packages("reshape2"))
+      }
+if (!require(tidyr, quietly = TRUE)){
+      suppressMessages(install.packages("tidyr"))
+}
+if (!require(pracma, quietly = TRUE)){
+      suppressMessages(install.packages("pracma"))
+      }
+if (!require(lsr, quietly = TRUE)){
+      suppressMessages(install.packages("lsr"))
+      }
+if (!require(car, quietly = TRUE)){
+      suppressMessages(install.packages("car"))
+      }
+if (!require(pwr, quietly = TRUE)){
+      suppressMessages(install.packages("pwr"))
+      }
+if (!require(multcompView, quietly = TRUE)){
+      suppressMessages(install.packages("multcompView"))
+      }
+if (!require(lmtest, quietly = TRUE)){
+      suppressMessages(install.packages("lmtest"))
+      }
+if (!require(effectsize, quietly = TRUE)){
+      suppressMessages(install.packages("effectsize"))
+      }
+if (!require(CAISEr, quietly = TRUE)){
+      suppressMessages(install.packages("CAISEr"))
+      }
+```
+
+
+```{r, message = FALSE, warning = FALSE, results = 'hide', echo = FALSE}
+# Statistical package 
+library(stats)
+# Ggplot2 package
+library(ggplot2)
+# Plotly package
+library(plotly)
+# Reshape2 package  
+library(reshape2)
+# GGally package
+library(GGally)
+# Tidyr package
+library(tidyr)
+# Pracma package
+library(pracma)
+# Lsr package
+library(lsr)
+# Car package
+library(car)
+# Pwr package
+library(pwr)
+# Tukey package
+library(multcompView)
+# Durbin Watson Test package
+library(lmtest)
+# Effect Size for ANOVA
+library(effectsize)
+# Comparison of algorithms with iterative sample size estimation
+library(CAISEr)
+# UFT-8 Encoding
+options(Encoding="UTF-8")
+```
+
+\renewcommand{\figurename}{Figura}
+\renewcommand{\tablename}{Tabela}
+
+# Introdução
+
+O algoritmo de Evolução Diferencial (DE, do inglês *Differential Evolution*) é uma estratégia baseada em população comumente utilizada para resolver problemas de otimização cujos métodos baseados em gradiente são inviáveis ou apresentam déficit de desempenho. Na linguagem R, sua implementação está disponível no pacote `ExpDE` \cite{Campelo2016-ExpDE} com o seguinte protótipo:
+
+\begin{framed}
+\texttt{ExpDE}(\texttt{popsize}, \texttt{mutpars} = list(name = "mutation\_rand", f = 0.2), \\
+      \hspace*{1.45cm} \texttt{recpars} = list(name = "recombination\_bin", cr = 0.8, nvecs = 1), \\
+      \hspace*{1.45cm} \texttt{selpars} = list(name = "standard"), \texttt{stopcrit}, \texttt{probpars}, \texttt{seed} = NULL, \\
+      \hspace*{1.45cm} \texttt{showpars} = list(show.iters = "none"))
+\end{framed}
+
+\noindent onde \texttt{popsize} é o tamanho da população, \texttt{mutpars}, \texttt{recpars} e \texttt{selpars} são as listas com as definições dos parâmetros de mutação, recombinação e seleção, respectivamente, \texttt{stopcrit} é a lista com as definições dos critérios de parada, \texttt{probpars} é a lista com os parâmetros relacionados a instância do problema, \texttt{seed} é a semente do gerador de números aleatórios e, por fim, \texttt{showpars} é a lista que controla o histórico que será impresso no terminal durante a execução do algoritmo.
+
+No presente estudo serão investigadas duas configurações diferentes deste algoritmo:
+
+\begin{framed}
+    Algoritmo 1: \\
+    \hspace*{0.5cm} Recombinação \textit{Blend Alpha Beta} com $\alpha = 0,4$ e $\beta = 0,4$ \\
+    \hspace*{0.5cm} \texttt{recpars} <- list(name = "recombination\_blxAlphaBeta", alpha = 0.4, beta = 0.4) \\
+    \hspace*{0.5cm} Mutação nos indivíduos aleatórios com um fator de escala $f=4$ para o vetor de diferenças \\
+    \hspace*{0.5cm} \texttt{mutpars} <- list(name = "mutation\_rand", f = 4)
+\end{framed}
+
+\begin{framed}
+    Algoritmo 2: \\
+    \hspace*{0.5cm} Recombinação binomial com probabilidade $c_r = 0,9$ \\
+    \hspace*{0.5cm} \texttt{recpars} <- list(name = "recombination\_eigen", othername = "recombination\_bin", cr = 0.9) \\
+    \hspace*{0.5cm} Mutação nos melhores indivíduos com um fator de escala $f=2,8$ para o vetor de diferenças \\
+    \hspace*{0.5cm} \texttt{mutpars} <- list(name = "mutation\_best", f = 2.8)
+\end{framed}
+
+A função de teste escolhida foi a Rosenbrock, cuja equação é dada por \eqref{eq:rosenbrock}:
+
+\begin{equation}
+  \label{eq:rosenbrock}
+  f(\mathbf{x}) = \sum_{i=1}^{D-1} (100(x_i^2 + x_{i+1})^2) + (x_i - 1)^2)
+\end{equation}
+
+\noindent onde $D$ é a dimensão do problema e $x_i$ é a $i$-ésima variável do indivíduo $\mathbf{x}$, tal que $x_i \in [\text{-}5, 10]$ para $i \in [1, D]$. A Figura \ref{fig:rosenbrock} apresenta a superfície bidimensional da função descrita e ressalta sua principal propriedade que é ter um vale estreito do ótimo local ao ótimo global.
+
+```{r, echo = FALSE, fig.height = 3, fig.width = 3, fig.align = 'center', fig.cap = '\\label{fig:rosenbrock}Função Rosenbrock ($D=2$).', fig.pos = 'H'}
+rosenbrock <- function(X, Y){
+  f = (1-X)^2 + 100*(Y-X^2)^2
+  return(f)
+}
+x <- y <- seq(from = -5, to = 10, by = 1)
+par(mar = c(2, 2, 2, 1))
+persp(x = x, y = y, z = outer(x, y, rosenbrock),
+      zlab = 'f(x,y)',
+      theta = -120,
+      col = 'steelblue',
+      shade = 0.5)
+```
+
+Os demais parâmetros foram definidos igualmente para ambas configurações durante toda a experimentação, sendo tamanho da população \texttt{popsize} $= 5 \times D$, número máximo de avaliações na função objetivo \texttt{maxevals} $= 5000\times D$ e número máximo de iterações \texttt{maxiter} $= 100 \times D$.
+
+# Planejamento dos Experimentos
+
+Dado que o propósito do estudo é analisar o desempenho de duas configurações de algoritmos de otimização, os valores da função objetivo (*fitness*) serão utilizados como métrica de qualidade das soluções encontradas. É interessante ressaltar que em problemas de minimização, como é o caso da função Rosenbrock, soluções boas apresentam valores pequenos de $f(\mathbf{x})$ e soluções ruins apresentam valores maiores de $f(\mathbf{x})$. Assim, ao final de cada execução de um algoritmo para uma determinada instância do problema, apenas o valor de fitness do melhor indivíduo da população será tomado como referência.
+
+As hipóteses estatísticas foram definidas com o objetivo de verificar as seguintes proposições:
+\begin{itemize}
+  \item Há alguma diferença no desempenho médio das duas configurações propostas do algoritmo de Evolução Diferencial para a classe de problemas de interesse?
+  \item Caso haja, qual a magnitude dessa diferença encontrada? 
+  \item Se possível ainda, qual configuração é superior em termos da qualidade média das soluções encontradas no conjunto de instâncias definido? 
+\end{itemize}
+
+Considerando as questões propostas, foram estabelecidas as seguintes hipóteses de teste sobre o *fitness* médio das duas configurações de algoritmo \cite{Campelo2019}:
+\begin{equation}
+  \begin{cases} 
+      H_0: \mu_{\text{algo}_{1}} \geq \mu_{\text{algo}_{2}} \\ 
+      H_1: \mu_{\text{algo}_{1}} < \mu_{\text{algo}_{2}}
+  \end{cases}
+\end{equation}
+
+Os parâmetros experimentais considerados para realização dos testes foram nível de significância $\alpha = 0,05$, mínima diferença de importância prática (padronizada) $d^{*} = \delta^{*}/\sigma = 0,5$ e potência mínima desejada $\pi = 1 - \beta = 0,80$ para tamanho de efeito $d = d^{*}$.
+
+# Coleta de Dados
+
+A classe de funções de interesse para o presente experimento é composta por instâncias de dimensão no domínio $2 \leq D \leq 150$. De modo a permitir que o Teorema Central do Limite (TCL) seja evocado, se necessário, cada algoritmo foi executado $33$ vezes para cada instância do problema. Supondo todas as instâncias no intervalo desejado, ao todo foram cerca de $n_{\text{algoritmos}} \times n_{\text{instâncias}} \times n_{\text{execuções por instância}}$ $= 2 \times 149 \times 33 = 9834$ execuções. Essa experimentação exaustiva foi realizada por uma máquina Intel(R) Xeon(R) Gold 6140 de 18 núcleos e 36 threads operando a 2.30 GHz, 256 GB de RAM, RAID 5 com SSDs de 1TB e Placa de Vídeo Nvidia Quadro P5000 com 2560 cores CUDA e 16GB GDDR5X.
+
+Embora para este estudo de caso o orçamento computacional não tenha sido um gargalo insuperável, problemas de engenharia, cuja solução emprega heurísticas para otimizar modelos numéricos, podem requerer uma limitação no número de instâncias. Assim, diferenças no desempenho médio que excedem algum limite mínimo de relevância prática $d^{*}$ ainda podem ser alcançados em um subconjunto das instâncias disponíveis, a um custo computacional muito menor do que o que seria necessário para a investigação completa \cite{Campelo2019}.
+
+O método `calc_instances` do pacote `CAISEr` em linguagem R permite estimar o número de instâncias mínimas necessárias para se comparar múltiplos algoritmos, de modo que os requisitos experimentais $\alpha$, $d^{*}$ e $\pi$ sejam atingidos \cite{CAISEr}. O parâmetro número de comparações \texttt{ncomparisons} é dado pela Equação \eqref{eq:ncomparisons}:
+
+\begin{equation}
+  \label{eq:ncomparisons}
+  \texttt{ncomparisons} = \frac{K\times(K-1)}{2}
+\end{equation}
+
+\noindent onde $K$ é o número de algoritmos que se deseja comparar. Para o estudo em questão, $K = 2$ e, portanto, $\frac{2 \times (2-1)}{2} = 1$.
+
+```{r}
+out <- calc_instances(ncomparisons = 1, 
+                      d = 0.5, 
+                      power = 0.80, 
+                      sig.level = 0.05, 
+                      alternative.side = "one.sided", 
+                      power.target = "mean")
+cat('Número de instâncias necessárias:', out$ninstances)
+```
+O número de instâncias necessárias para se realizar o experimento descrito é de apenas 27 instâncias, ou seja, 1782 execuções no total, o que demanda cerca de $81,88\%$ a menos de processamento computacional que a experimentação integral. Desse modo, as instâncias seriam amostras igualmente espaçadas no domínio $D \in [2, 150]$.
+
+```{r}
+options(width = 90)
+round(linspace(2, 150, out$ninstances), digits = 0)
+```
+
+# Análise Exploratória de Dados
+
+Diante do demasiado número de instâncias do problema, ainda que sejam consideradas apenas as instâncias mínimas definidas anteriormente, analisar estatísticas amostrais, como média, mediana e desvio, par a par, com o intuito de gerar algumas suposições sobre potenciais diferenças nos algoritmos se torna impraticável. Portanto, a fim de compreender melhor os dados em estudo e, posteriormente, inferir sobre as populações de onde as amostras provêm, serão analisadas algumas representações gráficas.
+
+No que se refere ao gráfico de *fitness* médio por instância do problema, é possível evidenciar que, para um intervalo visualmente estimado de $10 < D < 60$, a média de desempenho do Algoritmo 1 é substancialmente pior que a média de desempenho do Algoritmo 2. À medida que a dimensão do problema cresce, as diferenças entre os valores médios já não são mais perceptíveis. Essa verificação ressalta ainda mais a importância de se realizar uma amostragem uniformemente distribuída de instâncias no intervalo de interesse. Caso contrário, as análises podem ser completamente enviesadas. No presente estudo, o Algoritmo 2, ao que tudo indica, apresenta uma melhor performance para dimensões relativamente menores. Se porventura o subconjunto de instâncias abrangesse apenas problemas de baixa dimensão, por exemplo, as conclusões tiradas seriam polarizadas.
+
+```{r preprocessing, results = 'hide', echo = FALSE}
+
+# Leitura dos dados
+data <- read.csv('CS4.csv', sep = ',', head = FALSE, skip = 1)
+# Remove índices da primeira coluna
+data <- data[2:length(data)]
+
+# Separa qualidade das soluções do tempo de execução
+ninstances <- ncol(data)/4
+fobjs <- data[1:(2*ninstances)]
+times <- data[(2*ninstances+1):ncol(data)]
+
+# Separa qualidade das soluções dos dois algoritmos
+algo1 <- fobjs[1:ninstances]
+algo2 <- fobjs[(ninstances+1):(2*ninstances)]
+
+# Renomeando as colunas
+colnames(algo1) <- as.character(2:150)
+colnames(algo2) <- as.character(2:150)
+```
+
+```{r mean, echo = FALSE, fig.height = 2.4, fig.width = 6, fig.align = 'center', fig.cap = 'Média de desempenho dos algoritmos em todas as 149 instâncias.', fig.pos = 'H'}
+# Média de desempenho do algoritmo 1
+muAlgo1 <- as.vector(colMeans(algo1))
+# Média de desempenho do algoritmo 2
+muAlgo2 <- as.vector(colMeans(algo2))
+
+# Estruturando dados do algoritmo 1 para gráfico de linhas no ggplot2
+label <- rep('1', ninstances)
+variable <- 2:150
+arr1 <- melt(muAlgo1, id.vars = NULL)
+head <- cbind(variable, arr1, label)
+
+# Estruturando dados do algoritmo 2 para gráfico de linhas no ggplot2
+label <- rep('2', ninstances)
+arr2 <- melt(muAlgo2, id.vars = NULL)
+tail <- cbind(variable, arr2, label)
+
+# União dos desempenhos dos dois algoritmos em todas as instâncias
+merged <- rbind(head, tail)
+
+# Lineplot
+p <- ggplot(merged, aes(x = variable, y = value, color = label)) + geom_line()
+p + labs(x = "Dimensão", y = "Fitness médio") +
+    guides(color=guide_legend(title="Algoritmo")) +
+    scale_color_manual(values = c("steelblue", "darkred"))
+
+```
+
+Com a finalidade de verificar o comportamento dos algoritmos nas primeiras instâncias, foram gerados diagramas de caixa par a par no intervalo $2 \leq D \leq 11$. As diferenças evidentes no gráfico anterior têm origem na instância $D=8$, onde já se pode perceber uma mediana maior do Algoritmo 1 em relação ao Algoritmo 2, bem como uma tendência de crescimento apenas do Algoritmo 1 nas instâncias seguintes. Além disso, a dispersão da primeira configuração apresenta um comportamento com princípio exponencial ($D \geq 8$), enquanto que para a segunda configuração não é possível visualizar o intervalo interquatilico entre o terceiro e o primeiro quartil para o mesmo domínio.
+
+```{r head10, echo = FALSE, fig.height = 2.4, fig.width = 6, fig.align = 'center', fig.cap = 'Boxplot das dez primeiras instâncias.', fig.pos = 'H'}
+# Estruturando dados do algoritmo 1 para boxplots no ggplot2
+label <- rep('1', (33 * ninstances))
+arr1 <- melt(algo1, id.vars = NULL)
+head <- cbind(arr1, label)
+
+# Estruturando dados do algoritmo 2 para boxplots no ggplot2
+label <- rep('2', (33 * ninstances))
+arr2 <- melt(algo2, id.vars = NULL)
+tail <- cbind(arr2, label)
+
+# União dos desempenhos dos dois algoritmos nas dez primeiras instâncias
+merged <- rbind(head(head, 33*10), head(tail, 33*10))
+
+# Boxplot
+p <- ggplot(data = merged, aes(x=variable, y=value)) + geom_boxplot(aes(fill=label))
+p + labs(x = "Dimensão", y = "Fitness") +
+    scale_fill_manual(name = "Algoritmo", values = c("#56B4E9", "#CD5C5C"))
+```
+
+Analogamente, os diagramas de caixa par a par das últimas instâncias também foram produzidos. Conforme mencionado anteriormente para o gráfico de *fitness* médio por instância, as diferenças nos desempenhos dos algoritmos se tornam imperceptíveis em dimensões maiores. Nas instâncias $D = 141, 142, 148 \text{ e } 149$, por exemplo, a mediana do Algoritmo 1 se encontra inferior a mediana do Algoritmo 2. Em contrapartida, nas instâncias $D = 143 \text{ e } 144$, se observa o inverso. Por fim, não se pode concluir nada a respeito dos segundos quartis nas instâncias $D = 145 \text{ e } 146$. Essa incerteza acerca das comparações entre as duas configurações propostas do algoritmo de Evolução Diferencial, torna ainda mais clara a necessidade da análise estatística para o estudo de caso que se segue.
+
+```{r tail10, echo = FALSE, fig.height = 2.4, fig.width = 6, fig.align = 'center', fig.cap = 'Boxplot das dez últimas instâncias.', fig.pos = 'H'}
+# União dos desempenhos dos dois algoritmos nas dez últimas instâncias
+merged <- rbind(tail(head, 33*10), tail(tail, 33*10))
+
+# Boxplot
+p <- ggplot(data = merged, aes(x=variable, y=value)) + geom_boxplot(aes(fill=label))
+p + labs(x = "Dimensão", y = "Fitness") +
+    scale_fill_manual(name = "Algoritmo", values = c("#56B4E9", "#CD5C5C"))
+```
+
+# Potência do Teste
+
+Tendo em vista que a análise estatística do presente trabalho será realizada sobre a experimentação completa, isto é, as 149 instâncias do problema ao invés apenas da quantidade mínima calculada, a potência obtida no teste sofrerá uma mudança e, portanto, deve ser calculada para o novo tamanho amostral. Dado que o tamanho de efeito não é afetado pelo tamanho da amostra ($d^{*} = 0,5$), tem-se a seguinte relação entre potência do teste e número de instâncias para um nível de significância constante e igual a $\alpha = 0,05$.
+
+```{r, results = 'hide', echo = FALSE}
+# Calcula relação entre potência e tamanho amostral
+interval <- 2:150
+power_values <- c()
+for (i in interval) {
+  out <- calc_instances(ncomparisons = 1, 
+                       d = 0.5, 
+                       ninstances = i, 
+                       sig.level = 0.05, 
+                       alternative.side = "one.sided", 
+                       power.target = "mean")
+  power_values[i-1] <- out$power
+}
+df <- data.frame(x = interval, y = power_values)
+```
+
+```{r, echo = FALSE, fig.height = 2.2, fig.width = 3, fig.align = 'center', fig.cap = 'Relação entre o poder do teste e o número de instâncias.', fig.pos = 'H'}
+ggplot(data = df, aes(x = x, y = y, group = 1)) +
+  xlab('Número de instâncias') + 
+  ylab('Potência do teste') + 
+  geom_line(linetype = 'dashed')+
+  geom_point()
+```
+
+Aumentar o número de instâncias torna o teste de hipótese mais sensível, isto é, mais provável de rejeitar a hipótese nula quando ela é, de fato, falsa. Em outras palavras, a probabilidade de cometer um erro do tipo II ($\beta$) diminui à medida que o tamanho amostral aumenta. Como a potência do teste é o complemento do erro do tipo II ($\pi = 1-\beta$), então consequentemente ela aumenta. Desse modo, tem-se uma potência de $99,99\%$ ao se considerar 149 instâncias do problema com os demais parâmetros experimentais fixos.
+
+```{r}
+out <- calc_instances(ncomparisons = 1, 
+                       d = 0.5, 
+                       ninstances = 149, 
+                       sig.level = 0.05, 
+                       alternative.side = "one.sided", 
+                       power.target = "mean")
+cat('Potência alcançada:', out$power)
+```
+
+# Validação de Premissas
+
+# Análise Estatística
+
+# Conclusões
+
+
+## Discussão de Melhorias
+
+
+## Atividades Desempenhadas
+
+
+
+\renewcommand\refname{Referências}
+\bibliographystyle{plain}
+\bibliography{ref}
