@@ -92,5 +92,5 @@ for (i in 1:length(dimensions)) {
 # Saving data
 data <- cbind(fs, ts)
 data <- data.frame(data)
-filename <- paste(getwd(),'/data-csv04.csv', sep = "")
+filename <- paste(getwd(),'/CS4.csv', sep = "")
 write.csv(data, file = filename)
