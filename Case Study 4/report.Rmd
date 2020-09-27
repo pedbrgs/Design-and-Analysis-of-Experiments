@@ -63,6 +63,9 @@ if (!require(pwr, quietly = TRUE)){
 if (!require(multcompView, quietly = TRUE)){
       suppressMessages(install.packages("multcompView"))
       }
+if (!require(multcomp, quietly = TRUE)){
+      suppressMessages(install.packages("multcomp"))
+      }
 if (!require(lmtest, quietly = TRUE)){
       suppressMessages(install.packages("lmtest"))
       }
@@ -98,6 +101,8 @@ library(car)
 library(pwr)
 # Tukey package
 library(multcompView)
+# Multiple comparisons
+library(multcomp)
 # Durbin Watson Test package
 library(lmtest)
 # Effect Size for ANOVA
@@ -351,6 +356,32 @@ cat('Potência alcançada:', out$power)
 # Validação de Premissas
 
 # Análise Estatística
+
+```{r, results = 'hide', echo = FALSE}
+# Agregando desempenho médio dos algoritmos em todas as instâncias
+aggdata <- data.frame(rbind(muAlgo1, muAlgo2))
+# Renomeando colunas
+colnames(aggdata) <- as.character(2:150)
+# Renomeando linhas
+rownames(aggdata) <- c('1', '2')
+# Manipulando formato
+aggdata <- melt(t(aggdata), id.vars = NULL)
+colnames(aggdata) <- c('Instancia_Grupo', 'Algoritmo', 'f')
+# Transformando variáveis categóricas em fatores
+for (i in 1:2) aggdata[, i] <- as.factor(aggdata[, i])
+```
+
+```{r}
+model <- aov(formula = log(f)~Algoritmo+Instancia_Grupo, data = aggdata)
+model
+summary.lm(model)$r.squared
+```
+```
+
+```{r}
+par(mfrow = c(2, 2))
+plot(model, pch = 20, las = 1)
+```
 
 # Conclusões
 
