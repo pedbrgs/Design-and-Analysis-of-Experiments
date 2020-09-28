@@ -359,12 +359,16 @@ Uma possibilidade de conduzir a análise deste experimento é por meio do Planej
 
 Este experimento assume que há uma observação por bloco, blocos independentes e independência da aleatorização dentro do bloco \cite{Campelo2018-LNDoE}. Dessa forma, cada uma das dimensões dentro do intervalo proposto, foi considerada uma instância do problema, e por isso, a média de cada uma das 33 execuções por instância é uma observação do bloco referente à respectiva instância, e somente a esta instância.
 
-Além disso, assim como no Anova, as premissas deste teste considera a normalidade dos resíduos, homocedasticidade e independência amostral. Tendo isso em vista, e com intuito de garantir a normalidade dos dados, cada uma das instâncias foi executada $33\times$, pois assim pode-se evocar o Teorema do Limite Central. Ainda sim, é importante notar que graficamente, os resíduos se ajustam bem à reta do QQ-plot, com a presença de somente dois outliers,  referentes à dimensão igual a 2 de cada um dos algoritmos. Quanto à homocedasticidade, observa-se que os resíduos comportam-se de maneira semelhante, com variabilidade constante, independente do algoritmo. Já em relação à independência, cada uma das execuções ocorreu de forma independente, com vista a garantir a independência amostral. 
+Para reduzir possíveis viéses causados por outliers, e melhorar o ajuste dos dados, facilitando a análise destes, foi aplicado uma transformação logarítmica sobre eles. 
+
+Assim como no Anova, as premissas deste teste considera a normalidade dos resíduos, homocedasticidade e independência amostral. Tendo isso em vista, e com intuito de garantir a normalidade dos dados, cada uma das instâncias foi executada $33\times$, pois assim pode-se evocar o Teorema do Limite Central. Ainda sim, é importante notar que graficamente, os resíduos se ajustam bem à reta do QQ-plot, com a presença de somente dois outliers,  referentes à dimensão igual a 2 de cada um dos algoritmos. Quanto à homocedasticidade, observa-se que os resíduos comportam-se de maneira semelhante, com variabilidade constante, independente do algoritmo. Já em relação à independência, cada uma das execuções ocorreu de forma independente, com vista a garantir a independência amostral. 
 
 Com isso, pode-se prosseguir para a análise estatística proposta.
 
 
 # Análise Estatística
+
+No R é possível executar este teste por meio da função aov \cite{AOV}, passando como parâmetro tanto o fator experimental a ser analisado (os Algoritmos), como o fator a ser bloqueado, que neste contexto são as instâncias. Pode-se verificar que o somatório dos quadrados das instâncias foi muito superior ao observado nos algoritmos. Com isso, percebe-se a blocagem deste elemento mostra-se fundamental para análise correta dos dados. Observa-se ainda que tanto em relação aos algoritmos, como se tratando das instâncias o valor de p foi muito pequeno, $p = 0,00061$ e $p = 2 \times 10 ^{-16}$, respectivamente, que permite inferir que a Hipótese Nula deste teste é refutada, e consequentemente as diferenças observadas nas médias dos algoritmos de fato existem.
 
 ```{r, results = 'hide', echo = FALSE}
 # Agregando desempenho médio dos algoritmos em todas as instâncias
@@ -385,6 +389,7 @@ for (i in 1:2) aggdata[, i] <- as.factor(aggdata[, i])
 model <- aov(formula = log(f)~Algoritmo+Instancia_Grupo, data = aggdata)
 model
 
+shapiro.test(model$residuals)
 summary(model)
 summary.lm(model)$r.squared
 ```
