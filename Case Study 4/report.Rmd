@@ -355,21 +355,6 @@ cat('Potência alcançada:', out$power)
 
 # Validação de Premissas
 
-Uma possibilidade de conduzir a análise deste experimento é por meio do Planejamento por Blocagem Completamente Randomizado (RBBD), também conhecido como Blocagem (Blocking). Este método permite isolar os fatores indesejados, conhecidos e desconhecidos, e consequentemente conduzir a uma análise mais fidedígna, uma vez que o poder estatístico é impulsionado ao excluir a variabilidade entre as repetições dos resíduos \cite{Campelo2018-LNDoE}. Neste contexto, embora a aplicação do algoritmo em diferentes dimensões pudesse causar um efeito indesejado, a separação das instâncias por blocos exclui o efeito da instância e permite o estudo da média dos algoritmos.
-
-Este experimento assume que há uma observação por bloco, blocos independentes e independência da aleatorização dentro do bloco \cite{Campelo2018-LNDoE}. Dessa forma, cada uma das dimensões dentro do intervalo proposto, foi considerada uma instância do problema, e por isso, a média de cada uma das 33 execuções por instância é uma observação do bloco referente à respectiva instância, e somente a esta instância.
-
-Para reduzir possíveis viéses causados por outliers, e melhorar o ajuste dos dados, facilitando a análise destes, foi aplicado uma transformação logarítmica sobre eles. 
-
-Assim como no Anova, as premissas deste teste considera a normalidade dos resíduos, homocedasticidade e independência amostral. Tendo isso em vista, e com intuito de garantir a normalidade dos dados, cada uma das instâncias foi executada $33\times$, pois assim pode-se evocar o Teorema do Limite Central. Ainda sim, é importante notar que graficamente, os resíduos se ajustam bem à reta do QQ-plot, com a presença de somente dois outliers,  referentes à dimensão igual a 2 de cada um dos algoritmos. Quanto à homocedasticidade, observa-se que os resíduos comportam-se de maneira semelhante, com variabilidade constante, independente do algoritmo. Já em relação à independência, cada uma das execuções ocorreu de forma independente, com vista a garantir a independência amostral. 
-
-Com isso, pode-se prosseguir para a análise estatística proposta.
-
-
-# Análise Estatística
-
-No R é possível executar este teste por meio da função aov \cite{AOV}, passando como parâmetro tanto o fator experimental a ser analisado (os Algoritmos), como o fator a ser bloqueado, que neste contexto são as instâncias. Pode-se verificar que o somatório dos quadrados das instâncias foi muito superior ao observado nos algoritmos. Com isso, percebe-se a blocagem deste elemento mostra-se fundamental para análise correta dos dados. Observa-se ainda que tanto em relação aos algoritmos, como se tratando das instâncias o valor de p foi muito pequeno, $p = 0,00061$ e $p = 2 \times 10 ^{-16}$, respectivamente, que permite inferir que a Hipótese Nula deste teste é refutada, e consequentemente as diferenças observadas nas médias dos algoritmos de fato existem.
-
 ```{r, results = 'hide', echo = FALSE}
 # Agregando desempenho médio dos algoritmos em todas as instâncias
 aggdata <- data.frame(rbind(muAlgo1, muAlgo2))
@@ -385,19 +370,69 @@ colnames(aggdata) <- c('Instancia_Grupo', 'Algoritmo', 'f')
 for (i in 1:2) aggdata[, i] <- as.factor(aggdata[, i])
 ```
 
+Uma possibilidade de conduzir a análise deste experimento é por meio do Planejamento por Blocagem Completamente Randomizado, do inglês *Randomized Complete Block Design* (RCBD). Este método, também conhecido como Blocagem (*Blocking*), permite isolar os fatores indesejados, conhecidos e desconhecidos, e consequentemente conduzir a uma análise comparativa mais fidedígna, uma vez que o poder estatístico é impulsionado ao excluir a variabilidade entre as repetições dos resíduos \cite{Campelo2018-LNDoE}. Neste contexto, embora a aplicação do algoritmo em diferentes dimensões possa causar um efeito indesejado, a separação das instâncias por blocos exclui o efeito da instância e permite o estudo da média dos algoritmos.
+
+Este experimento assume que há uma observação por bloco, blocos independentes e independência da aleatorização dentro do bloco \cite{Campelo2018-LNDoE}. Dessa forma, cada uma das dimensões dentro do intervalo proposto foi considerada uma instância do problema, e por isso, a média de cada uma das 33 execuções por instância é uma observação do bloco referente à respectiva instância, e somente a esta instância.
+
+Para reduzir possíveis viéses causados por outliers, e melhorar o ajuste dos dados, facilitando a análise destes, foi aplicado uma transformação logarítmica sobre a variável de saída (*fitness* médio). 
+
 ```{r}
 model <- aov(formula = log(f)~Algoritmo+Instancia_Grupo, data = aggdata)
-model
+```
 
+Assim como no Anova, as premissas deste teste são normalidade dos resíduos, homocedasticidade e independência amostral. Tendo isso em vista, e com intuito de garantir a normalidade dos dados, cada uma das instâncias foi executada $33\times$, pois assim pode-se evocar o Teorema do Limite Central. Ainda sim, é importante notar que graficamente, os resíduos se ajustam bem à reta do QQ-plot, com a presença de somente dois outliers,  referentes à dimensão igual a 2 de cada um dos algoritmos. Quanto à homocedasticidade, observa-se que os resíduos comportam-se de maneira semelhante, com variabilidade constante, independente do algoritmo. A fim de garantir a independência das amostras, todas as execuções ocorreram de forma independente na mesma máquina, conforme relatado na coleta de dados. Diante da validação das premissas, é possível prosseguir para a análise estatística inicialmente proposta.
+
+```{r, results = 'hide', echo = FALSE}
 shapiro.test(model$residuals)
+```
+
+```{r qqplot, echo = FALSE, fig.height = 2, fig.width = 3, fig.align = 'center', fig.cap = 'QQ-Plot.', fig.pos = 'H'}
+qqplot <- ggplot(data = as.data.frame(model$residuals), mapping = aes(sample = model$residuals))
+qqplot + geom_qq_line() + geom_qq() + scale_y_continuous(name = 'Quantis da Amostra') + 
+         scale_x_continuous(name = 'Quantis Teóricos Normais')
+```
+
+```{r, echo = FALSE, fig.height = 6, fig.width = 7, fig.pos = "H", fig.align = "center"}
+# par(mfrow = c(2, 2))
+# plot(model, pch = 20, las = 1)
+```
+
+# Análise Estatística
+
+No R é possível ajustar um modelo de análise de variância (ANOVA) por meio da função `aov` \cite{AOV}, passando como parâmetro tanto o fator experimental a ser analisado (os algoritmos), como o fator a ser bloqueado, que neste contexto são as instâncias. Pode-se verificar que o somatório dos quadrados das instâncias foi muito superior ao observado nos algoritmos. Com isso, percebe-se a blocagem deste elemento mostra-se fundamental para análise correta dos dados. Observa-se ainda que tanto em relação aos algoritmos, como se tratando das instâncias, os $p$ valores foram substancialmente pequenos, $p = 0,00061$ e $p = 2 \times 10 ^{-16}$, respectivamente, o que permite inferir a rejeição da hipótese nula ao nível de confiança de $95\%$. Assim, é possível relatar que as diferenças observadas nas médias dos algoritmos de fato existem.
+
+```{r}
 summary(model)
 summary.lm(model)$r.squared
 ```
-```
 
 ```{r}
-par(mfrow = c(2, 2))
-plot(model, pch = 20, las = 1)
+# Relative blocking efficiency (E)
+df <- as.data.frame(summary(model)[[1]])
+MSblocks <- df["Instancia_Grupo","Mean Sq"]
+MSe <- df["Residuals","Mean Sq"]
+a <- length(unique(aggdata$Algoritmo))
+b <- length(unique(aggdata$Instancia_Grupo))
+E <- ((b - 1) * MSblocks + b * (a - 1) * MSe) / ((a * b - 1) * MSe)
+cat('Relative blocking efficiency (E):', E)
+```
+
+```{r, echo = FALSE, results = 'hide', fig.height = 2.8, fig.width = 3, fig.align = 'center', fig.cap = 'Intervalo de confiança do teste de Dunnet ao nível de confiança de 95\\%.', fig.pos = 'H'}
+duntest <- glht(model, linfct = mcp(Algoritmo = "Dunnett"))
+duntestCI <- confint(duntest)
+par(mar = c(5, 1, 1, 1), las = 1)
+plot(duntestCI, xlab = "Diferença média (escala logarítmica)", main = "")
+```
+
+```{r middle10, echo = FALSE, fig.height = 2.4, fig.width = 6, fig.align = 'center', fig.cap = 'Boxplot das instâncias contidas no domínio $20 \\leq D \\leq 30$.', fig.pos = 'H'}
+# União dos desempenhos dos dois algoritmos nas dez instâncias do intervalo [20,30]
+merged <- rbind(subset(head, as.numeric(variable) >= 19 & as.numeric(variable) < 30),
+                subset(tail, as.numeric(variable) >= 19 & as.numeric(variable) < 30))
+
+# Boxplot
+p <- ggplot(data = merged, aes(x=variable, y=value)) + geom_boxplot(aes(fill=label))
+p + labs(x = "Dimensão", y = "Fitness") +
+    scale_fill_manual(name = "Algoritmo", values = c("#56B4E9", "#CD5C5C"))
 ```
 
 # Conclusões
