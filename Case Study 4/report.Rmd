@@ -401,6 +401,9 @@ qqplot + geom_qq_line() + geom_qq() + scale_y_continuous(name = 'Quantis da Amos
 
 No R é possível ajustar um modelo de análise de variância (ANOVA) por meio da função `aov` \cite{AOV}, passando como parâmetro tanto o fator experimental a ser analisado (os algoritmos), como o fator a ser bloqueado, que neste contexto são as instâncias. Pode-se verificar que o somatório dos quadrados das instâncias foi muito superior ao observado nos algoritmos. Com isso, percebe-se a blocagem deste elemento mostra-se fundamental para análise correta dos dados. Observa-se ainda que tanto em relação aos algoritmos, como se tratando das instâncias, os $p$ valores foram substancialmente pequenos, $p = 0,00061$ e $p = 2 \times 10 ^{-16}$, respectivamente, o que permite inferir a rejeição da hipótese nula ao nível de confiança de $95\%$. Assim, é possível relatar que as diferenças observadas nas médias dos algoritmos de fato existem.
 
+Esta função também tem como saída o coeficiente de determinação, também conhecido como $R^{2}$. Trata-se de uma medida de ajuste que determina o quanto a variância dos dados pode ser explicada pelo modelo proposto. O $R^{2}$ pode assumir valores entre 0 e 1, e quanto mais próximo de 1, mais o modelo é uma boa representação das diferenças observadas. Neste contexto, $R^{2}$ resultou em $0,86$ que evidencia que as conclusões obtidas ...
+
+
 ```{r}
 summary(model)
 summary.lm(model)$r.squared
