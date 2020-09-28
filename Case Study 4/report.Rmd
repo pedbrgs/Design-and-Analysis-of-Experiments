@@ -355,6 +355,15 @@ cat('Potência alcançada:', out$power)
 
 # Validação de Premissas
 
+Uma possibilidade de conduzir a análise deste experimento é por meio do Planejamento por Blocagem Completamente Randomizado (RBBD), também conhecido como Blocagem (Blocking). Este método permite isolar os fatores indesejados, conhecidos e desconhecidos, e consequentemente conduzir a uma análise mais fidedígna, uma vez que o poder estatístico é impulsionado ao excluir a variabilidade entre as repetições dos resíduos \cite{Campelo2018-LNDoE}. Neste contexto, embora a aplicação do algoritmo em diferentes dimensões pudesse causar um efeito indesejado, a separação das instâncias por blocos exclui o efeito da instância e permite o estudo da média dos algoritmos.
+
+Este experimento assume que há uma observação por bloco, blocos independentes e independência da aleatorização dentro do bloco \cite{Campelo2018-LNDoE}. Dessa forma, cada uma das dimensões dentro do intervalo proposto, foi considerada uma instância do problema, e por isso, a média de cada uma das 33 execuções por instância é uma observação do bloco referente à respectiva instância, e somente a esta instância.
+
+Além disso, assim como no Anova, as premissas deste teste considera a normalidade dos resíduos, homocedasticidade e independência amostral. Tendo isso em vista, e com intuito de garantir a normalidade dos dados, cada uma das instâncias foi executada $33\times$, pois assim pode-se evocar o Teorema do Limite Central. Ainda sim, é importante notar que graficamente, os resíduos se ajustam bem à reta do QQ-plot, com a presença de somente dois outliers,  referentes à dimensão igual a 2 de cada um dos algoritmos. Quanto à homocedasticidade, observa-se que os resíduos comportam-se de maneira semelhante, com variabilidade constante, independente do algoritmo. Já em relação à independência, cada uma das execuções ocorreu de forma independente, com vista a garantir a independência amostral. 
+
+Com isso, pode-se prosseguir para a análise estatística proposta.
+
+
 # Análise Estatística
 
 ```{r, results = 'hide', echo = FALSE}
@@ -366,6 +375,7 @@ colnames(aggdata) <- as.character(2:150)
 rownames(aggdata) <- c('1', '2')
 # Manipulando formato
 aggdata <- melt(t(aggdata), id.vars = NULL)
+print(aggdata)
 colnames(aggdata) <- c('Instancia_Grupo', 'Algoritmo', 'f')
 # Transformando variáveis categóricas em fatores
 for (i in 1:2) aggdata[, i] <- as.factor(aggdata[, i])
@@ -374,6 +384,8 @@ for (i in 1:2) aggdata[, i] <- as.factor(aggdata[, i])
 ```{r}
 model <- aov(formula = log(f)~Algoritmo+Instancia_Grupo, data = aggdata)
 model
+
+summary(model)
 summary.lm(model)$r.squared
 ```
 ```
