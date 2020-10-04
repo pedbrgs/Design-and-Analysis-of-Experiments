@@ -301,7 +301,7 @@ p + labs(x = "Dimensão", y = "Fitness") +
     scale_fill_manual(name = "Algoritmo", values = c("#56B4E9", "#CD5C5C"))
 ```
 
-Analogamente, os diagramas de caixa par a par das últimas instâncias também foram produzidos. Conforme mencionado anteriormente para o gráfico de *fitness* médio por instância, as diferenças nos desempenhos dos algoritmos se tornam imperceptíveis em dimensões maiores. Nas instâncias $D = 141, 142, 148 \text{ e } 149$, por exemplo, a mediana do Algoritmo 1 se encontra inferior a mediana do Algoritmo 2. Em contrapartida, nas instâncias $D = 143 \text{ e } 144$, se observa o inverso. Por fim, não se pode concluir nada a respeito dos segundos quartis nas instâncias $D = 145 \text{ e } 146$. Essa incerteza acerca das comparações entre as duas configurações propostas do algoritmo de Evolução Diferencial, torna ainda mais clara a necessidade da análise estatística para o estudo de caso que se segue.
+Analogamente, os diagramas de caixa par a par das últimas instâncias também foram produzidos. Conforme mencionado anteriormente para o gráfico de *fitness* médio por instância, as diferenças nos desempenhos dos algoritmos se tornam imperceptíveis em dimensões maiores. Nas instâncias $D = 141, 142, 148 \text{ e } 149$, por exemplo, a mediana do Algoritmo 1 se encontra inferior a mediana do Algoritmo 2. Em contrapartida, nas instâncias $D = 143 \text{ e } 144$, se observa o inverso. Por fim, não se pode concluir nada a respeito dos segundos quartis nas instâncias $D = 145 \text{ e } 146$. Essa incerteza acerca das comparações entre as duas configurações propostas do algoritmo de Evolução Diferencial torna ainda mais clara a necessidade da análise estatística para o estudo de caso que se segue.
 
 ```{r tail10, echo = FALSE, fig.height = 2.4, fig.width = 6, fig.align = 'center', fig.cap = 'Boxplot das dez últimas instâncias.', fig.pos = 'H'}
 # União dos desempenhos dos dois algoritmos nas dez últimas instâncias
@@ -315,7 +315,7 @@ p + labs(x = "Dimensão", y = "Fitness") +
 
 # Potência do Teste
 
-Tendo em vista que a análise estatística do presente trabalho será realizada sobre a experimentação completa, isto é, as 149 instâncias do problema ao invés apenas da quantidade mínima calculada, a potência obtida no teste sofrerá uma mudança e, portanto, deve ser calculada para o novo tamanho amostral. Dado que o tamanho de efeito não é afetado pelo tamanho da amostra ($d^{*} = 0,5$), tem-se a seguinte relação entre potência do teste e número de instâncias para um nível de significância constante e igual a $\alpha = 0,05$.
+Tendo em vista que a análise estatística do presente trabalho será realizada sobre a experimentação completa, isto é, as 149 instâncias do problema ao invés apenas da quantidade mínima calculada, a potência obtida no teste sofrerá uma mudança e, portanto, deve ser calculada para o novo tamanho amostral. Dado que deseja-se manter o tamanho de efeito constante ($d^{*} = 0,5$), tem-se a seguinte relação entre potência do teste e número de instâncias para um nível de significância igual a $\alpha = 0,05$.
 
 ```{r, results = 'hide', echo = FALSE}
 # Calcula relação entre potência e tamanho amostral
@@ -333,7 +333,7 @@ for (i in interval) {
 df <- data.frame(x = interval, y = power_values)
 ```
 
-```{r, echo = FALSE, fig.height = 2.2, fig.width = 3, fig.align = 'center', fig.cap = 'Relação entre o poder do teste e o número de instâncias.', fig.pos = 'H'}
+```{r, echo = FALSE, fig.height = 2.4, fig.width = 3, fig.align = 'center', fig.cap = 'Relação entre o poder do teste e o número de instâncias.', fig.pos = 'H'}
 ggplot(data = df, aes(x = x, y = y, group = 1)) +
   xlab('Número de instâncias') + 
   ylab('Potência do teste') + 
@@ -380,17 +380,22 @@ Para reduzir possíveis viéses causados por outliers, e melhorar o ajuste dos d
 model <- aov(formula = log(f)~Algoritmo+Instancia_Grupo, data = aggdata)
 ```
 
-Assim como no Anova, as premissas deste teste são normalidade dos resíduos, homocedasticidade e independência amostral. Tendo isso em vista, e com intuito de garantir a normalidade dos dados, cada uma das instâncias foi executada $33\times$, pois assim pode-se evocar o Teorema do Limite Central. Ainda sim, é importante notar que graficamente, os resíduos se ajustam bem à reta do QQ-plot, com a presença de somente dois outliers,  referentes à dimensão igual a 2 de cada um dos algoritmos. Quanto à homocedasticidade, observa-se que os resíduos comportam-se de maneira semelhante, com variabilidade constante, independente do algoritmo. A fim de garantir a independência das amostras, todas as execuções ocorreram de forma independente na mesma máquina, conforme relatado na coleta de dados. Diante da validação das premissas, é possível prosseguir para a análise estatística inicialmente proposta.
+Assim como no Anova, as premissas deste teste são normalidade dos resíduos, homocedasticidade e independência amostral. Tendo isso em vista, e com intuito de garantir a normalidade dos dados, cada uma das instâncias foi executada $33$ vezes, pois assim pode-se evocar o Teorema do Limite Central. 
 
 ```{r, results = 'hide', echo = FALSE}
 shapiro.test(model$residuals)
 ```
 
-```{r qqplot, echo = FALSE, fig.height = 2, fig.width = 3, fig.align = 'center', fig.cap = 'QQ-Plot.', fig.pos = 'H'}
-qqplot <- ggplot(data = as.data.frame(model$residuals), mapping = aes(sample = model$residuals))
-qqplot + geom_qq_line() + geom_qq() + scale_y_continuous(name = 'Quantis da Amostra') + 
-         scale_x_continuous(name = 'Quantis Teóricos Normais')
+```{r, results = 'hide', echo = FALSE, fig.height = 3.7, fig.width = 8, fig.align = 'center', fig.cap = 'QQ-Plot e Resíduos por Níveis de Fatores.', fig.pos = 'H'}
+par(mar = c(5, 5, 3, 1), mgp = c(3, .35, 0),
+            cex.axis = .9, bg = "white", fg = "black",
+            col.axis = "black", col.lab = "black",
+            mfrow = c(1, 2))
+plot(model, which = 2, panel.first=grid(lty = "solid"))
+plot(model, which = 5, panel.first=grid(lty = "solid"))
 ```
+
+Ainda sim, é importante notar que graficamente, os resíduos se ajustam bem à reta do QQ-plot, com a presença de somente dois outliers,  referentes à dimensão igual a 2 de cada um dos algoritmos. Quanto à homocedasticidade, observa-se que os resíduos comportam-se de maneira semelhante, com variabilidade constante, independente do algoritmo. A fim de garantir a independência das amostras, todas as execuções ocorreram de forma independente na mesma máquina, conforme relatado na coleta de dados. Diante da validação das premissas, é possível prosseguir para a análise estatística inicialmente proposta.
 
 ```{r, echo = FALSE, fig.height = 6, fig.width = 7, fig.pos = "H", fig.align = "center"}
 # par(mfrow = c(2, 2))
@@ -399,17 +404,19 @@ qqplot + geom_qq_line() + geom_qq() + scale_y_continuous(name = 'Quantis da Amos
 
 # Análise Estatística
 
-No R é possível ajustar um modelo de análise de variância (ANOVA) por meio da função `aov` \cite{AOV}, passando como parâmetro tanto o fator experimental a ser analisado (os algoritmos), como o fator a ser bloqueado, que neste contexto são as instâncias. Pode-se verificar que o somatório dos quadrados das instâncias foi muito superior ao observado nos algoritmos. Com isso, percebe-se que a blocagem deste elemento mostra-se importante para análise correta dos dados. Observa-se ainda que tanto em relação aos algoritmos, como se tratando das instâncias, os $p$ valores foram substancialmente pequenos, $p = 0,00061$ e $p = 2 \times 10 ^{-16}$, respectivamente, o que permite inferir que a hipótese nula deste teste é rejeitada nível de confiança de $95\%$. Assim, é possível relatar que as diferenças observadas nas médias dos algoritmos de fato existem, além de se estimar quão grande pode ser o efeito das instâncias sobre resultado do algoritmo, caso não seja bloqueado.
-
-Esta função também tem como saída o coeficiente de determinação, também conhecido como $R^{2}$. Trata-se de uma medida de ajuste que determina o quanto a variância dos dados pode ser explicada pelo modelo proposto. O $R^{2}$ pode assumir valores entre 0 e 1, e quanto mais próximo de 1, mais o modelo é uma boa representação das diferenças observadas. Neste contexto, $R^{2}$ resultou em $0,86$ que evidencia que as conclusões obtidas definem bem o experimento proposto.
-
+No R é possível ajustar um modelo de análise de variância (ANOVA) por meio da função `aov` \cite{AOV}, passando como parâmetro tanto o fator experimental a ser analisado (os algoritmos), como o fator a ser bloqueado, que neste contexto são as instâncias. Pode-se verificar que o somatório dos quadrados das instâncias foi muito superior ao observado nos algoritmos. Com isso, percebe-se que a blocagem deste elemento mostra-se importante para análise correta dos dados. Observa-se ainda que tanto em relação aos algoritmos, como se tratando das instâncias, os $p$ valores foram substancialmente pequenos, $p = 0,00061$ e $p = 2 \times 10 ^{-16}$, respectivamente, o que permite inferir que a hipótese nula deste teste é rejeitada ao nível de confiança de $95\%$. Assim, é possível relatar que as diferenças observadas nas médias dos algoritmos de fato existem, além de se estimar quão grande pode ser o efeito das instâncias sobre resultado do algoritmo, caso não seja bloqueado.
 
 ```{r}
 summary(model)
-summary.lm(model)$r.squared
 ```
 
+Esta função também tem como saída o coeficiente de determinação, também conhecido como $R^{2}$. Trata-se de uma medida de ajuste que determina o quanto a variância dos dados pode ser explicada pelo modelo proposto. O $R^{2}$ pode assumir valores entre 0 e 1, e quanto mais próximo de 1, mais o modelo é uma boa representação das diferenças observadas. Neste contexto, $R^{2}$ resultou em $0,86$ que evidencia que as conclusões obtidas definem bem o experimento proposto.
+
 ```{r}
+cat('Coeficiente de determinação:', summary.lm(model)$r.squared)
+```
+
+```{r, results = 'hide', echo = FALSE}
 # Relative blocking efficiency (E)
 df <- as.data.frame(summary(model)[[1]])
 MSblocks <- df["Instancia_Grupo","Mean Sq"]
@@ -419,18 +426,16 @@ b <- length(unique(aggdata$Instancia_Grupo))
 E <- ((b - 1) * MSblocks + b * (a - 1) * MSe) / ((a * b - 1) * MSe)
 cat('Relative blocking efficiency (E):', E)
 ```
-Uma vez identificado através da análise das variâncias (ANOVA) que existe diferença estatística entre as medias das soluções dos algoritmos, deve-se realizar testes comparativos para identificar qual algoritmo tem melhor desempenho perante o outro,
-
-Quando se deseja realizar múltiplas comparações, em geral tem dois métodos a ser utilizado, comparação todos contra todos e todos contra um. Todos contra um é utilizado quando se tem um "controle" e deseja-se comparar os demais tratamentos, algoritmos, soluções, com o "controle". No caso deste experimento, por se ter apenas dois algoritmos, o teste de comparação de todos contra um se resume a comparação de um com o outro. O teste de Dunnett neste caso foi utilizado por se ter maior sensibilidade \cite{Campelo2018-LNDoE}, atuando de forma semelhante ao $t-test$. Após apresentação do intervalo das diferenças das medias em escala logarítmica, pode-se concluir com $95\%$ de confiança que o Algoritmo  2 apresenta melhor solução que o Algoritmo 1, devido ao intervalo está totalmente contido em valores negativos, $Algoritmo 1 - Algoritmo 2$.
+Uma vez identificado através da análise das variâncias (ANOVA) que existe diferença estatística entre as médias das soluções dos algoritmos, deve-se realizar testes comparativos para identificar qual algoritmo tem o melhor desempenho. Quando se deseja realizar múltiplas comparações, dois paradigmas são possíveis: (i) comparação todos contra todos; (ii) e todos contra um. Todos contra um é utilizado quando se tem um tratamento de referência e deseja-se compará-lo com os demais. No caso deste experimento, por se tratar de apenas dois algoritmos ($K=2$), o teste de comparação de todos contra um coincide com o cenário do caso de todos contra todos. O teste de Dunnett neste caso foi utilizado por se ter maior sensibilidade \cite{Campelo2018-LNDoE}, atuando de forma semelhante ao teste $t$ de Student. Após apresentação do intervalo das diferenças das médias em escala logarítmica, pode-se concluir com $95\%$ de confiança que o Algoritmo 2 apresenta melhor solução que o Algoritmo 1, uma vez que o intervalo de confiança está totalmente contido no domínio negativo ($\mu_{\text{algo}_2} - \mu_{\text{algo}_1} < 0$) e o melhor algoritmo apresenta a menor média (problema de minimização).
 
 ```{r, echo = FALSE, results = 'hide', fig.height = 2.8, fig.width = 3, fig.align = 'center', fig.cap = 'Intervalo de confiança do teste de Dunnet ao nível de confiança de 95\\%.', fig.pos = 'H'}
 duntest <- glht(model, linfct = mcp(Algoritmo = "Dunnett"))
 duntestCI <- confint(duntest)
-par(mar = c(5, 1, 1, 1), las = 1)
+par(mar = c(5, 3, 1, 2), las = 1)
 plot(duntestCI, xlab = "Diferença média (escala logarítmica)", main = "")
 ```
 
-Como já mencionado anteriormente, aquele algoritmo que apresenta menor valor fitness apresenta uma melhor solução com relação ao outro. Já mencionado também que no caso deste experimento, nas dimensões extremas, ou seja, menores e maiores dimensões, os dois algoritmos não apresentam diferenças significativas graficamente. Dessa forma, foi destacado graficamente o intervalo das dimensões onde os algoritmos apresentavam diferenças na solução $D \in [20, 30]$, reforçando então o resultado do teste de Dunnet onde com $95\%$ de confiança, devido ao intervalo das diferenças das médias (escala logarítmica), o $Algoritmo 2$ tem melhor solução que o $Algoritmo 1$.
+Como já foi mencionado anteriormente, os dois algoritmos não apresentam diferenças visualmente significativas nas dimensões extremas. Dessa forma, foi destacado graficamente uma proporção do intervalo das dimensões onde os algoritmos apresentam diferenças na qualidade das soluções $D \in [20, 30]$. Tal evidência corrobora ainda mais o resultado do teste de Dunnet.
 
 ```{r middle10, echo = FALSE, fig.height = 2.4, fig.width = 6, fig.align = 'center', fig.cap = 'Boxplot das instâncias contidas no domínio $20 \\leq D \\leq 30$.', fig.pos = 'H'}
 # União dos desempenhos dos dois algoritmos nas dez instâncias do intervalo [20,30]
@@ -445,22 +450,21 @@ p + labs(x = "Dimensão", y = "Fitness") +
 
 
 # Conclusões
-Sendo o maior desafio do experimento coletar e tabular os dados, isto porque devido à ordem de grandeza das dimensões do problema é necessário uma máquina com bom poder de processamento e/ou usar diferentes máquinas para rodar as soluções randomicamente em paralelo. Neste experimento, este passo foi superado ao utilizar uma máquina robusta, onde foi possível resolver todas as instâncias em tempo hábil, mesmo que o número mínimo calculado foi de 27 instâncias.
 
-Ao comparar dois algoritmos, espera-se que um tenha melhor solução que o outro, foi o idealizado ao elaborar a hipótese nula do estudo. A princípio, graficamente, a diferença era pouco aparente, de qualquer forma, o estudo estatístico faz-se necessário entre outras aplicações, definir com certo nível de confiança, se esta diferença existe, e sendo confirmado essa diferença, qual o algoritmo de melhor desempenho.
+O maior desafio do experimento foi definir o número de instâncias mínimas para se obter a potência, o tamanho de efeito e o nível de significância desejados. No entanto, ainda que o número mínimo calculado tenha sido de 27 instâncias, considerou-se todo o domínio do problema, isto é, as 149 instâncias. Para que fosse possível realizar a coleta de dados sem maiores problemas de orçamento computacional, as execuções foram realizadas em uma máquina mais robusta.
 
-Sendo assim, através da análise das variâncias conclui-se que com $95\%$ de confiança que existe diferença estatística entre o fitness médio das soluções dos algoritmos e também com $95\%$ de confiança, através do teste de comparações múltiplas, que o $Algoritmo 2$ apresenta melhor solução perante o $Algoritmo 1$. Uma vez estatísticamente comprovado que o $Algoritmo 2$ tem melhor solução que o $Algoritmo 1$, pode-se corroborar com $95\%$ de confiança com a hipótese nula $H0$ principal do estudo, de que o $Algoritmo 1$ tem média maior ou igual ao $Algoritmo 2$, e portanto, o Algorítmo 2, neste contexto, apresenta-se como melhor alternativa.
+Ao comparar dois algoritmos, espera-se que diferenças estatísticas sejam evidenciadas, de tal forma que se tenha um *ranking* de desempenho dos algoritmos. A princípio, graficamente, a diferença se apresentou pouco aparente para a maioria das instâncias, com exceção de um subconjunto de instâncias no domínio $D \in [10,60]$. Tal indicativo reiterou ainda mais a necessidade de se fazer um estudo estatístico para possíveis ratificações.
 
+Sendo assim, através da análise das variâncias conclui-se ao nível de confiança de $95\%$ que existe diferença estatística entre o *fitness* médio das soluções dos algoritmos e também com $95\%$ de confiança, através do teste de comparações múltiplas, que a segunda configuração do DE apresenta melhor solução média que a primeira configuração apresentada para o problema de interesse. Uma vez que se tem comprovado tais evidências estatísticas, pode-se corroborar a hipótese nula $H_0$ principal do estudo ao nível de significância de $5\%$ ($\mu_{\text{algo}_{1}} \geq \mu_{\text{algo}_{2}}$).
 
 ## Discussão de Melhorias
-Para melhor evidenciar o desempenho de um determinado algoritmo perante outros, seria válido ter mais algoritmos para se comparar. Claro depende da aplicação. Um ponto de atenção neste caso é que com mais algoritmos, o tratamento dos dados e os estudos estatísticos requereriam maiores níveis energia para chegar ao resultado.
-Como neste experimento foi desempenhado a coleta dos dados em uma única maquina, não há como propor melhoria neste sentido, em outras palavras, caso o experimento tenha tido usado mais de uma maquina para executar as soluções, mesmo que usado instâncias aleatórias para retirar o efeito das diferenças das maquinas, executar em uma so maquina, neste caso, seria uma melhoria.
-Outro fator de analise é com relação ao numero de instancias empregado. Para efeitos estatísticos, um numero mínimo de instancias pode ser considerado para um certo nível de potencia do teste. Neste experimento foi utilizado todas as instâncias, em outras palavras, para testes em que se utilizaram apenas o numero mínimo de instâncias, ao utilizar mais instâncias para o estudo estatístico, a potencia do teste torna-se maior, fato este mencionado com detalhes durante o estudo.
 
+Dentre as principais melhorias possíveis, algumas já foram consideradas no decorrer do planejamento e da análise dos experimentos. No que se refere ao processo de coleta de dados, por exemplo, um número maior de instâncias foi considerado, de modo a maximizar a potência do teste e de tornar o estudo mais completo. É interessante ressaltar ainda que ao realizar as execuções dos algoritmos em uma mesma máquina foi possível isolar um possível efeito das diferenças das máquinas.
+
+Sob a perspectiva da análise estatística, optou-se ainda pela utilização do modelo de análise de variância pela possibilidade de se verificar além da divergência entre os algoritmos, o impacto que as instâncias poderiam ter, caso não fossem bloqueadas. Embora o ANOVA em conjunto com o teste de Dunnet seja uma abordagem adequada e bastante efetiva, geralmente tal associação é utilizada quando há pelo menos três tratamentos. Portanto, outros métodos mais simples poderiam chegar aos mesmos resultados, como é o caso do teste $t$ de duas amostras para a comparação dos algoritmos. 
 
 ## Atividades Desempenhadas
-A hipótese de teste foi definida em concordância com os três autores, bem como a definição da execução das soluções dos algoritmos para captura dos dados para melhor condução do experimento. O pré-processamento dos dados, a análise exploratória e o estudo da potencia do teste foram conduzidas pelo Pedro . A validação das premissas foi elaborado pela Samara e Pedro. A análise estatística, por sua vez, que inclui tanto a verificação da existência de diferenças entre as médias dos dois algoritmos quanto o teste de comparações múltiplas a posteriori, foi realizada pela Samara e pelo Sávio. Por fim, a Samara e o Savio concluíram o trabalho com as considerações finais e discussões de melhoria.
-
+A hipótese de teste foi definida em concordância com os três autores. A coleta, o pré-processamento e a análise exploratória dos dados foram conduzidas pelo Pedro, bem como o estudo da potência do teste. A validação das premissas foi elaborada pela Samara. A análise estatística, por sua vez, que inclui tanto a verificação da existência de diferenças entre as médias dos dois algoritmos quanto o teste comparativo a posteriori, foi realizada pelos três autores. Por fim, a Samara e o Savio concluíram o trabalho com as considerações finais e discussões de melhoria.
 
 \renewcommand\refname{Referências}
 \bibliographystyle{plain}
