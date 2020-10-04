@@ -1,0 +1,11 @@
+### Parameter file
+# name		           switch	 type	  values	  [conditions (using R syntax)]
+mutpars.name          " "     c     (mutation_best, mutation_current_to_pbest, mutation_mean, mutation_rand, mutation_wgi)
+recpars.name          " "     c     (recombination_arith, recombination_bin, recombination_blxAlphaBeta, recombination_mmax, recombination_sbx)
+mutpars.f             " "     r     (0.01,5)
+mutpars.p             " "     r     (0,1) | mutpars.name == "mutation_current_to_pbest"
+recpars.cr            " "     r     (0,1) | recpars.name == "recombination_bin"
+recpars.alpha         " "     r     (0,0.5) | recpars.name == "recombination_blxAlphaBeta"
+recpars.beta          " "     r     (0,0.5) | recpars.name == "recombination_blxAlphaBeta"
+recpars.eta           " "     r     (0,100) | recpars.name == "recombination_sbx"
+recpars.lambda        " "     r     (0,1) | recpars.name == "recombination_mmax"

@@ -1,4 +1,4 @@
-# Evolutionary Computation (EEE882)
+# Design and Analysis of Experiments (EEE933)
 # Pedro Vinicius A. B. de Venâncio
 
 # Import library (https://bit.ly/3httVfE)
