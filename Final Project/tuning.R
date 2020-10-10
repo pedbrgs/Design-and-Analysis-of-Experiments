@@ -93,7 +93,7 @@ target.runner <- function(experiment, scenario){
   selpars  <- list(name = "selection_standard")
   
   # Convergence parameters
-  stopcrit <- list(names = "stop_maxeval", maxevals = 100000)
+  stopcrit <- list(names = "stop_maxeval", maxevals = 10000*as.numeric(fdef[2]))
   
   # Problem parameters
   probpars <- list(name  = "test_functions", i = as.numeric(fdef[1]), 

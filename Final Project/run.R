@@ -1,4 +1,4 @@
-  # Design and Analysis of Experiments (EEE933)
+# Design and Analysis of Experiments (EEE951)
 # Pedro Vinicius A. B. de Venâncio
 
 # Clear workspace
@@ -23,7 +23,7 @@ allfuns <- 1:28
 # Test dimensions (10, 50)
 testdims <- c(10, 50)
 # Number of runs
-n_runs = 33
+n_runs = 51
 
 # Search range
 search_range <- c(-100, 100)
@@ -32,8 +32,6 @@ search_range <- c(-100, 100)
 popsize <- 200
 # Selection parameters
 selpars <- list(name = "selection_standard")
-# Convergence parameters
-stopcrit <- list(names = "stop_maxeval", maxevals = 100000)
 # Echoing
 showpars <- list(show.iters = "none", showevery = 10)
 
@@ -45,18 +43,22 @@ load('./irace.Rdata')
 # Mutation parameters
 mutpars <- list(list(name = iraceResults$state$eliteConfigurations[1,]$mutpars.name, f = iraceResults$state$eliteConfigurations[1,]$mutpars.f, nvecs = 1),
                 list(name = iraceResults$state$eliteConfigurations[2,]$mutpars.name, f = iraceResults$state$eliteConfigurations[2,]$mutpars.f, nvecs = 1),
-                list(name = iraceResults$state$eliteConfigurations[3,]$mutpars.name, f = iraceResults$state$eliteConfigurations[3,]$mutpars.f, nvecs = 1))
+                list(name = iraceResults$state$eliteConfigurations[3,]$mutpars.name, f = iraceResults$state$eliteConfigurations[3,]$mutpars.f, nvecs = 1),
+                list(name = iraceResults$state$eliteConfigurations[4,]$mutpars.name, f = iraceResults$state$eliteConfigurations[4,]$mutpars.f, nvecs = 1),
+                list(name = iraceResults$state$eliteConfigurations[5,]$mutpars.name, f = iraceResults$state$eliteConfigurations[5,]$mutpars.f, nvecs = 1))
 # Recombination parameters
 recpars <- list(list(name = iraceResults$state$eliteConfigurations[1,]$recpars.name, cr = iraceResults$state$eliteConfigurations[1,]$recpars.cr),
                 list(name = iraceResults$state$eliteConfigurations[2,]$recpars.name, cr = iraceResults$state$eliteConfigurations[2,]$recpars.cr),
-                list(name = iraceResults$state$eliteConfigurations[3,]$recpars.name, cr = iraceResults$state$eliteConfigurations[3,]$recpars.cr))
+                list(name = iraceResults$state$eliteConfigurations[3,]$recpars.name, cr = iraceResults$state$eliteConfigurations[3,]$recpars.cr),
+                list(name = iraceResults$state$eliteConfigurations[4,]$recpars.name, cr = iraceResults$state$eliteConfigurations[4,]$recpars.cr),
+                list(name = iraceResults$state$eliteConfigurations[5,]$recpars.name, cr = iraceResults$state$eliteConfigurations[5,]$recpars.cr))
 
 # Number of ExpDE versions
 algos <- length(recpars)
 
-# Fitness (33x(3*28*2)) -> (33x168)
+# Fitness (51x(3*28*2)) -> (51x168)
 fs <- matrix(nrow = n_runs, ncol = length(allfuns)*length(testdims)*algos)
-# Times (33x(3*28*2)) -> (33x168)
+# Times (51x(3*28*2)) -> (51x168)
 ts <- matrix(nrow = n_runs, ncol = length(allfuns)*length(testdims)*algos)
 
 # Initializing iterator
@@ -88,6 +90,9 @@ for (alg in 1:algos) {
         
         # Start time
         start_time <- Sys.time()
+        
+        # Convergence parameters
+        stopcrit <- list(names = "stop_maxeval", maxevals = 10000*dim)
         
         # Problem parameters
         probpars <- list(name  = "test_functions", i = fun, 
