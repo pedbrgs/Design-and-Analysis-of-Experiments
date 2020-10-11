@@ -98,8 +98,8 @@ for (alg in 1:algos) {
         probpars <- list(name  = "test_functions", i = fun, 
                          xmin = rep(search_range[1], dim), 
                          xmax = rep(search_range[2], dim))
-        # Fixed seed
-        seed <- 1234
+        # Random seed
+        seed <- abs(sample(.Random.seed)[1])
         # Run ExpDE
         out <- ExpDE(popsize, mutpars[[alg]], recpars[[alg]], selpars, 
                      stopcrit, probpars, seed, showpars)

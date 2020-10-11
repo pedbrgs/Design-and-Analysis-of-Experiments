@@ -61,7 +61,7 @@ fs <- tapply(as.list(fs), gl(ncol(fs)/(nfunc*ndims), (nfunc*ndims)), as.data.fra
 # Splitting runtime data by algorithm
 ts <- tapply(as.list(ts), gl(ncol(ts)/(nfunc*ndims), (nfunc*ndims)), as.data.frame)
 
-# Renaming column names (FUN_DIM)
+# Renaming column names
 # colnames <- c(paste(1:28, "10", sep = "_"), paste(1:28, "50", sep = "_"))
 colnames <- c(1:(nfunc*ndims))
 for (i in 1:length(fs)){
@@ -69,24 +69,33 @@ for (i in 1:length(fs)){
   colnames(ts[[i]]) <- colnames
 }
 
-# Fitness average
-tmean <- sapply(ts, colMeans)
+# Removing instances that the algorithm did not converge
+diverged <- c(2,3,30,31)
+cleaned_fs <- lapply(fs, function(fs) fs[,-diverged])
+
 # Runtime average
-fmean <- sapply(fs, colMeans)
+tmean <- sapply(ts, colMeans)
+# Fitness average
+fmean <- sapply(cleaned_fs, colMeans)
 
-# Instances with dimension 10
-fmean10 <- melt(head(fmean,nfunc))
-# Removing instances that the algorithm did not converge
-fmean10 <- fmean10[-c(2, 3, 30, 31, 58, 59, 86, 87, 114, 115),]
+# Preprocessing data to plot lineplot
+fmean <- melt(fmean)
 
-# Instances with dimension 50
-fmean50 <- melt(tail(fmean,nfunc))
-# Removing instances that the algorithm did not converge
-fmean50 <- fmean50[-c(2, 3, 30, 31, 58, 59, 86, 87, 114, 115),]
-
-# Instances
-fmean_ <- rbind(fmean10, fmean50)
 # Lineplot
-p <- ggplot(fmean_, aes(x = as.factor(Var1), y = value, group = Var2, color = Var2)) + geom_line()
-p + labs(x = "Função", y = "Fitness médio") + geom_point(size = 2) + 
+p <- ggplot(fmean, aes(x = as.factor(Var1), y = value, group = Var2, color = Var2)) + geom_line()
+p + labs(x = "Instância", y = "Fitness médio") + geom_point(size = 2) + 
   guides(color=guide_legend(title="Algoritmo"))
+
+# Peak
+peak <- c("4", "15", "23", "32", "43", "51", "56")
+merged <- lapply(cleaned_fs, function(fs) fs[,peak])
+# Preprocessing data to plot boxplot
+merged <- lapply(merged, melt, id.var = NULL)
+merged <- do.call("rbind", merged)
+label <- c(sapply(1:nalgs, rep, times = (nruns*length(peak))))
+merged <- cbind(merged, label)
+
+# Boxplot
+p <- ggplot(data = merged, aes(x = as.factor(variable), y=value, fill = as.factor(label)))
+p + geom_boxplot() + labs(fill = "Algoritmo") + 
+    labs(x = "Instância", y = "Fitness")
