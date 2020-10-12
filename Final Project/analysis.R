@@ -80,6 +80,15 @@ fmean <- sapply(cleaned_fs, colMeans)
 
 # Preprocessing data to plot lineplot
 fmean_ <- melt(fmean)
+colnames(fmean_) <- c('Instancia_Grupo', 'Algoritmo', 'f')
+fmean_
+for (i in 1:2) fmean_[, i] <- as.factor(fmean_[, i])
+model <- aov(formula = log(f)~Algoritmo+Instancia_Grupo, data = fmean_)
+summary(model)
+model
+shapiro.test(model$residuals)
+
+
 
 # Lineplot
 p <- ggplot(fmean_, aes(x = as.factor(Var1), y = value, group = Var2, color = Var2)) + geom_line()
