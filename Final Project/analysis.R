@@ -83,10 +83,17 @@ fmean_ <- melt(fmean)
 colnames(fmean_) <- c('Instancia_Grupo', 'Algoritmo', 'f')
 fmean_
 for (i in 1:2) fmean_[, i] <- as.factor(fmean_[, i])
-model <- aov(formula = log(f)~Algoritmo+Instancia_Grupo, data = fmean_)
+model <- aov(formula = f~Algoritmo+Instancia_Grupo, data = fmean_)
 summary(model)
 model
 shapiro.test(model$residuals)
+
+par(mar = c(5, 5, 3, 1), mgp = c(3, .35, 0),
+    cex.axis = .9, bg = "white", fg = "black",
+    col.axis = "black", col.lab = "black",
+    mfrow = c(1, 2))
+plot(model, which = 2, panel.first=grid(lty = "solid"))
+plot(model, which = 5, panel.first=grid(lty = "solid"))
 
 
 
