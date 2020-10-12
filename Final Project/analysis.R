@@ -79,10 +79,10 @@ tmean <- sapply(ts, colMeans)
 fmean <- sapply(cleaned_fs, colMeans)
 
 # Preprocessing data to plot lineplot
-fmean <- melt(fmean)
+fmean_ <- melt(fmean)
 
 # Lineplot
-p <- ggplot(fmean, aes(x = as.factor(Var1), y = value, group = Var2, color = Var2)) + geom_line()
+p <- ggplot(fmean_, aes(x = as.factor(Var1), y = value, group = Var2, color = Var2)) + geom_line()
 p + labs(x = "Instância", y = "Fitness médio") + geom_point(size = 2) + 
   guides(color=guide_legend(title="Algoritmo"))
 
