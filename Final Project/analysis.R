@@ -16,6 +16,8 @@ library(stats)
 library(ggplot2)
 # Reshape2 package
 library(reshape2)
+library(agricolae)
+
 
 # Number of runs
 nruns <- 51
@@ -92,7 +94,7 @@ par(mar = c(5, 5, 3, 1), mgp = c(3, .35, 0),
     cex.axis = .9, bg = "white", fg = "black",
     col.axis = "black", col.lab = "black",
     mfrow = c(1, 2))
-plot(model, which = 2, panel.first=grid(lty = "solid"))
+#plot(model, which = 2, panel.first=grid(lty = "solid"))
 plot(model, which = 5, panel.first=grid(lty = "solid"))
 
 
