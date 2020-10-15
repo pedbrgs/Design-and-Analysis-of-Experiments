@@ -41,8 +41,8 @@ K <- 5
 # Number of comparisons (K*(K-1))/2
 nc <- (K*(K-1))/2
 
-# Calculates power
-power <- calc_instances(ncomparisons = nc, 
+# Calculates power (all instances)
+all <- calc_instances(ncomparisons = nc, 
                       ninstances = (nfunc*ndims),
                       d = d, 
                       sig.level = alpha, 
@@ -78,8 +78,10 @@ for (i in 1:length(fs)){
 
 # Global optimal solutions
 gopt <- c(seq(-1400, -100, 100), seq(100, 1400, 100))
-# Data normalization
+# Normalization of fitness
 normalized_fs <- lapply(fs, function(x) t(apply(x, 1, "/", gopt)))
+# Normalization of runtime
+normalized_ts <- lapply(ts, function(x) apply(x, 2, function(x) (x - min(x))/(max(x)-min(x))))
 
 # Removing instances that the algorithm did not converge
 diverged <- c(2,3,30,31,32,43,51)
@@ -94,16 +96,29 @@ cl_fmean <- sapply(cl_fs, colMeans)
 
 ## ------------- Exploratory Data Analysis ------------- ##
 
-# To plot
+# To plot fitness
 ref <- c(gopt,gopt)[-diverged]
 fplot <- cbind(ref, cl_fmean)
 fplot <- melt(fplot)
 colnames(fplot) <- c("Instancia", "Algoritmo", "f")
 
-# Lineplot
+# Fitness lineplot
+# pdf(file = "fmean.pdf", width = 10, height = 4)
 p <- ggplot(fplot, aes(x = as.factor(Instancia), y = f, group = Algoritmo, color = Algoritmo)) + geom_line()
 p + labs(x = "Instância", y = "Fitness médio") + geom_point(size = 2) + 
     guides(color=guide_legend(title="Algoritmo"))
+# dev.off()
+
+# To plot runtime
+tmean <- melt(tmean)
+colnames(tmean) <- c("Instancia", "Algoritmo", "t")
+
+# Runtime plot
+# pdf(file = "tmean.pdf", width = 10, height = 4)
+p <- ggplot(tmean, aes(x = as.factor(Instancia), y = t, group = Algoritmo, color = Algoritmo)) + geom_line()
+p + labs(x = "Instância", y = "Tempo decorrido médio (s)") + geom_point(size = 2) + 
+  guides(color=guide_legend(title="Algoritmo"))
+# dev.off()
 
 # Peak
 peak <- c("15", "23", "42", "50")
@@ -115,19 +130,45 @@ label <- c(sapply(1:nalgs, rep, times = (nruns*length(peak))))
 merged <- cbind(merged, label)
 
 # Boxplot
+# pdf(file = "finstances.pdf", width = 11, height = 3)
 p <- ggplot(data = merged, aes(x = as.factor(variable), y=value, fill = as.factor(label)))
 p + geom_boxplot(alpha = 0.4) + labs(fill = "Algoritmo") + 
     scale_fill_manual(values = c("#B79F00", "#00BA38", "#00BFC4", "#619CFF", "#F564E3")) +
     labs(x = "Instância", y = "Fitness")
+# dev.off()
 
 ## ------------- Statistical Analysis ------------- ##
 
+# Calculates power (all instances that the algorithms converged)
+some <- calc_instances(ncomparisons = nc, 
+                       ninstances = (nfunc*ndims-length(diverged)),
+                       d = d, 
+                       sig.level = alpha, 
+                       alternative.side = "one.sided", 
+                       power.target = "mean")$power
+
+ncomp <- rep(1:nc, 2)
+power <- data.frame(cbind(all, some))
+colnames(power) <- c("56", "49")
+power <- melt(power, id.vars = NULL)
+power <- cbind(power, ncomp)
+
+# Relationship between the number of comparisons and the power of the test
+# pdf(file = "power.pdf", width = 6, height = 4)
+p <- ggplot(data = power, aes(x = ncomp, y = value, color = variable))
+p + xlab('Número de comparações') + 
+  ylab('Potência do teste') + 
+  geom_line(linetype = 'dashed') +
+  geom_point(size = 2) + scale_x_continuous( breaks=ncomp) +
+  guides(color=guide_legend(title="# Instâncias"))
+# dev.off()
+
 # Preprocessing data
 fmean <- melt(fmean)
-colnames(fmean) <- c('Instancia_Grupo', 'Algoritmo', 'f')
+colnames(fmean) <- c('Instancia', 'Algoritmo', 'f')
 for (i in 1:2) fmean[, i] <- as.factor(fmean[, i])
 # Fitting an Analysis Of Variance (AOV) model
-model <- aov(formula = f~Algoritmo+Instancia_Grupo, data = fmean)
+model <- aov(formula = f~Algoritmo+Instancia, data = fmean)
 # Summarizing model
 summary(model)
 
@@ -140,6 +181,10 @@ par(mar = c(5, 5, 3, 1), mgp = c(3, .35, 0),
     col.axis = "black", col.lab = "black",
     mfrow = c(1, 2))
 # QQ-Plot
+# pdf(file = "qqplot.pdf", width = 5, height = 5)
 plot(model, which = 2, panel.first=grid(lty = "solid"))
+# dev.off()
 # Constant Leverage plot: Residual vs Factor Levels
+# pdf(file = "leverage.pdf", width = 5, height = 5)
 plot(model, which = 5, panel.first=grid(lty = "solid"))
+# dev.off()
