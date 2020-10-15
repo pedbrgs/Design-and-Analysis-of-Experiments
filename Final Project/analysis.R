@@ -172,6 +172,19 @@ model <- aov(formula = f~Algoritmo+Instancia, data = fmean)
 # Summarizing model
 summary(model)
 
+#Coeficiente de determinação -r2
+cat('Coeficiente de determinação:', summary.lm(model)$r.squared)
+
+# Relative blocking efficiency (E)
+df <- as.data.frame(summary(model)[[1]])
+MSblocks <- df["Instancia","Mean Sq"]
+MSe <- df["Residuals","Mean Sq"]
+a <- length(unique(fmean$Algoritmo))
+b <- length(unique(fmean$Instancia))
+E <- ((b - 1) * MSblocks + b * (a - 1) * MSe) / ((a * b - 1) * MSe)
+cat('Relative blocking efficiency (E):', E)
+
+
 # Shapiro-Wilk test for normality
 shapiro.test(model$residuals)
 
@@ -188,3 +201,4 @@ plot(model, which = 2, panel.first=grid(lty = "solid"))
 # pdf(file = "leverage.pdf", width = 5, height = 5)
 plot(model, which = 5, panel.first=grid(lty = "solid"))
 # dev.off()
+
