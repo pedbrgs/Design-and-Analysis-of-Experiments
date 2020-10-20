@@ -103,22 +103,18 @@ fplot <- melt(fplot)
 colnames(fplot) <- c("Instancia", "Algoritmo", "f")
 
 # Fitness lineplot
-# pdf(file = "fmean.pdf", width = 10, height = 4)
 p <- ggplot(fplot, aes(x = as.factor(Instancia), y = f, group = Algoritmo, color = Algoritmo)) + geom_line()
 p + labs(x = "Instância", y = "Fitness médio") + geom_point(size = 2) + 
-    guides(color=guide_legend(title="Algoritmo"))
-# dev.off()
+  guides(color=guide_legend(title="Algoritmo"))
 
 # To plot runtime
 tmean <- melt(tmean)
 colnames(tmean) <- c("Instancia", "Algoritmo", "t")
 
 # Runtime plot
-# pdf(file = "tmean.pdf", width = 10, height = 4)
 p <- ggplot(tmean, aes(x = as.factor(Instancia), y = t, group = Algoritmo, color = Algoritmo)) + geom_line()
 p + labs(x = "Instância", y = "Tempo decorrido médio (s)") + geom_point(size = 2) + 
   guides(color=guide_legend(title="Algoritmo"))
-# dev.off()
 
 # Peak
 peak <- c("15", "23", "42", "50")
@@ -130,12 +126,10 @@ label <- c(sapply(1:nalgs, rep, times = (nruns*length(peak))))
 merged <- cbind(merged, label)
 
 # Boxplot
-# pdf(file = "finstances.pdf", width = 11, height = 3)
 p <- ggplot(data = merged, aes(x = as.factor(variable), y=value, fill = as.factor(label)))
 p + geom_boxplot(alpha = 0.4) + labs(fill = "Algoritmo") + 
-    scale_fill_manual(values = c("#B79F00", "#00BA38", "#00BFC4", "#619CFF", "#F564E3")) +
-    labs(x = "Instância", y = "Fitness")
-# dev.off()
+  scale_fill_manual(values = c("#B79F00", "#00BA38", "#00BFC4", "#619CFF", "#F564E3")) +
+  labs(x = "Instância", y = "Fitness")
 
 ## ------------- Statistical Analysis ------------- ##
 
@@ -154,14 +148,12 @@ power <- melt(power, id.vars = NULL)
 power <- cbind(power, ncomp)
 
 # Relationship between the number of comparisons and the power of the test
-# pdf(file = "power.pdf", width = 6, height = 4)
 p <- ggplot(data = power, aes(x = ncomp, y = value, color = variable))
 p + xlab('Número de comparações') + 
   ylab('Potência do teste') + 
   geom_line(linetype = 'dashed') +
   geom_point(size = 2) + scale_x_continuous( breaks=ncomp) +
   guides(color=guide_legend(title="# Instâncias"))
-# dev.off()
 
 # Preprocessing data
 fmean <- melt(fmean)
@@ -172,8 +164,8 @@ model <- aov(formula = f~Algoritmo+Instancia, data = fmean)
 # Summarizing model
 summary(model)
 
-#Coeficiente de determina��o -r2
-cat('Coeficiente de determina��o:', summary.lm(model)$r.squared)
+# Coefficient of determination
+cat('R-squared:', summary.lm(model)$r.squared, '\n')
 
 # Relative blocking efficiency (E)
 df <- as.data.frame(summary(model)[[1]])
@@ -184,7 +176,6 @@ b <- length(unique(fmean$Instancia))
 E <- ((b - 1) * MSblocks + b * (a - 1) * MSe) / ((a * b - 1) * MSe)
 cat('Relative blocking efficiency (E):', E)
 
-
 # Shapiro-Wilk test for normality
 shapiro.test(model$residuals)
 
@@ -193,12 +184,9 @@ par(mar = c(5, 5, 3, 1), mgp = c(3, .35, 0),
     cex.axis = .9, bg = "white", fg = "black",
     col.axis = "black", col.lab = "black",
     mfrow = c(1, 2))
-# QQ-Plot
-# pdf(file = "qqplot.pdf", width = 5, height = 5)
-plot(model, which = 2, panel.first=grid(lty = "solid"))
-# dev.off()
-# Constant Leverage plot: Residual vs Factor Levels
-# pdf(file = "leverage.pdf", width = 5, height = 5)
-plot(model, which = 5, panel.first=grid(lty = "solid"))
-# dev.off()
 
+# QQ-Plot
+plot(model, which = 2, panel.first=grid(lty = "solid"))
+
+# Constant Leverage plot: Residual vs Factor Levels
+plot(model, which = 5, panel.first=grid(lty = "solid"))
