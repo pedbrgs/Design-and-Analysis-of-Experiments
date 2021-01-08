@@ -3,7 +3,7 @@
 **Authors:** [Pedro Vinícius A. B. Venâncio](https://www.linkedin.com/in/pedbrgs/)<sup>1,2</sup>, [Samara Silva Santos](https://minds.eng.ufmg.br/team/68/Samara_Silva_Santos)<sup>1,5</sup> and [Savio Vieira Silva Moura](https://www.escavador.com/sobre/378469398/savio-vieira-silva-moura)<sup>1</sup> <br />
 **Professors:** [Eduardo Gontijo Carrano](https://scholar.google.com.br/citations?user=X6QB-BgAAAAJ&hl=pt-BR)<sup>3,4</sup> and [Michel Bessani](https://scholar.google.com.br/citations?user=btaJnpEAAAAJ&hl=pt-BR)<sup>3,4</sup> <br />
 > <sup>1</sup> Graduate Program in Electrical Engineering (PPGEE/UFMG)<br />
-> <sup>2</sup> Center for Research on Speech, Acoustics and Music (CEFALA/UFMG)<br />
+> <sup>2</sup> Gaia, solutions on demand (GAIA)<br />
 > <sup>3</sup> Department of Electrical Engineering (DEE/UFMG)<br />
 > <sup>4</sup> Operations Research and Complex Systems Laboratory (ORCS/UFMG)<br />
 > <sup>5</sup> Machine Intelligence and Data Science Laboratory (MINDS/UFMG)
